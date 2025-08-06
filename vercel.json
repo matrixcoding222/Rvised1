@@ -1,6 +1,18 @@
 {
-  "buildCommand": "cd rvised && npm run build",
-  "outputDirectory": "rvised/.next",
-  "installCommand": "cd rvised && npm install",
-  "framework": "nextjs"
+  "version": 2,
+  "builds": [
+    {
+      "src": "rvised/package.json",
+      "use": "@vercel/next@latest",
+      "config": {
+        "distDir": ".next"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/rvised/$1"
+    }
+  ]
 }

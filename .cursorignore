@@ -1,0 +1,30 @@
+# Add directories or file patterns to ignore during indexing (e.g. foo/ or *.csv)
+
+# Ignore sensitive files but allow development .env files
+*.key
+*.pem
+*.p12
+*.crt
+*private*
+*secret*
+*password*
+
+# Allow specific .env files for AI assistance (comment out to block)
+# .env.production  # Keep production files blocked
+# .env.staging     # Keep staging files blocked
+
+# Allow these development files for AI assistance:
+# (By NOT listing them here, they become available to AI)
+# .env
+# .env.local
+# .env.development
+# .env.example
+
+# Block large/unnecessary files from AI
+node_modules/
+.next/
+dist/
+build/
+*.log
+*.cache
+coverage/

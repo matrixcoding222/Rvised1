@@ -1,18 +1,6 @@
 {
-  "version": 2,
   "buildCommand": "cd rvised && npm run build",
   "outputDirectory": "rvised/.next",
   "installCommand": "cd rvised && npm install",
-  "framework": "nextjs",
-  "functions": {
-    "rvised/src/app/api/**/*.ts": {
-      "runtime": "nodejs18.x"
-    }
-  },
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/rvised/$1"
-    }
-  ]
+  "framework": "nextjs"
 }

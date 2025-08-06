@@ -1,0 +1,11 @@
+{
+  "framework": "nextjs",
+  "buildCommand": "npm run build",
+  "outputDirectory": ".next",
+  "installCommand": "npm install",
+  "devCommand": "npm run dev",
+  "env": {
+    "OPENAI_API_KEY": "@openai_api_key",
+    "YOUTUBE_API_KEY": "@youtube_api_key"
+  }
+}

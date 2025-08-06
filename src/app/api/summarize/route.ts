@@ -118,6 +118,7 @@ Keep the tone professional but accessible. Focus on what busy professionals and 
     try {
       return JSON.parse(content)
     } catch (parseError) {
+      console.log('JSON parsing failed:', parseError instanceof Error ? parseError.message : 'Unknown error')
       // Fallback if JSON parsing fails
       return {
         summary: content.slice(0, 500),
@@ -177,7 +178,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<Summarize
           console.log(`Transcript found with language: ${lang}`)
           break
         } catch (langError) {
-          console.log(`Failed to get transcript with ${lang}, trying next...`)
+          console.log(`Failed to get transcript with ${lang}:`, langError instanceof Error ? langError.message : 'Unknown error')
         }
       }
       
@@ -197,7 +198,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<Summarize
         console.log(`Transcript extracted: ${contentToSummarize.length} characters`)
       }
     } catch (transcriptError) {
-      console.log('Transcript extraction failed:', transcriptError.message)
+      console.log('Transcript extraction failed:', transcriptError instanceof Error ? transcriptError.message : 'Unknown error')
     }
 
     // Method 2: If no transcript, use video description as fallback

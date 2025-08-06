@@ -14,7 +14,6 @@ interface SummaryData {
 
 export default function Home() {
   const [summaryData, setSummaryData] = useState<SummaryData | null>(null)
-  const [isLoading, setIsLoading] = useState(false)
 
   const handleVideoSubmit = (data: SummaryData) => {
     setSummaryData(data)
@@ -64,7 +63,7 @@ export default function Home() {
           {summaryData ? (
             <SummaryDisplay data={summaryData} onBack={handleBack} />
           ) : (
-            <VideoUrlInput onSubmit={handleVideoSubmit} isLoading={isLoading} />
+            <VideoUrlInput onSubmit={handleVideoSubmit} />
           )}
         </div>
 

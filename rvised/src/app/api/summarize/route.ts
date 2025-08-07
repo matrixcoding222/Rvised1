@@ -375,7 +375,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<Summarize
         // If library returns empty, try Innertube first, then direct scrape
         if (!transcript || transcript.length === 0) {
           console.log('📡 Library empty. Trying Innertube API...')
-          const tubeLines = await fetchTranscriptInnertube(videoId)
+          const tubeLines = await fetchTranscriptInnertube()
           if (tubeLines.length) {
             transcript = tubeLines.map(text => ({ text }))
           } else {

@@ -211,63 +211,75 @@ async function generateSummary(content: string, videoTitle: string, contentSourc
     deep: 'SUMMARY MUST BE 600-800 WORDS. Provide extensive analysis with detailed insights (7+) and thorough actionable steps (5+).'
   }
 
-  // Explicit feature instructions with stronger enforcement
-  const featureInstructions: string[] = []
+  // ULTRA-EXPLICIT feature instructions to force compliance
+  const featureCommands: string[] = []
   
+  // EMOJI ENFORCEMENT
   if (settings?.includeEmojis) {
-    featureInstructions.push('✅ EMOJIS: Use relevant emojis in section headings and key points.')
+    featureCommands.push('MANDATORY: Every section heading MUST start with a relevant emoji. Example: "🎯 Main Takeaway", "💡 Key Insights"')
   } else {
-    featureInstructions.push('🚫 NO EMOJIS: Absolutely NO emojis anywhere. Use plain text only.')
+    featureCommands.push('STRICTLY FORBIDDEN: Do NOT include ANY emoji characters (🎯💡📝🔧⚡🧪📍💻🛠️) anywhere in your response. Use only plain text.')
   }
   
-  if (settings?.includeCode && contentSource === 'transcript') {
-    featureInstructions.push('✅ CODE: Include codeSnippets section with actual code examples if discussed.')
+  // CODE ENFORCEMENT  
+  if (settings?.includeCode) {
+    featureCommands.push('MANDATORY: You MUST include a "codeSnippets" array with at least 1-2 code examples if ANY programming is mentioned. Format: [{"language": "javascript", "code": "actual code", "description": "what it does"}]')
   } else {
-    featureInstructions.push('🚫 NO CODE: Set codeSnippets to null.')
+    featureCommands.push('STRICTLY FORBIDDEN: Do NOT include "codeSnippets" property. Set it to null.')
   }
   
-  if (settings?.generateQuiz) {
-    featureInstructions.push('✅ QUIZ: Include quiz section with 2-3 challenging questions.')
+  // QUIZ ENFORCEMENT
+  if (settings?.includeQuiz) {
+    featureCommands.push('MANDATORY: You MUST include a "quiz" array with exactly 2-3 questions. Format: [{"question": "challenging question", "answer": "detailed answer"}]. No exceptions.')
   } else {
-    featureInstructions.push('🚫 NO QUIZ: Set quiz to null.')
+    featureCommands.push('STRICTLY FORBIDDEN: Do NOT include "quiz" property. Set it to null.')
   }
   
+  // TIMESTAMP ENFORCEMENT
   if (settings?.includeTimestamps) {
-    featureInstructions.push('✅ TIMESTAMPS: Create timestampedSections array breaking down video into 3-5 major sections with [mm:ss] timestamps. Extract timing from transcript if available, or estimate based on content flow.')
+    featureCommands.push('MANDATORY: You MUST include "timestampedSections" array with 3-5 video sections. Format: [{"time": "02:15", "description": "section description"}]. Create logical timestamps even if not in transcript.')
   } else {
-    featureInstructions.push('🚫 NO TIMESTAMPS: Set timestampedSections to null.')
+    featureCommands.push('STRICTLY FORBIDDEN: Do NOT include "timestampedSections" property. Set it to null.')
   }
 
-  const prompt = `
-Video: "${videoTitle}"
-Source: ${sourceDescription} | Mode: ${settings?.learningMode || 'student'} | Depth: ${settings?.summaryDepth || 'standard'}
+  const prompt = `You are a specialized video content analyzer. You MUST follow these instructions EXACTLY.
 
-${contentQualityNote}
+VIDEO: "${videoTitle}"
+MODE: ${settings?.learningMode} | DEPTH: ${settings.summaryDepth}
+CONTENT SOURCE: ${sourceDescription}
 
 CONTENT:
 ${content}
 
-DEPTH REQUIREMENT: ${depthInstructions[settings?.summaryDepth as keyof typeof depthInstructions] || depthInstructions.standard}
+WORD COUNT REQUIREMENT: ${depthInstructions[settings?.summaryDepth as keyof typeof depthInstructions] || depthInstructions.standard}
 
-FEATURE REQUIREMENTS:
-${featureInstructions.join('\n')}
+CRITICAL FEATURE COMPLIANCE RULES:
+${featureCommands.join('\n')}
 
-Extract meaningful insights and actionable content from this video. Focus on accuracy and avoid assumptions about video type.
-
-Respond with PURE JSON only:
+RESPONSE FORMAT: You MUST respond with valid JSON in this EXACT structure:
 
 {
-  "mainTakeaway": "Single powerful sentence capturing core value",
-  "summary": "EXACT word count as specified in depth requirement above",
-  "techStack": ["tech1", "tech2"] // null if not technical,
-  "keyInsights": ["insight with examples", "..."], // Match depth requirements
-  "actionItems": ["specific actionable step", "..."], // Match depth requirements  
-  ${settings?.includeTimestamps ? '"timestampedSections": [{"time": "mm:ss", "description": "section"}],' : '"timestampedSections": null,'}
-  ${settings?.includeCode ? '"codeSnippets": [{"language": "js", "code": "code", "description": "what it does"}],' : '"codeSnippets": null,'}
-  ${settings?.generateQuiz ? '"quiz": [{"question": "challenging question", "answer": "detailed answer"}],' : '"quiz": null,'}
-  "resources": [{"title": "name", "url": "if_mentioned", "type": "type"}], // null if none
-  "keyPoints": [] // copy from keyInsights for legacy
-}`
+  "mainTakeaway": "Single sentence summary",
+  "summary": "Follow word count requirement exactly",
+  "techStack": ${content.toLowerCase().includes('code') || content.toLowerCase().includes('programming') || content.toLowerCase().includes('app') ? '["Technology1", "Technology2"]' : 'null'},
+  "keyInsights": ["Insight 1", "Insight 2", "Insight 3"],
+  "actionItems": ["Action 1", "Action 2", "Action 3"],
+  "timestampedSections": ${settings?.includeTimestamps ? '[{"time": "00:30", "description": "Section 1"}, {"time": "05:15", "description": "Section 2"}, {"time": "12:00", "description": "Section 3"}]' : 'null'},
+  "codeSnippets": ${settings?.includeCode ? '[{"language": "javascript", "code": "console.log(\'example\')", "description": "Example code"}]' : 'null'},
+  "quiz": ${settings?.includeQuiz ? '[{"question": "Test question 1?", "answer": "Answer 1"}, {"question": "Test question 2?", "answer": "Answer 2"}]' : 'null'},
+  "resources": null,
+  "keyPoints": ["Copy from keyInsights"]
+}
+
+VALIDATION CHECKLIST BEFORE RESPONDING:
+- ${settings?.includeEmojis ? '✅ Emojis in headings' : '❌ NO emojis anywhere'}
+- ${settings?.includeTimestamps ? '✅ timestampedSections array included' : '❌ timestampedSections set to null'}
+- ${settings?.includeCode ? '✅ codeSnippets array included' : '❌ codeSnippets set to null'}
+- ${settings?.includeQuiz ? '✅ quiz array included' : '❌ quiz set to null'}
+- ✅ Word count matches depth requirement
+- ✅ Valid JSON format
+
+RESPOND WITH JSON ONLY:`
 
   try {
     const completion = await openai.chat.completions.create({
@@ -340,6 +352,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<Summarize
       includeEmojis: !!rawBody.settings?.includeEmojis,
       includeCode: !!rawBody.settings?.includeCode,
       includeQuiz: !!rawBody.settings?.includeQuiz,
+      generateQuiz: !!rawBody.settings?.includeQuiz, // Alias for backward compatibility
       includeTimestamps: !!rawBody.settings?.includeTimestamps
     }
     const videoUrl: string = rawBody.videoUrl || rawBody.url // support old key
@@ -462,8 +475,24 @@ export async function POST(request: NextRequest): Promise<NextResponse<Summarize
     }
 
     // Generate summary with OpenAI (no video type detection - let AI determine content naturally)
-    console.log(`Generating summary from ${contentSource} with settings:`, settings)
+    console.log(`🔧 DETAILED SETTINGS DEBUG:`)
+    console.log(`- Learning Mode: ${settings.learningMode}`)
+    console.log(`- Summary Depth: ${settings.summaryDepth}`)
+    console.log(`- Include Emojis: ${settings.includeEmojis}`)
+    console.log(`- Include Code: ${settings.includeCode}`)
+    console.log(`- Include Quiz: ${settings.includeQuiz}`)
+    console.log(`- Include Timestamps: ${settings.includeTimestamps}`)
+    console.log(`- Content Source: ${contentSource}`)
+    console.log(`- Content Length: ${contentToSummarize.length} chars`)
+    
     const summaryData = await generateSummary(contentToSummarize, metadata.title, contentSource, settings)
+    
+    console.log(`🔍 RAW AI RESPONSE RECEIVED:`)
+    console.log(`- Has timestampedSections: ${!!summaryData.timestampedSections}`)
+    console.log(`- Has codeSnippets: ${!!summaryData.codeSnippets}`)
+    console.log(`- Has quiz: ${!!summaryData.quiz}`)
+    console.log(`- Summary length: ${summaryData.summary?.length || 0} chars`)
+    console.log(`- Contains emojis: ${/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu.test(summaryData.summary || '')}`)
 
     // Server-side enforcement of feature toggles
     if (!settings.includeTimestamps) {

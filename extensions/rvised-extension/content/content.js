@@ -780,6 +780,14 @@ window.copyToClipboard = copyToClipboard;
 // Listen for messages from popup
 chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
   if (message.action === 'startSummarization') {
+    console.log('🎯 Received startSummarization message:', message);
+    
+    // Update settings if provided
+    if (message.settings) {
+      console.log('⚙️ Updating settings from popup:', message.settings);
+      updateSettingsFromPopup(message.settings);
+    }
+    
     // Show overlay if hidden
     if (!rvisedOverlay || rvisedOverlay.style.display === 'none') {
       createRvisedOverlay();
@@ -789,8 +797,60 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
     handleSummarize();
     
     sendResponse({success: true});
+  } else if (message.action === 'updateSettings') {
+    console.log('⚙️ Updating settings:', message.settings);
+    updateSettingsFromPopup(message.settings);
+    sendResponse({success: true});
   }
 });
+
+// Update settings from popup
+function updateSettingsFromPopup(settings) {
+  // Update UI elements with new settings
+  if (settings.learningMode) {
+    const learningModeSelect = document.getElementById('learningMode');
+    if (learningModeSelect) {
+      learningModeSelect.value = settings.learningMode;
+    }
+  }
+  
+  if (settings.summaryDepth) {
+    const summaryDepthSelect = document.getElementById('summaryDepth');
+    if (summaryDepthSelect) {
+      summaryDepthSelect.value = settings.summaryDepth;
+    }
+  }
+  
+  if (settings.includeEmojis !== undefined) {
+    const emojisCheckbox = document.getElementById('includeEmojis');
+    if (emojisCheckbox) {
+      emojisCheckbox.checked = settings.includeEmojis;
+    }
+  }
+  
+  if (settings.includeQuiz !== undefined) {
+    const quizCheckbox = document.getElementById('includeQuiz');
+    if (quizCheckbox) {
+      quizCheckbox.checked = settings.includeQuiz;
+    }
+  }
+  
+  if (settings.includeTimestamps !== undefined) {
+    const timestampsCheckbox = document.getElementById('includeTimestamps');
+    if (timestampsCheckbox) {
+      timestampsCheckbox.checked = settings.includeTimestamps;
+    }
+  }
+  
+  if (settings.includeActionItems !== undefined) {
+    const actionItemsCheckbox = document.getElementById('includeActionItems');
+    if (actionItemsCheckbox) {
+      actionItemsCheckbox.checked = settings.includeActionItems;
+    }
+  }
+  
+  console.log('✅ Settings updated in overlay');
+}
 
 // Initialize when page loads
 function initializeRvised() {

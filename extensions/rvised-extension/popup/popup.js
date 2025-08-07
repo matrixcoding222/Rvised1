@@ -125,17 +125,28 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
 // Save settings when user finishes setup
 function saveSettings() {
-    const settings = getCurrentSettings();
+  const settings = getCurrentSettings();
+  
+  // Save to chrome storage
+  chrome.storage.sync.set({
+    rvisedSettings: settings
+  }, function() {
+    console.log('Settings saved:', settings);
     
-    // Save to chrome storage
-    chrome.storage.sync.set({
-        rvisedSettings: settings
-    }, function() {
-        console.log('Settings saved:', settings);
-        
-        // Send to content script
-        sendSettingsToContentScript();
+    // Send to content script
+    sendSettingsToContentScript();
+    
+    // Close popup and trigger summarization on current YouTube page
+    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+      if (tabs[0] && tabs[0].url && tabs[0].url.includes('youtube.com/watch')) {
+        chrome.tabs.sendMessage(tabs[0].id, {
+          action: 'startSummarization',
+          settings: settings
+        });
+        window.close();
+      }
     });
+  });
 }
 
 // Load settings from storage
@@ -191,7 +202,35 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Save settings when user clicks "Finish Setup"
 document.addEventListener('click', function(e) {
-    if (e.target.textContent === 'Finish Setup') {
-        saveSettings();
-    }
+  if (e.target.textContent === 'Finish Setup') {
+    saveSettings();
+  }
 });
+
+// Generate summary immediately
+function generateSummaryNow() {
+  const settings = getCurrentSettings();
+  
+  // Save settings first
+  chrome.storage.sync.set({
+    rvisedSettings: settings
+  }, function() {
+    console.log('Settings saved and generating summary:', settings);
+    
+    // Send to content script and trigger summarization
+    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+      if (tabs[0] && tabs[0].url && tabs[0].url.includes('youtube.com/watch')) {
+        chrome.tabs.sendMessage(tabs[0].id, {
+          action: 'startSummarization',
+          settings: settings
+        });
+        window.close();
+      } else {
+        alert('Please navigate to a YouTube video first!');
+      }
+    });
+  });
+}
+
+// Make function globally available
+window.generateSummaryNow = generateSummaryNow;

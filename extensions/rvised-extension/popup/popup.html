@@ -4,626 +4,600 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rvised Extension</title>
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 16px;
+            background: #f9fafb;
+            width: 320px;
+            height: 520px;
         }
+        
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid #e5e7eb;
+            overflow: hidden;
+            height: 100%;
+        }
+        
         .screen {
-            opacity: 0;
-            transform: translateX(20px);
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             display: none;
+            height: 100%;
+            flex-direction: column;
         }
+        
         .screen.active {
-            opacity: 1;
-            transform: translateX(0);
-            display: block;
+            display: flex;
         }
-        .screen.slide-out {
-            opacity: 0;
-            transform: translateX(-20px);
+        
+        .header {
+            padding: 24px 20px 16px;
+            text-align: center;
+            border-bottom: 1px solid #f3f4f6;
         }
-        .setup-item, .summary-item {
-            opacity: 0;
-            transform: translateY(10px);
-            animation: itemSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        
+        .header h1 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #111827;
+            margin: 0 0 8px 0;
         }
-        .setup-item:nth-child(1), .summary-item:nth-child(1) { animation-delay: 0.05s; }
-        .setup-item:nth-child(2), .summary-item:nth-child(2) { animation-delay: 0.1s; }
-        .setup-item:nth-child(3), .summary-item:nth-child(3) { animation-delay: 0.15s; }
-        .setup-item:nth-child(4), .summary-item:nth-child(4) { animation-delay: 0.2s; }
-        .setup-item:nth-child(5), .summary-item:nth-child(5) { animation-delay: 0.25s; }
-        .setup-item:nth-child(6), .summary-item:nth-child(6) { animation-delay: 0.3s; }
-        .setup-item:nth-child(7), .summary-item:nth-child(7) { animation-delay: 0.35s; }
-        .setup-item:nth-child(8), .summary-item:nth-child(8) { animation-delay: 0.4s; }
-        @keyframes itemSlideUp {
-            to { opacity: 1; transform: translateY(0); }
+        
+        .header p {
+            font-size: 14px;
+            color: #6b7280;
+            margin: 0;
         }
-        .custom-radio {
-            appearance: none;
-            width: 16px;
-            height: 16px;
-            border: 2px solid #d1d5db;
-            border-radius: 50%;
-            position: relative;
+        
+        .content {
+            flex: 1;
+            padding: 16px 20px;
+            overflow-y: auto;
+        }
+        
+        .setup-item {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 8px;
             cursor: pointer;
+            transition: background-color 0.2s;
         }
-        .custom-radio:checked {
-            border-color: #2563eb;
+        
+        .setup-item:hover {
+            background: #f3f4f6;
         }
-        .custom-radio:checked::after {
-            content: '';
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #2563eb;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+        
+        .setup-item .title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #111827;
+            margin-bottom: 4px;
         }
-        .custom-checkbox {
-            appearance: none;
-            width: 16px;
-            height: 16px;
-            border: 2px solid #d1d5db;
-            border-radius: 4px;
-            position: relative;
+        
+        .setup-item .subtitle {
+            font-size: 12px;
+            color: #6b7280;
+        }
+        
+        .radio-group {
+            margin-bottom: 16px;
+        }
+        
+        .radio-option {
+            display: flex;
+            align-items: flex-start;
+            padding: 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            margin-bottom: 8px;
             cursor: pointer;
+            transition: background-color 0.2s;
         }
-        .custom-checkbox:checked {
-            border-color: #2563eb;
-            background: #2563eb;
+        
+        .radio-option:hover {
+            background: #f9fafb;
         }
-        .custom-checkbox:checked::after {
-            content: '✓';
+        
+        .radio-option input[type="radio"] {
+            margin-right: 12px;
+            margin-top: 2px;
+        }
+        
+        .radio-option .content {
+            flex: 1;
+        }
+        
+        .radio-option .title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #111827;
+            margin-bottom: 4px;
+        }
+        
+        .radio-option .description {
+            font-size: 12px;
+            color: #6b7280;
+        }
+        
+        .checkbox-option {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        
+        .checkbox-option:last-child {
+            border-bottom: none;
+        }
+        
+        .checkbox-option .content {
+            display: flex;
+            align-items: center;
+        }
+        
+        .checkbox-option .emoji {
+            font-size: 20px;
+            margin-right: 12px;
+        }
+        
+        .checkbox-option .text {
+            flex: 1;
+        }
+        
+        .checkbox-option .title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #111827;
+            margin-bottom: 2px;
+        }
+        
+        .checkbox-option .description {
+            font-size: 12px;
+            color: #6b7280;
+        }
+        
+        .progress-dots {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            padding: 8px 0;
+        }
+        
+        .progress-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #d1d5db;
+        }
+        
+        .progress-dot.active {
+            background: #3b82f6;
+        }
+        
+        .footer {
+            padding: 16px 20px 20px;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .btn-primary {
+            background: #3b82f6;
             color: white;
-            font-size: 10px;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
         }
-        .clickable {
+        
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+        
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #374151;
+        }
+        
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+        
+        .btn-gradient {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: white;
+        }
+        
+        .btn-gradient:hover {
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+        }
+        
+        .back-btn {
+            background: none;
+            border: none;
+            padding: 4px;
+            border-radius: 6px;
             cursor: pointer;
-            user-select: none;
+            color: #6b7280;
+        }
+        
+        .back-btn:hover {
+            background: #f3f4f6;
+        }
+        
+        .success-icon {
+            width: 64px;
+            height: 64px;
+            background: #dcfce7;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+        }
+        
+        .success-icon svg {
+            width: 32px;
+            height: 32px;
+            color: #16a34a;
         }
     </style>
 </head>
-<body class="bg-gray-50 p-4">
-    <div class="max-w-sm mx-auto">
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden" style="width: 320px; height: 520px;">
+<body>
+    <div class="container">
+        <!-- Screen 1: Setup Overview -->
+        <div id="screen-1" class="screen active">
+            <div class="header">
+                <h1>Rvised</h1>
+                <p>Set up your YouTube learning experience</p>
+            </div>
             
-            <!-- Screen 1: Setup - Learning Mode -->
-            <div id="screen-1" class="screen h-full flex flex-col active">
-                <div class="px-5 pt-6 pb-4 text-center border-b border-gray-100">
-                    <div class="flex items-center justify-center mb-3">
-                        <i data-lucide="glasses" class="w-5 h-5 text-blue-600 mr-2" style="stroke-width: 1.5;"></i>
-                        <h1 class="text-lg font-semibold text-gray-900 tracking-tight">Rvised</h1>
-                    </div>
-                    <p class="text-sm text-gray-600">Set up your YouTube learning experience</p>
+            <div class="content">
+                <div class="setup-item" data-screen="2">
+                    <div class="title">Learning Mode</div>
+                    <div class="subtitle">Student</div>
                 </div>
-
-                <div class="px-5 py-4 space-y-3 flex-1">
-                    <div class="setup-item clickable" onclick="goToScreen(2)">
-                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100 hover:bg-gray-100 transition-colors">
-                            <div class="flex items-center space-x-3">
-                                <div class="w-7 h-7 bg-blue-100 rounded-lg flex items-center justify-center">
-                                    <i data-lucide="graduation-cap" class="w-3.5 h-3.5 text-blue-600" style="stroke-width: 1.5;"></i>
-                                </div>
-                                <div>
-                                    <div class="text-sm font-medium text-gray-900">Learning Mode</div>
-                                    <div class="text-xs text-gray-500">Student</div>
-                                </div>
-                            </div>
-                            <i data-lucide="chevron-right" class="w-4 h-4 text-gray-400" style="stroke-width: 1.5;"></i>
-                        </div>
-                    </div>
-
-                    <div class="setup-item clickable" onclick="goToScreen(3)">
-                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100 hover:bg-gray-100 transition-colors">
-                            <div class="flex items-center space-x-3">
-                                <div class="w-7 h-7 bg-green-100 rounded-lg flex items-center justify-center">
-                                    <i data-lucide="settings" class="w-3.5 h-3.5 text-green-600" style="stroke-width: 1.5;"></i>
-                                </div>
-                                <div>
-                                    <div class="text-sm font-medium text-gray-900">Summary Depth</div>
-                                    <div class="text-xs text-gray-500">Standard</div>
-                                </div>
-                            </div>
-                            <i data-lucide="chevron-right" class="w-4 h-4 text-gray-400" style="stroke-width: 1.5;"></i>
-                        </div>
-                    </div>
-
-                    <div class="setup-item clickable" onclick="goToScreen(4)">
-                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100 hover:bg-gray-100 transition-colors">
-                            <div class="flex items-center space-x-3">
-                                <div class="w-7 h-7 bg-purple-100 rounded-lg flex items-center justify-center">
-                                    <i data-lucide="folder" class="w-3.5 h-3.5 text-purple-600" style="stroke-width: 1.5;"></i>
-                                </div>
-                                <div>
-                                    <div class="text-sm font-medium text-gray-900">Default Project</div>
-                                    <div class="text-xs text-gray-500">General Learning</div>
-                                </div>
-                            </div>
-                            <i data-lucide="chevron-right" class="w-4 h-4 text-gray-400" style="stroke-width: 1.5;"></i>
-                        </div>
-                    </div>
-
-                    <div class="setup-item clickable" onclick="goToScreen(5)">
-                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100 hover:bg-gray-100 transition-colors">
-                            <div class="flex items-center space-x-3">
-                                <div class="w-7 h-7 bg-orange-100 rounded-lg flex items-center justify-center">
-                                    <i data-lucide="sliders" class="w-3.5 h-3.5 text-orange-600" style="stroke-width: 1.5;"></i>
-                                </div>
-                                <div>
-                                    <div class="text-sm font-medium text-gray-900">Preferences</div>
-                                    <div class="text-xs text-gray-500">Format options</div>
-                                </div>
-                            </div>
-                            <i data-lucide="chevron-right" class="w-4 h-4 text-gray-400" style="stroke-width: 1.5;"></i>
-                        </div>
-                    </div>
+                
+                <div class="setup-item" data-screen="3">
+                    <div class="title">Summary Depth</div>
+                    <div class="subtitle">Standard</div>
                 </div>
-
-                <div class="px-5 pb-2">
-                    <div class="flex items-center justify-center space-x-1.5">
-                        <div class="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
-                        <div class="w-1.5 h-1.5 bg-gray-300 rounded-full"></div>
-                        <div class="w-1.5 h-1.5 bg-gray-300 rounded-full"></div>
-                        <div class="w-1.5 h-1.5 bg-gray-300 rounded-full"></div>
-                        <div class="w-1.5 h-1.5 bg-gray-300 rounded-full"></div>
-                    </div>
+                
+                <div class="setup-item" data-screen="4">
+                    <div class="title">Default Project</div>
+                    <div class="subtitle">General Learning</div>
                 </div>
-
-                <div class="px-5 pb-5 pt-2">
-                    <button onclick="goToScreen(6)" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2.5 px-4 rounded-lg transition-colors">
-                        Continue Setup
-                    </button>
+                
+                <div class="setup-item" data-screen="5">
+                    <div class="title">Preferences</div>
+                    <div class="subtitle">Format options</div>
                 </div>
             </div>
+            
+            <div class="progress-dots">
+                <div class="progress-dot active"></div>
+                <div class="progress-dot"></div>
+                <div class="progress-dot"></div>
+                <div class="progress-dot"></div>
+                <div class="progress-dot"></div>
+            </div>
+            
+            <div class="footer">
+                <button class="btn btn-primary" data-screen="6">Continue Setup</button>
+            </div>
+        </div>
 
-            <!-- Screen 2: Learning Mode Selection -->
-            <div id="screen-2" class="screen h-full flex flex-col">
-                <div class="px-5 pt-6 pb-4 border-b border-gray-100">
-                    <div class="flex items-center justify-between mb-3">
-                        <button onclick="goToScreen(1)" class="p-1 hover:bg-gray-100 rounded-lg transition-colors">
-                            <i data-lucide="arrow-left" class="w-4 h-4 text-gray-600" style="stroke-width: 1.5;"></i>
-                        </button>
-                        <h2 class="text-lg font-semibold text-gray-900 tracking-tight">Learning Mode</h2>
-                        <div class="w-6"></div>
-                    </div>
-                    <p class="text-sm text-gray-600 text-center">How do you prefer to learn from videos?</p>
+        <!-- Screen 2: Learning Mode -->
+        <div id="screen-2" class="screen">
+            <div class="header">
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <button class="back-btn" data-screen="1">←</button>
+                    <h1>Learning Mode</h1>
+                    <div style="width: 24px;"></div>
                 </div>
-
-                <div class="px-5 py-4 flex-1 space-y-3">
-                    <label class="setup-item flex items-start space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
-                        <input type="radio" name="learningMode" value="student" class="custom-radio mt-1" checked>
-                        <div class="flex-1">
-                            <div class="flex items-center mb-1">
-                                <i data-lucide="graduation-cap" class="w-4 h-4 text-blue-600 mr-2" style="stroke-width: 1.5;"></i>
-                                <span class="text-sm font-medium text-gray-900">Student</span>
-                            </div>
-                            <p class="text-xs text-gray-600">Detailed explanations and key concepts for learning</p>
+                <p>How do you prefer to learn from videos?</p>
+            </div>
+            
+            <div class="content">
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" name="learningMode" value="student" checked>
+                        <div class="content">
+                            <div class="title">Student</div>
+                            <div class="description">Detailed explanations and key concepts for learning</div>
                         </div>
                     </label>
-
-                    <label class="setup-item flex items-start space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
-                        <input type="radio" name="learningMode" value="build" class="custom-radio mt-1">
-                        <div class="flex-1">
-                            <div class="flex items-center mb-1">
-                                <i data-lucide="hammer" class="w-4 h-4 text-green-600 mr-2" style="stroke-width: 1.5;"></i>
-                                <span class="text-sm font-medium text-gray-900">Build</span>
-                            </div>
-                            <p class="text-xs text-gray-600">Practical steps and implementation guides</p>
+                    
+                    <label class="radio-option">
+                        <input type="radio" name="learningMode" value="build">
+                        <div class="content">
+                            <div class="title">Build</div>
+                            <div class="description">Practical steps and implementation guides</div>
                         </div>
                     </label>
-
-                    <label class="setup-item flex items-start space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
-                        <input type="radio" name="learningMode" value="understand" class="custom-radio mt-1">
-                        <div class="flex-1">
-                            <div class="flex items-center mb-1">
-                                <i data-lucide="lightbulb" class="w-4 h-4 text-purple-600 mr-2" style="stroke-width: 1.5;"></i>
-                                <span class="text-sm font-medium text-gray-900">Understand</span>
-                            </div>
-                            <p class="text-xs text-gray-600">Deep insights and comprehensive analysis</p>
+                    
+                    <label class="radio-option">
+                        <input type="radio" name="learningMode" value="understand">
+                        <div class="content">
+                            <div class="title">Understand</div>
+                            <div class="description">Deep insights and comprehensive analysis</div>
                         </div>
                     </label>
                 </div>
-
-                <div class="px-5 pb-2">
-                    <div class="flex items-center justify-center space-x-1.5">
-                        <div class="w-1.5 h-1.5 bg-gray-300 rounded-full"></div>
-                        <div class="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
-                        <div class="w-1.5 h-1.5 bg-gray-300 rounded-full"></div>
-                        <div class="w-1.5 h-1.5 bg-gray-300 rounded-full"></div>
-                        <div class="w-1.5 h-1.5 bg-gray-300 rounded-full"></div>
-                    </div>
-                </div>
-
-                <div class="px-5 pb-5 pt-2">
-                    <button onclick="goToScreen(3)" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2.5 px-4 rounded-lg transition-colors">
-                        Continue
-                    </button>
-                </div>
             </div>
+            
+            <div class="progress-dots">
+                <div class="progress-dot"></div>
+                <div class="progress-dot active"></div>
+                <div class="progress-dot"></div>
+                <div class="progress-dot"></div>
+                <div class="progress-dot"></div>
+            </div>
+            
+            <div class="footer">
+                <button class="btn btn-primary" data-screen="3">Continue</button>
+            </div>
+        </div>
 
-            <!-- Screen 3: Summary Depth -->
-            <div id="screen-3" class="screen h-full flex flex-col">
-                <div class="px-5 pt-6 pb-4 border-b border-gray-100">
-                    <div class="flex items-center justify-between mb-3">
-                        <button onclick="goToScreen(2)" class="p-1 hover:bg-gray-100 rounded-lg transition-colors">
-                            <i data-lucide="arrow-left" class="w-4 h-4 text-gray-600" style="stroke-width: 1.5;"></i>
-                        </button>
-                        <h2 class="text-lg font-semibold text-gray-900 tracking-tight">Summary Depth</h2>
-                        <div class="w-6"></div>
-                    </div>
-                    <p class="text-sm text-gray-600 text-center">Choose your preferred summary detail level</p>
+        <!-- Screen 3: Summary Depth -->
+        <div id="screen-3" class="screen">
+            <div class="header">
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <button class="back-btn" data-screen="2">←</button>
+                    <h1>Summary Depth</h1>
+                    <div style="width: 24px;"></div>
                 </div>
-
-                <div class="px-5 py-4 flex-1 space-y-3">
-                    <label class="setup-item flex items-start space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
-                        <input type="radio" name="summaryDepth" value="quick" class="custom-radio mt-1">
-                        <div class="flex-1">
-                            <div class="flex items-center justify-between mb-1">
-                                <span class="text-sm font-medium text-gray-900">Quick</span>
-                                <span class="text-xs text-gray-500">2-3 min read</span>
-                            </div>
-                            <p class="text-xs text-gray-600">Essential points and main takeaways</p>
+                <p>Choose your preferred summary detail level</p>
+            </div>
+            
+            <div class="content">
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" name="summaryDepth" value="quick">
+                        <div class="content">
+                            <div class="title">Quick <span style="color: #6b7280; font-weight: normal;">(2-3 min read)</span></div>
+                            <div class="description">Essential points and main takeaways</div>
                         </div>
                     </label>
-
-                    <label class="setup-item flex items-start space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
-                        <input type="radio" name="summaryDepth" value="standard" class="custom-radio mt-1" checked>
-                        <div class="flex-1">
-                            <div class="flex items-center justify-between mb-1">
-                                <span class="text-sm font-medium text-gray-900">Standard</span>
-                                <span class="text-xs text-gray-500">5-7 min read</span>
-                            </div>
-                            <p class="text-xs text-gray-600">Balanced overview with key details</p>
+                    
+                    <label class="radio-option">
+                        <input type="radio" name="summaryDepth" value="standard" checked>
+                        <div class="content">
+                            <div class="title">Standard <span style="color: #6b7280; font-weight: normal;">(5-7 min read)</span></div>
+                            <div class="description">Balanced overview with key details</div>
                         </div>
                     </label>
-
-                    <label class="setup-item flex items-start space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
-                        <input type="radio" name="summaryDepth" value="deep" class="custom-radio mt-1">
-                        <div class="flex-1">
-                            <div class="flex items-center justify-between mb-1">
-                                <span class="text-sm font-medium text-gray-900">Deep</span>
-                                <span class="text-xs text-gray-500">10+ min read</span>
-                            </div>
-                            <p class="text-xs text-gray-600">Comprehensive analysis with examples</p>
+                    
+                    <label class="radio-option">
+                        <input type="radio" name="summaryDepth" value="deep">
+                        <div class="content">
+                            <div class="title">Deep <span style="color: #6b7280; font-weight: normal;">(10+ min read)</span></div>
+                            <div class="description">Comprehensive analysis with examples</div>
                         </div>
                     </label>
                 </div>
+            </div>
+            
+            <div class="progress-dots">
+                <div class="progress-dot"></div>
+                <div class="progress-dot"></div>
+                <div class="progress-dot active"></div>
+                <div class="progress-dot"></div>
+                <div class="progress-dot"></div>
+            </div>
+            
+            <div class="footer">
+                <button class="btn btn-primary" data-screen="4">Continue</button>
+            </div>
+        </div>
 
-                <div class="px-5 pb-2">
-                    <div class="flex items-center justify-center space-x-1.5">
-                        <div class="w-1.5 h-1.5 bg-gray-300 rounded-full"></div>
-                        <div class="w-1.5 h-1.5 bg-gray-300 rounded-full"></div>
-                        <div class="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
-                        <div class="w-1.5 h-1.5 bg-gray-300 rounded-full"></div>
-                        <div class="w-1.5 h-1.5 bg-gray-300 rounded-full"></div>
-                    </div>
+        <!-- Screen 4: Default Project -->
+        <div id="screen-4" class="screen">
+            <div class="header">
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <button class="back-btn" data-screen="3">←</button>
+                    <h1>Default Project</h1>
+                    <div style="width: 24px;"></div>
                 </div>
-
-                <div class="px-5 pb-5 pt-2">
-                    <button onclick="goToScreen(4)" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2.5 px-4 rounded-lg transition-colors">
-                        Continue
-                    </button>
+                <p>Where should we save your video summaries?</p>
+            </div>
+            
+            <div class="content">
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" name="project" value="general" checked>
+                        <div class="content">
+                            <div class="title">General Learning</div>
+                            <div class="description">Default save location</div>
+                        </div>
+                    </label>
+                    
+                    <label class="radio-option">
+                        <input type="radio" name="project" value="work">
+                        <div class="content">
+                            <div class="title">Work & Career</div>
+                            <div class="description">Professional development</div>
+                        </div>
+                    </label>
+                    
+                    <label class="radio-option">
+                        <input type="radio" name="project" value="tech">
+                        <div class="content">
+                            <div class="title">Technology</div>
+                            <div class="description">Tech tutorials and guides</div>
+                        </div>
+                    </label>
                 </div>
             </div>
+            
+            <div class="progress-dots">
+                <div class="progress-dot"></div>
+                <div class="progress-dot"></div>
+                <div class="progress-dot"></div>
+                <div class="progress-dot active"></div>
+                <div class="progress-dot"></div>
+            </div>
+            
+            <div class="footer">
+                <button class="btn btn-primary" data-screen="5">Continue</button>
+            </div>
+        </div>
 
-            <!-- Screen 4: Default Project -->
-            <div id="screen-4" class="screen h-full flex flex-col">
-                <div class="px-5 pt-6 pb-4 border-b border-gray-100">
-                    <div class="flex items-center justify-between mb-3">
-                        <button onclick="goToScreen(3)" class="p-1 hover:bg-gray-100 rounded-lg transition-colors">
-                            <i data-lucide="arrow-left" class="w-4 h-4 text-gray-600" style="stroke-width: 1.5;"></i>
-                        </button>
-                        <h2 class="text-lg font-semibold text-gray-900 tracking-tight">Default Project</h2>
-                        <div class="w-6"></div>
-                    </div>
-                    <p class="text-sm text-gray-600 text-center">Where should we save your video summaries?</p>
+        <!-- Screen 5: Preferences -->
+        <div id="screen-5" class="screen">
+            <div class="header">
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <button class="back-btn" data-screen="4">←</button>
+                    <h1>Preferences</h1>
+                    <div style="width: 24px;"></div>
                 </div>
-
-                <div class="px-5 py-4 flex-1">
-                    <div class="space-y-3">
-                        <label class="setup-item flex items-center space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
-                            <input type="radio" name="project" value="general" class="custom-radio" checked>
-                            <div class="w-6 h-6 bg-blue-100 rounded-lg flex items-center justify-center">
-                                <i data-lucide="bookmark" class="w-3 h-3 text-blue-600" style="stroke-width: 1.5;"></i>
-                            </div>
-                            <span class="text-sm font-medium text-gray-900">General Learning</span>
-                        </label>
-
-                        <label class="setup-item flex items-center space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
-                            <input type="radio" name="project" value="work" class="custom-radio">
-                            <div class="w-6 h-6 bg-green-100 rounded-lg flex items-center justify-center">
-                                <i data-lucide="briefcase" class="w-3 h-3 text-green-600" style="stroke-width: 1.5;"></i>
-                            </div>
-                            <span class="text-sm font-medium text-gray-900">Work & Career</span>
-                        </label>
-
-                        <label class="setup-item flex items-center space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
-                            <input type="radio" name="project" value="tech" class="custom-radio">
-                            <div class="w-6 h-6 bg-purple-100 rounded-lg flex items-center justify-center">
-                                <i data-lucide="code" class="w-3 h-3 text-purple-600" style="stroke-width: 1.5;"></i>
-                            </div>
-                            <span class="text-sm font-medium text-gray-900">Technology</span>
-                        </label>
-
-                        <div class="setup-item p-3 border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-400 cursor-pointer">
-                            <div class="flex items-center justify-center space-x-2 text-gray-600">
-                                <i data-lucide="plus" class="w-4 h-4" style="stroke-width: 1.5;"></i>
-                                <span class="text-sm">Create New Project</span>
-                            </div>
+                <p>Customize your summary format</p>
+            </div>
+            
+            <div class="content">
+                <div class="checkbox-option">
+                    <div class="content">
+                        <span class="emoji">⏱️</span>
+                        <div class="text">
+                            <div class="title">Include Timestamps</div>
+                            <div class="description">Link to specific video moments</div>
                         </div>
                     </div>
+                    <input type="checkbox" id="includeTimestamps" checked>
                 </div>
-
-                <div class="px-5 pb-2">
-                    <div class="flex items-center justify-center space-x-1.5">
-                        <div class="w-1.5 h-1.5 bg-gray-300 rounded-full"></div>
-                        <div class="w-1.5 h-1.5 bg-gray-300 rounded-full"></div>
-                        <div class="w-1.5 h-1.5 bg-gray-300 rounded-full"></div>
-                        <div class="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
-                        <div class="w-1.5 h-1.5 bg-gray-300 rounded-full"></div>
+                
+                <div class="checkbox-option">
+                    <div class="content">
+                        <span class="emoji">🎯</span>
+                        <div class="text">
+                            <div class="title">Action Items</div>
+                            <div class="description">Extract actionable tasks</div>
+                        </div>
                     </div>
+                    <input type="checkbox" id="includeActionItems" checked>
                 </div>
-
-                <div class="px-5 pb-5 pt-2">
-                    <button onclick="goToScreen(5)" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2.5 px-4 rounded-lg transition-colors">
-                        Continue
-                    </button>
+                
+                <div class="checkbox-option">
+                    <div class="content">
+                        <span class="emoji">😊</span>
+                        <div class="text">
+                            <div class="title">Use Emojis</div>
+                            <div class="description">Add visual cues to summaries</div>
+                        </div>
+                    </div>
+                    <input type="checkbox" id="includeEmojis" checked>
+                </div>
+                
+                <div class="checkbox-option">
+                    <div class="content">
+                        <span class="emoji">❓</span>
+                        <div class="text">
+                            <div class="title">Quiz Questions</div>
+                            <div class="description">Generate questions for review</div>
+                        </div>
+                    </div>
+                    <input type="checkbox" id="includeQuiz">
+                </div>
+                
+                <div class="checkbox-option">
+                    <div class="content">
+                        <span class="emoji">🔗</span>
+                        <div class="text">
+                            <div class="title">Related Resources</div>
+                            <div class="description">Suggest similar content</div>
+                        </div>
+                    </div>
+                    <input type="checkbox" id="includeResources" checked>
+                </div>
+                
+                <div class="checkbox-option">
+                    <div class="content">
+                        <span class="emoji">🔍</span>
+                        <div class="text">
+                            <div class="title">Key Terms</div>
+                            <div class="description">Highlight important definitions</div>
+                        </div>
+                    </div>
+                    <input type="checkbox" id="includeKeyTerms" checked>
                 </div>
             </div>
+            
+            <div class="progress-dots">
+                <div class="progress-dot"></div>
+                <div class="progress-dot"></div>
+                <div class="progress-dot"></div>
+                <div class="progress-dot"></div>
+                <div class="progress-dot active"></div>
+            </div>
+            
+            <div class="footer">
+                <button class="btn btn-primary" data-screen="6">Finish Setup</button>
+            </div>
+        </div>
 
-            <!-- Screen 5: Preferences -->
-            <div id="screen-5" class="screen h-full flex flex-col">
-                <div class="px-5 pt-6 pb-4 border-b border-gray-100">
-                    <div class="flex items-center justify-between mb-3">
-                        <button onclick="goToScreen(4)" class="p-1 hover:bg-gray-100 rounded-lg transition-colors">
-                            <i data-lucide="arrow-left" class="w-4 h-4 text-gray-600" style="stroke-width: 1.5;"></i>
-                        </button>
-                        <h2 class="text-lg font-semibold text-gray-900 tracking-tight">Preferences</h2>
-                        <div class="w-6"></div>
-                    </div>
-                    <p class="text-sm text-gray-600 text-center">Customize your summary format</p>
+        <!-- Screen 6: Setup Complete -->
+        <div id="screen-6" class="screen">
+            <div class="header">
+                <div class="success-icon">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
                 </div>
-
-                <div class="px-5 py-4 flex-1 overflow-y-auto">
-                    <div class="space-y-4">
-                        <div class="setup-item">
-                            <label class="flex items-center justify-between cursor-pointer">
-                                <div class="flex items-center space-x-3">
-                                    <span class="text-lg">⏱️</span>
-                                    <div>
-                                        <div class="text-sm font-medium text-gray-900">Include Timestamps</div>
-                                        <div class="text-xs text-gray-500">Link to specific video moments</div>
-                                    </div>
-                                </div>
-                                <input type="checkbox" id="includeTimestamps" class="custom-checkbox" checked>
-                            </label>
-                        </div>
-
-                        <div class="setup-item">
-                            <label class="flex items-center justify-between cursor-pointer">
-                                <div class="flex items-center space-x-3">
-                                    <span class="text-lg">🎯</span>
-                                    <div>
-                                        <div class="text-sm font-medium text-gray-900">Action Items</div>
-                                        <div class="text-xs text-gray-500">Extract actionable tasks</div>
-                                    </div>
-                                </div>
-                                <input type="checkbox" id="includeActionItems" class="custom-checkbox" checked>
-                            </label>
-                        </div>
-
-                        <div class="setup-item">
-                            <label class="flex items-center justify-between cursor-pointer">
-                                <div class="flex items-center space-x-3">
-                                    <span class="text-lg">😊</span>
-                                    <div>
-                                        <div class="text-sm font-medium text-gray-900">Use Emojis</div>
-                                        <div class="text-xs text-gray-500">Add visual cues to summaries</div>
-                                    </div>
-                                </div>
-                                <input type="checkbox" id="includeEmojis" class="custom-checkbox" checked>
-                            </label>
-                        </div>
-
-                        <div class="setup-item">
-                            <label class="flex items-center justify-between cursor-pointer">
-                                <div class="flex items-center space-x-3">
-                                    <span class="text-lg">❓</span>
-                                    <div>
-                                        <div class="text-sm font-medium text-gray-900">Quiz Questions</div>
-                                        <div class="text-xs text-gray-500">Generate questions for review</div>
-                                    </div>
-                                </div>
-                                <input type="checkbox" id="includeQuiz" class="custom-checkbox">
-                            </label>
-                        </div>
-
-                        <!-- Quiz Count Selection (only show if quiz is enabled) -->
-                        <div id="quizCountSection" class="setup-item hidden">
-                            <div class="flex items-center space-x-3">
-                                <span class="text-lg">📊</span>
-                                <div class="flex-1">
-                                    <div class="text-sm font-medium text-gray-900">Number of Questions</div>
-                                    <div class="text-xs text-gray-500">How many quiz questions to generate</div>
-                                </div>
-                            </div>
-                            <div class="mt-2 flex space-x-2">
-                                <label class="flex items-center space-x-2">
-                                    <input type="radio" name="quizCount" value="3" class="custom-radio">
-                                    <span class="text-xs">3</span>
-                                </label>
-                                <label class="flex items-center space-x-2">
-                                    <input type="radio" name="quizCount" value="5" class="custom-radio" checked>
-                                    <span class="text-xs">5</span>
-                                </label>
-                                <label class="flex items-center space-x-2">
-                                    <input type="radio" name="quizCount" value="10" class="custom-radio">
-                                    <span class="text-xs">10</span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <div class="setup-item">
-                            <label class="flex items-center justify-between cursor-pointer">
-                                <div class="flex items-center space-x-3">
-                                    <span class="text-lg">🔗</span>
-                                    <div>
-                                        <div class="text-sm font-medium text-gray-900">Related Resources</div>
-                                        <div class="text-xs text-gray-500">Suggest similar content</div>
-                                    </div>
-                                </div>
-                                <input type="checkbox" id="includeResources" class="custom-checkbox" checked>
-                            </label>
-                        </div>
-
-                        <div class="setup-item">
-                            <label class="flex items-center justify-between cursor-pointer">
-                                <div class="flex items-center space-x-3">
-                                    <span class="text-lg">🔍</span>
-                                    <div>
-                                        <div class="text-sm font-medium text-gray-900">Key Terms</div>
-                                        <div class="text-xs text-gray-500">Highlight important definitions</div>
-                                    </div>
-                                </div>
-                                <input type="checkbox" id="includeKeyTerms" class="custom-checkbox" checked>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="px-5 pb-2">
-                    <div class="flex items-center justify-center space-x-1.5">
-                        <div class="w-1.5 h-1.5 bg-gray-300 rounded-full"></div>
-                        <div class="w-1.5 h-1.5 bg-gray-300 rounded-full"></div>
-                        <div class="w-1.5 h-1.5 bg-gray-300 rounded-full"></div>
-                        <div class="w-1.5 h-1.5 bg-gray-300 rounded-full"></div>
-                        <div class="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
-                    </div>
-                </div>
-
-                <div class="px-5 pb-5 pt-2">
-                    <button onclick="goToScreen(6)" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2.5 px-4 rounded-lg transition-colors">
-                        Finish Setup
-                    </button>
+                <h1>All Set!</h1>
+                <p>Your Rvised extension is ready to enhance your YouTube learning experience</p>
+            </div>
+            
+            <div class="content">
+                <div style="text-align: center; color: #6b7280; font-size: 14px; line-height: 1.5;">
+                    <p>🎓 <strong>Learning Mode:</strong> Student</p>
+                    <p>⚙️ <strong>Summary:</strong> Standard</p>
+                    <p>📁 <strong>Project:</strong> General Learning</p>
+                    <p>✨ <strong>Features:</strong> Timestamps, Action Items, Emojis, Resources, Key Terms</p>
                 </div>
             </div>
+            
+            <div class="footer">
+                <button class="btn btn-gradient" id="generateSummaryBtn">🚀 Generate Summary Now</button>
+                <button class="btn btn-secondary" data-screen="7" style="margin-top: 8px;">Start Learning</button>
+                <button class="btn btn-secondary" data-screen="1" style="margin-top: 8px;">Modify Settings</button>
+            </div>
+        </div>
 
-            <!-- Screen 6: Setup Complete -->
-            <div id="screen-6" class="screen h-full flex flex-col">
-                <div class="px-5 pt-6 pb-4 text-center">
-                    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i data-lucide="check" class="w-8 h-8 text-green-600" style="stroke-width: 2;"></i>
+        <!-- Screen 7: Ready to Use -->
+        <div id="screen-7" class="screen">
+            <div class="header">
+                <h1>Ready to Learn!</h1>
+                <p>Navigate to any YouTube video and you'll see the Rvised button appear. Click it to generate your personalized summary.</p>
+            </div>
+            
+            <div class="content" style="display: flex; align-items: center; justify-content: center;">
+                <div style="text-align: center;">
+                    <div style="background: #ef4444; color: white; padding: 8px 16px; border-radius: 8px; margin-bottom: 16px; display: inline-block;">
+                        📺 YouTube Video
                     </div>
-                    <h2 class="text-xl font-semibold text-gray-900 mb-2">All Set!</h2>
-                    <p class="text-sm text-gray-600">Your Rvised extension is ready to enhance your YouTube learning experience</p>
-                </div>
-
-                <div class="px-5 py-6 flex-1">
-                    <div class="space-y-4">
-                        <div class="summary-item flex items-start space-x-3 p-4 bg-blue-50 rounded-lg border border-blue-100">
-                            <div class="w-6 h-6 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                                <i data-lucide="graduation-cap" class="w-3.5 h-3.5 text-blue-600" style="stroke-width: 1.5;"></i>
-                            </div>
-                            <div>
-                                <div class="text-sm font-medium text-gray-900 mb-1">Learning Mode: Student</div>
-                                <div class="text-xs text-gray-600">Detailed explanations and key concepts</div>
-                            </div>
-                        </div>
-
-                        <div class="summary-item flex items-start space-x-3 p-4 bg-green-50 rounded-lg border border-green-100">
-                            <div class="w-6 h-6 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                                <i data-lucide="settings" class="w-3.5 h-3.5 text-green-600" style="stroke-width: 1.5;"></i>
-                            </div>
-                            <div>
-                                <div class="text-sm font-medium text-gray-900 mb-1">Summary: Standard</div>
-                                <div class="text-xs text-gray-600">5-7 minute balanced overviews</div>
-                            </div>
-                        </div>
-
-                        <div class="summary-item flex items-start space-x-3 p-4 bg-purple-50 rounded-lg border border-purple-100">
-                            <div class="w-6 h-6 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                                <i data-lucide="folder" class="w-3.5 h-3.5 text-purple-600" style="stroke-width: 1.5;"></i>
-                            </div>
-                            <div>
-                                <div class="text-sm font-medium text-gray-900 mb-1">Project: General Learning</div>
-                                <div class="text-xs text-gray-600">Default save location</div>
-                            </div>
-                        </div>
-
-                        <div class="summary-item p-4 bg-gray-50 rounded-lg border border-gray-100">
-                            <div class="text-sm font-medium text-gray-900 mb-2">Active Features:</div>
-                            <div class="flex flex-wrap gap-1.5">
-                                <span class="text-xs bg-white px-2 py-1 rounded-full border text-gray-700">⏱️ Timestamps</span>
-                                <span class="text-xs bg-white px-2 py-1 rounded-full border text-gray-700">🎯 Action Items</span>
-                                <span class="text-xs bg-white px-2 py-1 rounded-full border text-gray-700">😊 Emojis</span>
-                                <span class="text-xs bg-white px-2 py-1 rounded-full border text-gray-700">🔗 Resources</span>
-                                <span class="text-xs bg-white px-2 py-1 rounded-full border text-gray-700">🔍 Key Terms</span>
-                            </div>
-                        </div>
+                    <div style="margin: 16px 0; color: #6b7280;">↓</div>
+                    <div style="background: #3b82f6; color: white; padding: 8px 16px; border-radius: 8px; display: inline-block;">
+                        🎓 Rvised Summary
                     </div>
-                </div>
-
-                <div class="px-5 pb-5">
-                    <button onclick="generateSummaryNow()" class="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-sm font-medium py-2.5 px-4 rounded-lg transition-colors mb-3">
-                        🚀 Generate Summary Now
-                    </button>
-                    <button onclick="goToScreen(7)" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2.5 px-4 rounded-lg transition-colors mb-3">
-                        Start Learning
-                    </button>
-                    <button onclick="goToScreen(1)" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium py-2.5 px-4 rounded-lg transition-colors">
-                        Modify Settings
-                    </button>
                 </div>
             </div>
-
-            <!-- Screen 7: Ready to Use -->
-            <div id="screen-7" class="screen h-full flex flex-col">
-                <div class="px-5 pt-8 pb-6 text-center">
-                    <div class="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <i data-lucide="glasses" class="w-10 h-10 text-white" style="stroke-width: 1.5;"></i>
-                    </div>
-                    <h2 class="text-2xl font-bold text-gray-900 mb-3">Ready to Learn!</h2>
-                    <p class="text-sm text-gray-600 leading-relaxed">Navigate to any YouTube video and you'll see the Rvised button appear. Click it to generate your personalized summary.</p>
-                </div>
-
-                <div class="px-5 flex-1 flex items-center justify-center">
-                    <div class="text-center">
-                        <div class="mb-6">
-                            <div class="inline-flex items-center space-x-2 bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg">
-                                <i data-lucide="play" class="w-4 h-4" style="stroke-width: 2;"></i>
-                                <span class="text-sm font-medium">YouTube Video</span>
-                            </div>
-                        </div>
-                        <div class="flex items-center justify-center mb-2">
-                            <div class="w-8 h-0.5 bg-gray-300"></div>
-                            <i data-lucide="arrow-down" class="w-5 h-5 text-gray-400 mx-2" style="stroke-width: 1.5;"></i>
-                            <div class="w-8 h-0.5 bg-gray-300"></div>
-                        </div>
-                        <div class="inline-flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg shadow-lg">
-                            <i data-lucide="glasses" class="w-4 h-4" style="stroke-width: 2;"></i>
-                            <span class="text-sm font-medium">Rvised Summary</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="px-5 pb-6">
-                    <div class="text-center mb-4">
-                        <p class="text-xs text-gray-500">You can always change your preferences in the extension settings</p>
-                    </div>
-                    <button onclick="window.close()" class="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-sm font-medium py-3 px-4 rounded-lg transition-all duration-200 shadow-lg">
-                        Start Using Rvised
-                    </button>
-                </div>
+            
+            <div class="footer">
+                <p style="text-align: center; font-size: 12px; color: #6b7280; margin-bottom: 16px;">
+                    You can always change your preferences in the extension settings
+                </p>
+                <button class="btn btn-gradient" id="startUsingBtn">Start Using Rvised</button>
             </div>
         </div>
     </div>

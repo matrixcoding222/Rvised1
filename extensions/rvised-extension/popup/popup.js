@@ -1,80 +1,15 @@
-// Initialize Lucide icons
-lucide.createIcons();
-
 // Screen navigation
 function goToScreen(screenNumber) {
-    // Hide current screen
-    const currentScreen = document.querySelector('.screen.active');
-    if (currentScreen) {
-        currentScreen.classList.remove('active');
-        currentScreen.classList.add('slide-out');
-        
-        setTimeout(() => {
-            currentScreen.classList.remove('slide-out');
-        }, 300);
-    }
-
-    // Show new screen
-    setTimeout(() => {
-        const newScreen = document.getElementById(`screen-${screenNumber}`);
-        if (newScreen) {
-            newScreen.classList.add('active');
-            
-            // Re-initialize icons for the new screen
-            setTimeout(() => {
-                lucide.createIcons();
-            }, 100);
-        }
-    }, 150);
-}
-
-// Initialize icons on page load
-document.addEventListener('DOMContentLoaded', function() {
-    lucide.createIcons();
-    
-    // Handle quiz checkbox toggle
-    const quizCheckbox = document.getElementById('includeQuiz');
-    const quizCountSection = document.getElementById('quizCountSection');
-    
-    if (quizCheckbox && quizCountSection) {
-        quizCheckbox.addEventListener('change', function() {
-            if (this.checked) {
-                quizCountSection.classList.remove('hidden');
-            } else {
-                quizCountSection.classList.add('hidden');
-            }
-        });
-    }
-    
-    // Handle form interactions
-    document.addEventListener('change', function(e) {
-        if (e.target.type === 'radio') {
-            // Update display values based on selections
-            updateDisplayValues();
-        }
+    // Hide all screens
+    const screens = document.querySelectorAll('.screen');
+    screens.forEach(screen => {
+        screen.classList.remove('active');
     });
-    
-    // Initialize display values
-    updateDisplayValues();
-});
 
-function updateDisplayValues() {
-    // Update learning mode display
-    const learningMode = document.querySelector('input[name="learningMode"]:checked');
-    if (learningMode) {
-        const display = document.querySelector('.setup-item:first-child .text-xs');
-        if (display && learningMode.value) {
-            display.textContent = learningMode.value.charAt(0).toUpperCase() + learningMode.value.slice(1);
-        }
-    }
-
-    // Update summary depth display  
-    const summaryDepth = document.querySelector('input[name="summaryDepth"]:checked');
-    if (summaryDepth) {
-        const display = document.querySelector('.setup-item:nth-child(2) .text-xs');
-        if (display && summaryDepth.value) {
-            display.textContent = summaryDepth.value.charAt(0).toUpperCase() + summaryDepth.value.slice(1);
-        }
+    // Show target screen
+    const targetScreen = document.getElementById(`screen-${screenNumber}`);
+    if (targetScreen) {
+        targetScreen.classList.add('active');
     }
 }
 
@@ -92,7 +27,7 @@ function getCurrentSettings() {
         includeActionItems: document.getElementById('includeActionItems')?.checked || false,
         includeEmojis: document.getElementById('includeEmojis')?.checked || false,
         includeQuiz: document.getElementById('includeQuiz')?.checked || false,
-        quizCount: document.querySelector('input[name="quizCount"]:checked')?.value || '5',
+        quizCount: '5', // Default quiz count
         includeResources: document.getElementById('includeResources')?.checked || false,
         includeKeyTerms: document.getElementById('includeKeyTerms')?.checked || false
     };
@@ -125,28 +60,28 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
 // Save settings when user finishes setup
 function saveSettings() {
-  const settings = getCurrentSettings();
-  
-  // Save to chrome storage
-  chrome.storage.sync.set({
-    rvisedSettings: settings
-  }, function() {
-    console.log('Settings saved:', settings);
+    const settings = getCurrentSettings();
     
-    // Send to content script
-    sendSettingsToContentScript();
-    
-    // Close popup and trigger summarization on current YouTube page
-    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-      if (tabs[0] && tabs[0].url && tabs[0].url.includes('youtube.com/watch')) {
-        chrome.tabs.sendMessage(tabs[0].id, {
-          action: 'startSummarization',
-          settings: settings
+    // Save to chrome storage
+    chrome.storage.sync.set({
+        rvisedSettings: settings
+    }, function() {
+        console.log('Settings saved:', settings);
+        
+        // Send to content script
+        sendSettingsToContentScript();
+        
+        // Close popup and trigger summarization on current YouTube page
+        chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+            if (tabs[0] && tabs[0].url && tabs[0].url.includes('youtube.com/watch')) {
+                chrome.tabs.sendMessage(tabs[0].id, {
+                    action: 'startSummarization',
+                    settings: settings
+                });
+                window.close();
+            }
         });
-        window.close();
-      }
     });
-  });
 }
 
 // Load settings from storage
@@ -176,12 +111,6 @@ function loadSettings() {
             }
             if (settings.includeQuiz !== undefined) {
                 document.getElementById('includeQuiz').checked = settings.includeQuiz;
-                if (settings.includeQuiz) {
-                    document.getElementById('quizCountSection').classList.remove('hidden');
-                }
-            }
-            if (settings.quizCount) {
-                document.querySelector(`input[name="quizCount"][value="${settings.quizCount}"]`)?.checked = true;
             }
             if (settings.includeResources !== undefined) {
                 document.getElementById('includeResources').checked = settings.includeResources;
@@ -189,48 +118,107 @@ function loadSettings() {
             if (settings.includeKeyTerms !== undefined) {
                 document.getElementById('includeKeyTerms').checked = settings.includeKeyTerms;
             }
-            
-            updateDisplayValues();
         }
     });
 }
 
-// Load settings when popup opens
-document.addEventListener('DOMContentLoaded', function() {
-    loadSettings();
-});
-
-// Save settings when user clicks "Finish Setup"
-document.addEventListener('click', function(e) {
-  if (e.target.textContent === 'Finish Setup') {
-    saveSettings();
-  }
-});
-
 // Generate summary immediately
 function generateSummaryNow() {
-  const settings = getCurrentSettings();
-  
-  // Save settings first
-  chrome.storage.sync.set({
-    rvisedSettings: settings
-  }, function() {
-    console.log('Settings saved and generating summary:', settings);
+    const settings = getCurrentSettings();
     
-    // Send to content script and trigger summarization
-    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-      if (tabs[0] && tabs[0].url && tabs[0].url.includes('youtube.com/watch')) {
-        chrome.tabs.sendMessage(tabs[0].id, {
-          action: 'startSummarization',
-          settings: settings
+    // Save settings first
+    chrome.storage.sync.set({
+        rvisedSettings: settings
+    }, function() {
+        console.log('Settings saved and generating summary:', settings);
+        
+        // Send to content script and trigger summarization
+        chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+            if (tabs[0] && tabs[0].url && tabs[0].url.includes('youtube.com/watch')) {
+                chrome.tabs.sendMessage(tabs[0].id, {
+                    action: 'startSummarization',
+                    settings: settings
+                });
+                window.close();
+            } else {
+                alert('Please navigate to a YouTube video first!');
+            }
         });
-        window.close();
-      } else {
-        alert('Please navigate to a YouTube video first!');
-      }
     });
-  });
 }
 
-// Make function globally available
-window.generateSummaryNow = generateSummaryNow;
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    // Load saved settings
+    loadSettings();
+    
+    // Add event listeners for navigation
+    document.addEventListener('click', function(e) {
+        // Handle screen navigation
+        if (e.target.hasAttribute('data-screen')) {
+            const screenNumber = e.target.getAttribute('data-screen');
+            goToScreen(screenNumber);
+        }
+        
+        // Handle setup item clicks
+        if (e.target.closest('.setup-item')) {
+            const setupItem = e.target.closest('.setup-item');
+            if (setupItem.hasAttribute('data-screen')) {
+                const screenNumber = setupItem.getAttribute('data-screen');
+                goToScreen(screenNumber);
+            }
+        }
+        
+        // Handle back button clicks
+        if (e.target.classList.contains('back-btn')) {
+            const screenNumber = e.target.getAttribute('data-screen');
+            goToScreen(screenNumber);
+        }
+        
+        // Handle finish setup
+        if (e.target.textContent === 'Finish Setup') {
+            saveSettings();
+        }
+        
+        // Handle generate summary
+        if (e.target.id === 'generateSummaryBtn') {
+            generateSummaryNow();
+        }
+        
+        // Handle start using
+        if (e.target.id === 'startUsingBtn') {
+            window.close();
+        }
+    });
+    
+    // Handle form interactions
+    document.addEventListener('change', function(e) {
+        if (e.target.type === 'radio' || e.target.type === 'checkbox') {
+            // Update display values based on selections
+            updateDisplayValues();
+        }
+    });
+    
+    // Initialize display values
+    updateDisplayValues();
+});
+
+function updateDisplayValues() {
+    // Update learning mode display
+    const learningMode = document.querySelector('input[name="learningMode"]:checked');
+    if (learningMode) {
+        const display = document.querySelector('.setup-item[data-screen="2"] .subtitle');
+        if (display && learningMode.value) {
+            display.textContent = learningMode.value.charAt(0).toUpperCase() + learningMode.value.slice(1);
+        }
+    }
+
+    // Update summary depth display  
+    const summaryDepth = document.querySelector('input[name="summaryDepth"]:checked');
+    if (summaryDepth) {
+        const display = document.querySelector('.setup-item[data-screen="3"] .subtitle');
+        if (display && summaryDepth.value) {
+            display.textContent = summaryDepth.value.charAt(0).toUpperCase() + summaryDepth.value.slice(1);
+        }
+    }
+}

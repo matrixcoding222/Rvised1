@@ -333,8 +333,10 @@ export async function POST(request: NextRequest): Promise<NextResponse<Summarize
     }
     const videoUrl: string = rawBody.videoUrl || rawBody.url // support old key
     const extensionTranscript = rawBody.extensionTranscript
+    const extensionChapters = rawBody.extensionChapters
     console.log('Request received with settings:', settings)
     console.log('Extension transcript provided:', !!extensionTranscript)
+    console.log('Extension chapters provided:', !!extensionChapters, extensionChapters?.length || 0, 'chapters')
 
     if (!videoUrl) {
       return NextResponse.json({ 
@@ -482,8 +484,13 @@ export async function POST(request: NextRequest): Promise<NextResponse<Summarize
         console.log('⚠️ AI failed to provide timestamps, generating server-side...')
         timestamps = []
         
-        // ENHANCED: Parse YouTube chapters from multiple sources
-        if (metadata.description) {
+        // PRIORITY: Use extension-provided chapters first
+        if (extensionChapters && Array.isArray(extensionChapters) && extensionChapters.length > 0) {
+          console.log('🎯 Using extension-provided chapters:', extensionChapters.length)
+          timestamps = extensionChapters
+        }
+        // FALLBACK: Parse YouTube chapters from video description
+        else if (metadata.description) {
           const lines = metadata.description.split(/\n|\r/)
           
           // Method 1: Standard chapter format (00:00 Title)

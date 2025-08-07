@@ -410,53 +410,102 @@ function createRvisedOverlay() {
     rvisedOverlay.remove();
   }
   
+  // Create overlay container
   rvisedOverlay = document.createElement('div');
   rvisedOverlay.id = 'rvised-overlay';
+  rvisedOverlay.className = 'rvised-overlay-container';
+  
+  // Inject Tailwind CSS if not already present
+  if (!document.querySelector('#rvised-tailwind')) {
+    const tailwindScript = document.createElement('script');
+    tailwindScript.id = 'rvised-tailwind';
+    tailwindScript.src = 'https://cdn.tailwindcss.com';
+    document.head.appendChild(tailwindScript);
+  }
+  
+  // Create overlay HTML with Tailwind classes
   rvisedOverlay.innerHTML = `
-    <div class="rvised-container">
-      <div class="rvised-header">
-        <span class="rvised-logo">📚 Rvised</span>
-        <button class="rvised-close" onclick="this.closest('#rvised-overlay').style.display='none'">×</button>
+    <div class="rvised-container bg-white rounded-xl shadow-2xl">
+      <!-- Header -->
+      <div class="rvised-header bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-4 rounded-t-xl flex justify-between items-center">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
+            <span class="text-white font-bold">R</span>
+          </div>
+          <span class="text-lg font-semibold">Rvised</span>
+        </div>
+        <button class="rvised-close text-white hover:bg-white/20 rounded-lg w-8 h-8 flex items-center justify-center transition-colors"
+                onclick="document.getElementById('rvised-overlay').style.display='none'">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
       </div>
       
-      <div class="rvised-content">
-        <div class="rvised-settings">
+      <div class="rvised-content p-6 space-y-4">
+        <!-- Settings Section -->
+        <div class="rvised-settings space-y-4">
+          <!-- Learning Mode -->
           <div class="setting-group">
-            <label>Learning Mode:</label>
-            <select id="learningMode">
-              <option value="Student">🎓 Student</option>
-              <option value="Build" selected>🔧 Build</option>
-              <option value="Understand">🧠 Understand</option>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Learning Mode</label>
+            <select id="learningMode" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              <option value="student">🎓 Student - Clear explanations</option>
+              <option value="build" selected>🔧 Build - Practical steps</option>
+              <option value="understand">🧠 Understand - Deep insights</option>
             </select>
           </div>
           
+          <!-- Summary Depth -->
           <div class="setting-group">
-            <label>Summary Depth:</label>
-            <select id="summaryDepth">
-              <option value="quick">⚡ Quick</option>
-              <option value="standard" selected>📋 Standard</option>
-              <option value="deep">🔍 Deep</option>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Summary Depth</label>
+            <select id="summaryDepth" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              <option value="quick">⚡ Quick (2-3 min read)</option>
+              <option value="standard" selected>📋 Standard (5-7 min read)</option>
+              <option value="deep">🔍 Deep (10+ min read)</option>
             </select>
           </div>
           
-          <div class="toggle-group">
-            <label><input type="checkbox" id="includeEmojis" checked> Include Emojis</label>
-            <label><input type="checkbox" id="includeQuiz" checked> Quiz Questions</label>
-            <label><input type="checkbox" id="includeTimestamps" checked> Timestamps</label>
+          <!-- Feature Toggles -->
+          <div class="toggle-group grid grid-cols-2 gap-3">
+            <label class="flex items-center space-x-2 cursor-pointer">
+              <input type="checkbox" id="includeEmojis" checked class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500">
+              <span class="text-sm text-gray-700">😊 Include Emojis</span>
+            </label>
+            <label class="flex items-center space-x-2 cursor-pointer">
+              <input type="checkbox" id="includeQuiz" checked class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500">
+              <span class="text-sm text-gray-700">❓ Quiz Questions</span>
+            </label>
+            <label class="flex items-center space-x-2 cursor-pointer">
+              <input type="checkbox" id="includeTimestamps" checked class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500">
+              <span class="text-sm text-gray-700">⏱️ Timestamps</span>
+            </label>
+            <label class="flex items-center space-x-2 cursor-pointer">
+              <input type="checkbox" id="includeActionItems" checked class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500">
+              <span class="text-sm text-gray-700">🎯 Action Items</span>
+            </label>
           </div>
         </div>
         
-        <button id="summarizeBtn" class="rvised-button">
-          ✨ Generate Summary
+        <!-- Generate Button -->
+        <button id="summarizeBtn" class="rvised-button w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-3 px-4 rounded-lg hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+          </svg>
+          Generate Summary
         </button>
         
-        <div id="summaryResult" class="summary-result" style="display: none;">
-          <!-- Summary will be inserted here -->
+        <!-- Loading State -->
+        <div id="loadingState" class="loading-state hidden">
+          <div class="flex flex-col items-center py-8">
+            <div class="spinner w-12 h-12 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin"></div>
+            <p class="mt-4 text-gray-600">Analyzing video and generating summary...</p>
+            <p class="text-sm text-gray-500 mt-2">This may take 10-15 seconds</p>
+          </div>
         </div>
         
-        <div id="loadingState" class="loading-state" style="display: none;">
-          <div class="spinner"></div>
-          <p>Analyzing video and generating summary...</p>
+        <!-- Summary Result -->
+        <div id="summaryResult" class="summary-result hidden">
+          <!-- Summary will be inserted here -->
         </div>
       </div>
     </div>
@@ -466,6 +515,14 @@ function createRvisedOverlay() {
   
   // Add event listeners
   document.getElementById('summarizeBtn').addEventListener('click', handleSummarize);
+  
+  // Add close button functionality
+  const closeBtn = rvisedOverlay.querySelector('.rvised-close');
+  if (closeBtn) {
+    closeBtn.addEventListener('click', () => {
+      rvisedOverlay.style.display = 'none';
+    });
+  }
 }
 
 // Handle summarization process
@@ -484,8 +541,8 @@ async function handleSummarize() {
   const summarizeBtn = document.getElementById('summarizeBtn');
   
   // Show loading state
-  loadingState.style.display = 'block';
-  summaryResult.style.display = 'none';
+  loadingState.classList.remove('hidden');
+  summaryResult.classList.add('hidden');
   summarizeBtn.disabled = true;
   summarizeBtn.textContent = 'Processing...';
   
@@ -555,12 +612,17 @@ async function handleSummarize() {
         <p>Please try again or check your connection.</p>
       </div>
     `;
-    summaryResult.style.display = 'block';
+    summaryResult.classList.remove('hidden');
   } finally {
     isProcessing = false;
-    loadingState.style.display = 'none';
+    loadingState.classList.add('hidden');
     summarizeBtn.disabled = false;
-    summarizeBtn.textContent = '✨ Generate Summary';
+    summarizeBtn.innerHTML = `
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+      </svg>
+      Generate Summary
+    `;
   }
 }
 
@@ -692,7 +754,7 @@ function displaySummary(data) {
   `;
   
   summaryResult.innerHTML = html;
-  summaryResult.style.display = 'block';
+  summaryResult.classList.remove('hidden');
 }
 
 // Copy summary to clipboard

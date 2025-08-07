@@ -327,7 +327,6 @@ export async function POST(request: NextRequest): Promise<NextResponse<Summarize
       learningMode: (rawBody.settings?.learningMode || 'student').toLowerCase(),
       summaryDepth: (rawBody.settings?.summaryDepth || 'standard').toLowerCase(),
       includeEmojis: !!rawBody.settings?.includeEmojis,
-      includeCode: !!rawBody.settings?.includeCode,
       includeQuiz: !!rawBody.settings?.includeQuiz,
       generateQuiz: !!rawBody.settings?.includeQuiz, // Alias for backward compatibility
       includeTimestamps: !!rawBody.settings?.includeTimestamps
@@ -456,7 +455,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<Summarize
     console.log(`- Learning Mode: ${settings.learningMode}`)
     console.log(`- Summary Depth: ${settings.summaryDepth}`)
     console.log(`- Include Emojis: ${settings.includeEmojis}`)
-    console.log(`- Include Code: ${settings.includeCode}`)
+    // Code feature removed for simplicity
     console.log(`- Include Quiz: ${settings.includeQuiz}`)
     console.log(`- Include Timestamps: ${settings.includeTimestamps}`)
     console.log(`- Content Source: ${contentSource}`)
@@ -483,22 +482,37 @@ export async function POST(request: NextRequest): Promise<NextResponse<Summarize
         console.log('⚠️ AI failed to provide timestamps, generating server-side...')
         timestamps = []
         
-        // Try to parse from YouTube description first
+        // ENHANCED: Parse YouTube chapters from multiple sources
         if (metadata.description) {
           const lines = metadata.description.split(/\n|\r/)
-          const tsRegex = /^(\d{1,2}:\d{2})\s+(.+)/
+          
+          // Method 1: Standard chapter format (00:00 Title)
+          const chapterRegex = /^(\d{1,2}:\d{2})\s+(.+)/
+          // Method 2: Enhanced chapter format with dashes/bullets
+          const enhancedRegex = /^[\-•*]?\s*(\d{1,2}:\d{2})\s*[\-–—]?\s*(.+)/
+          // Method 3: Brackets format [00:00] Title
+          const bracketRegex = /^\[(\d{1,2}:\d{2})\]\s*(.+)/
+          
           for (const line of lines) {
-            const match = line.trim().match(tsRegex)
+            const cleanLine = line.trim()
+            if (!cleanLine) continue
+            
+            let match = cleanLine.match(chapterRegex) || 
+                       cleanLine.match(enhancedRegex) || 
+                       cleanLine.match(bracketRegex)
+            
             if (match) {
               const [, time, desc] = match
               timestamps.push({ 
                 time: time.length === 4 ? '0' + time : time, 
-                description: desc.trim() 
+                description: desc.trim().replace(/^[\-–—•*]+\s*/, '') // Clean up prefixes
               })
             }
-            if (timestamps.length >= 5) break
+            if (timestamps.length >= 8) break // Get more chapters
           }
         }
+        
+        console.log(`📝 Extracted ${timestamps.length} timestamps from description`)
         
         // If still no timestamps, create logical ones based on video length
         if (timestamps.length === 0) {
@@ -520,31 +534,9 @@ export async function POST(request: NextRequest): Promise<NextResponse<Summarize
       delete summaryData.timestampedSections
     }
     
-    // CODE SNIPPETS: Generate if enabled and content mentions programming
-    if (settings.includeCode) {
-      if (!summaryData.codeSnippets || !Array.isArray(summaryData.codeSnippets) || summaryData.codeSnippets.length === 0) {
-        const hasCode = content.toLowerCase().includes('code') || 
-                       content.toLowerCase().includes('programming') || 
-                       content.toLowerCase().includes('development') ||
-                       content.toLowerCase().includes('javascript') ||
-                       content.toLowerCase().includes('react') ||
-                       content.toLowerCase().includes('app')
-        
-        if (hasCode) {
-          console.log('📝 Generating fallback code snippets...')
-          summaryData.codeSnippets = [
-            {
-              language: "javascript",
-              code: "// Example from video\nconsole.log('Key concept demonstrated');",
-              description: "Basic example shown in the tutorial"
-            }
-          ]
-        }
-      }
-    } else {
-      summaryData.codeSnippets = null
-      delete summaryData.codeSnippets
-    }
+    // CODE SNIPPETS: REMOVED - Too niche, adds complexity without universal value
+    summaryData.codeSnippets = null
+    delete summaryData.codeSnippets
     
     // QUIZ: Always generate if enabled
     if (settings.includeQuiz) {
@@ -571,11 +563,40 @@ export async function POST(request: NextRequest): Promise<NextResponse<Summarize
       delete summaryData.codeSnippets;
     }
 
-    // Critical: Strip ALL emojis if toggle is OFF
-    if (!settings.includeEmojis) {
-      const emojiRegex = /[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu;
+    // EMOJI TOGGLE: Make dramatically visible difference
+    const emojiRegex = /[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu;
+    
+    if (settings.includeEmojis) {
+      // FORCE emojis to be visible when enabled
+      if (!emojiRegex.test(summaryData.mainTakeaway || '')) {
+        summaryData.mainTakeaway = '🎯 ' + (summaryData.mainTakeaway || '');
+      }
       
-      // Strip emojis from all text fields
+      // Add emojis to insights if not present
+      if (summaryData.keyInsights) {
+        summaryData.keyInsights = summaryData.keyInsights.map((insight, i) => {
+          if (!emojiRegex.test(insight)) {
+            const emojis = ['💡', '🔥', '✨', '⚡', '🚀', '💎', '🎉'];
+            return emojis[i % emojis.length] + ' ' + insight;
+          }
+          return insight;
+        });
+      }
+      
+      // Add emojis to action items if not present  
+      if (summaryData.actionItems) {
+        summaryData.actionItems = summaryData.actionItems.map((item, i) => {
+          if (!emojiRegex.test(item)) {
+            const emojis = ['🎯', '🔧', '📝', '⭐', '🎪', '🎨'];
+            return emojis[i % emojis.length] + ' ' + item;
+          }
+          return item;
+        });
+      }
+      
+      console.log('✨ Emojis FORCED ON - users will see clear visual difference');
+    } else {
+      // Strip ALL emojis when disabled
       summaryData.mainTakeaway = summaryData.mainTakeaway?.replace(emojiRegex, '').trim() || '';
       summaryData.summary = summaryData.summary?.replace(emojiRegex, '').trim() || '';
       
@@ -597,18 +618,16 @@ export async function POST(request: NextRequest): Promise<NextResponse<Summarize
         );
       }
       
-      console.log('🚫 Emojis stripped from response due to toggle being OFF');
+      console.log('🚫 Emojis STRIPPED - clean minimalist text only');
     }
 
     // STEP 4: FINAL VALIDATION & LOGGING
     const finalValidation = {
       hasTimestamps: !!summaryData.timestampedSections,
-      hasCode: !!summaryData.codeSnippets,
       hasQuiz: !!summaryData.quiz,
       hasEmojis: /[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu.test(JSON.stringify(summaryData)),
       settingsRequested: {
         timestamps: settings.includeTimestamps,
-        code: settings.includeCode,
         quiz: settings.includeQuiz,
         emojis: settings.includeEmojis
       }
@@ -616,7 +635,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<Summarize
     
     console.log('🎯 FINAL VALIDATION RESULTS:')
     console.log(`- Timestamps: ${finalValidation.hasTimestamps ? '✅' : '❌'} (requested: ${finalValidation.settingsRequested.timestamps})`)
-    console.log(`- Code: ${finalValidation.hasCode ? '✅' : '❌'} (requested: ${finalValidation.settingsRequested.code})`)
+    // Code feature removed
     console.log(`- Quiz: ${finalValidation.hasQuiz ? '✅' : '❌'} (requested: ${finalValidation.settingsRequested.quiz})`)
     console.log(`- Emojis: ${finalValidation.hasEmojis ? '✅' : '❌'} (requested: ${finalValidation.settingsRequested.emojis})`)
 

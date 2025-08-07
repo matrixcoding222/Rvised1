@@ -161,7 +161,6 @@ function createRvisedOverlay() {
           
           <div class="toggle-group">
             <label><input type="checkbox" id="includeEmojis" checked> Include Emojis</label>
-            <label><input type="checkbox" id="includeCode" checked> Code Snippets</label>
             <label><input type="checkbox" id="includeQuiz" checked> Quiz Questions</label>
             <label><input type="checkbox" id="includeTimestamps" checked> Timestamps</label>
           </div>
@@ -216,7 +215,6 @@ async function handleSummarize() {
       learningMode: document.getElementById('learningMode').value,
       summaryDepth: document.getElementById('summaryDepth').value,
       includeEmojis: document.getElementById('includeEmojis').checked,
-      includeCode: document.getElementById('includeCode').checked,
       includeQuiz: document.getElementById('includeQuiz').checked,
       includeTimestamps: document.getElementById('includeTimestamps').checked
     };
@@ -341,26 +339,7 @@ function displaySummary(data) {
     console.log(`✅ FRONTEND: Displayed ${timestamps.length} timestamp sections`);
   }
 
-  // FRONTEND VALIDATION - Always show code section if enabled
-  const codeEnabled = document.getElementById('includeCode')?.checked;
-  if (codeEnabled) {
-    const codeSnippets = data.codeSnippets || [];
-    html += `
-      <div class="code-snippets">
-        <h3>💻 Code Snippets</h3>
-        ${codeSnippets.length > 0 
-          ? codeSnippets.map(snippet => `
-            <div class="snippet">
-              <div class="snippet-header">${snippet.language}: ${snippet.description}</div>
-              <pre><code>${snippet.code}</code></pre>
-            </div>
-          `).join('')
-          : '<div class="snippet"><div class="snippet-header">No code examples found in this video</div></div>'
-        }
-      </div>
-    `;
-    console.log(`✅ FRONTEND: Displayed ${codeSnippets.length} code snippets`);
-  }
+  // CODE SNIPPETS: REMOVED - Feature eliminated for simplicity
 
   // FRONTEND VALIDATION - Always show quiz section if enabled
   const quizEnabled = document.getElementById('includeQuiz')?.checked;

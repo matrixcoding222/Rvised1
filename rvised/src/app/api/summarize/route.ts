@@ -513,12 +513,10 @@ export async function POST(request: NextRequest): Promise<NextResponse<Summarize
         console.log(`✅ Generated ${timestamps.length} timestamp sections`)
       }
     } else {
-      summaryData.timestampedSections = null
       delete summaryData.timestampedSections
     }
     
     // CODE SNIPPETS: REMOVED - Too niche, adds complexity without universal value
-    summaryData.codeSnippets = null
     delete summaryData.codeSnippets
     
     // QUIZ: Always generate if enabled
@@ -537,13 +535,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<Summarize
         ]
       }
     } else {
-      summaryData.quiz = null
       delete summaryData.quiz
-    }
-
-    if (!settings.includeCode) {
-      summaryData.codeSnippets = null;
-      delete summaryData.codeSnippets;
     }
 
     // EMOJI TOGGLE: Make dramatically visible difference

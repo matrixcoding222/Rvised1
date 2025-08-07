@@ -149,14 +149,19 @@ function generateSummaryNow() {
 
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('Popup DOM loaded, initializing...');
+    
     // Load saved settings
     loadSettings();
     
     // Add event listeners for navigation
     document.addEventListener('click', function(e) {
-        // Handle screen navigation
+        console.log('Click event:', e.target);
+        
+        // Handle screen navigation buttons
         if (e.target.hasAttribute('data-screen')) {
             const screenNumber = e.target.getAttribute('data-screen');
+            console.log('Navigating to screen:', screenNumber);
             goToScreen(screenNumber);
         }
         
@@ -165,6 +170,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const setupItem = e.target.closest('.setup-item');
             if (setupItem.hasAttribute('data-screen')) {
                 const screenNumber = setupItem.getAttribute('data-screen');
+                console.log('Setup item clicked, navigating to screen:', screenNumber);
                 goToScreen(screenNumber);
             }
         }
@@ -172,21 +178,25 @@ document.addEventListener('DOMContentLoaded', function() {
         // Handle back button clicks
         if (e.target.classList.contains('back-btn')) {
             const screenNumber = e.target.getAttribute('data-screen');
+            console.log('Back button clicked, navigating to screen:', screenNumber);
             goToScreen(screenNumber);
         }
         
-        // Handle finish setup
+        // Handle finish setup button
         if (e.target.textContent === 'Finish Setup') {
+            console.log('Finish Setup clicked');
             saveSettings();
         }
         
-        // Handle generate summary
+        // Handle generate summary button
         if (e.target.id === 'generateSummaryBtn') {
+            console.log('Generate Summary clicked');
             generateSummaryNow();
         }
         
-        // Handle start using
+        // Handle start using button
         if (e.target.id === 'startUsingBtn') {
+            console.log('Start Using clicked');
             window.close();
         }
     });
@@ -194,6 +204,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Handle form interactions
     document.addEventListener('change', function(e) {
         if (e.target.type === 'radio' || e.target.type === 'checkbox') {
+            console.log('Form element changed:', e.target.name, e.target.value);
             // Update display values based on selections
             updateDisplayValues();
         }
@@ -201,6 +212,8 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize display values
     updateDisplayValues();
+    
+    console.log('Popup initialization complete');
 });
 
 function updateDisplayValues() {

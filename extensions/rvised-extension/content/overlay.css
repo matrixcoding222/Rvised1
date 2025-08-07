@@ -269,6 +269,44 @@ pre {
   margin-bottom: 8px;
 }
 
+.quiz-question {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.question-number {
+  width: 24px;
+  height: 24px;
+  background: #007bff;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.question-content {
+  flex: 1;
+}
+
+.question-text {
+  margin: 0 0 8px 0;
+  font-weight: 500;
+  color: #333;
+}
+
+.answer-text {
+  margin: 0;
+  color: #666;
+  font-style: italic;
+  padding-left: 16px;
+  border-left: 2px solid #e9ecef;
+}
+
 .quiz-item p {
   margin: 0;
 }

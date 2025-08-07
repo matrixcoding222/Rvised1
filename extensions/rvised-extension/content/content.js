@@ -13,25 +13,61 @@ function getVideoId() {
   return urlParams.get('v');
 }
 
-// Extract YouTube chapters from page data
+// AGGRESSIVE YouTube chapter extraction - NO FALLBACKS, ONLY REAL DATA
 function extractChaptersFromPage() {
   try {
-    console.log('🔍 Extracting YouTube chapters from page...');
+    console.log('🔍 AGGRESSIVE YouTube chapter extraction starting...');
     
-    // Method 1: Look for chapters in page scripts (MORE AGGRESSIVE)
+    // METHOD 1: Direct DOM scraping from video player
+    console.log('📍 Method 1: Scraping video player DOM...');
+    const videoPlayer = document.querySelector('#movie_player');
+    if (videoPlayer) {
+      // Look for chapter elements in the player
+      const chapterElements = videoPlayer.querySelectorAll('[data-segment-time], .ytp-chapter-title, .segment-timestamp, .ytp-chapter');
+      console.log(`📍 Found ${chapterElements.length} chapter elements in player`);
+      
+      if (chapterElements.length > 0) {
+        const chapters = [];
+        chapterElements.forEach((el, index) => {
+          const timeAttr = el.getAttribute('data-segment-time') || 
+                          el.getAttribute('data-start-time') || 
+                          el.getAttribute('data-time');
+          const titleEl = el.querySelector('.segment-title') || 
+                         el.querySelector('.ytp-chapter-title') || 
+                         el.textContent;
+          
+          if (timeAttr && titleEl) {
+            const time = formatSeconds(parseInt(timeAttr));
+            const description = titleEl.trim();
+            chapters.push({ time, description });
+            console.log(`📍 Chapter ${index + 1}: ${time} - ${description}`);
+          }
+        });
+        
+        if (chapters.length > 0) {
+          console.log('✅ SUCCESS: Extracted chapters from video player DOM');
+          return chapters;
+        }
+      }
+    }
+    
+    // METHOD 2: Scrape from YouTube's internal data structures
+    console.log('📍 Method 2: Scraping internal YouTube data...');
     const scripts = document.querySelectorAll('script');
     console.log(`📖 Searching ${scripts.length} scripts for chapter data...`);
     
     for (const script of scripts) {
       const scriptContent = script.textContent;
       
-      // Look for various chapter patterns
+      // Look for various chapter patterns in YouTube's data
       const patterns = [
         /"chapters":\s*(\[[\s\S]*?\])/,
         /"macroMarkers":\s*(\[[\s\S]*?\])/,
         /"segments":\s*(\[[\s\S]*?\])/,
         /chapters\s*=\s*(\[[\s\S]*?\])/,
-        /macroMarkers\s*=\s*(\[[\s\S]*?\])/
+        /macroMarkers\s*=\s*(\[[\s\S]*?\])/,
+        /"markers":\s*(\[[\s\S]*?\])/,
+        /"timeline":\s*(\[[\s\S]*?\])/
       ];
       
       for (const pattern of patterns) {
@@ -43,9 +79,17 @@ function extractChaptersFromPage() {
             
             if (data.length > 0) {
               if (data[0].timeRangeStartMillis) {
-                return parseChapterData(data);
+                const chapters = parseChapterData(data);
+                console.log('✅ SUCCESS: Parsed chapters from timeRangeStartMillis format');
+                return chapters;
               } else if (data[0].startTime) {
-                return parseSimpleChapterData(data);
+                const chapters = parseSimpleChapterData(data);
+                console.log('✅ SUCCESS: Parsed chapters from startTime format');
+                return chapters;
+              } else if (data[0].time) {
+                const chapters = parseTimeFormatData(data);
+                console.log('✅ SUCCESS: Parsed chapters from time format');
+                return chapters;
               }
             }
           } catch (e) {
@@ -54,6 +98,52 @@ function extractChaptersFromPage() {
         }
       }
     }
+    
+    // METHOD 3: Look for chapter data in window object
+    console.log('📍 Method 3: Checking window object for chapter data...');
+    if (window.ytInitialData) {
+      try {
+        const data = window.ytInitialData;
+        console.log('📖 Found ytInitialData:', data);
+        
+        // Navigate through the data structure to find chapters
+        const playerResponse = data?.contents?.twoColumnWatchNextResults?.results?.results?.contents?.[0]?.videoPrimaryInfoRenderer;
+        if (playerResponse) {
+          console.log('📖 Found player response data');
+          // Look for chapters in various locations
+          const chapters = extractChaptersFromPlayerResponse(playerResponse);
+          if (chapters && chapters.length > 0) {
+            console.log('✅ SUCCESS: Extracted chapters from ytInitialData');
+            return chapters;
+          }
+        }
+      } catch (e) {
+        console.log('❌ Error accessing ytInitialData:', e);
+      }
+    }
+    
+    // METHOD 4: Look for chapters in video description
+    console.log('📍 Method 4: Scraping video description for timestamps...');
+    const descriptionElement = document.querySelector('#description-inline-expander #description');
+    if (descriptionElement) {
+      const descriptionText = descriptionElement.textContent;
+      console.log('📖 Found video description');
+      
+      const chapters = extractChaptersFromDescription(descriptionText);
+      if (chapters && chapters.length > 0) {
+        console.log('✅ SUCCESS: Extracted chapters from video description');
+        return chapters;
+      }
+    }
+    
+    console.log('❌ NO CHAPTERS FOUND: All extraction methods failed');
+    return null;
+    
+  } catch (error) {
+    console.log('❌ Error in chapter extraction:', error);
+    return null;
+  }
+}
     
     // Method 2: Look for chapters in DOM elements
     const chapterElements = document.querySelectorAll('[data-segment-time], .ytp-chapter-title, .segment-timestamp');
@@ -105,6 +195,95 @@ function parseSimpleChapterData(chapters) {
     time: formatSeconds(chapter.startTime || chapter.time || 0),
     description: chapter.title || chapter.name || 'Chapter'
   }));
+}
+
+// Parse time format data
+function parseTimeFormatData(chapters) {
+  return chapters.map(chapter => ({
+    time: formatSeconds(chapter.time || 0),
+    description: chapter.title || chapter.description || 'Chapter'
+  }));
+}
+
+// Extract chapters from player response data
+function extractChaptersFromPlayerResponse(playerResponse) {
+  try {
+    // Look for chapters in various locations within player response
+    const chapters = [];
+    
+    // Check for chapters in the video info
+    if (playerResponse.chapters) {
+      playerResponse.chapters.forEach(chapter => {
+        if (chapter.time && chapter.title) {
+          chapters.push({
+            time: formatSeconds(chapter.time),
+            description: chapter.title
+          });
+        }
+      });
+    }
+    
+    // Check for macro markers
+    if (playerResponse.macroMarkers) {
+      playerResponse.macroMarkers.forEach(marker => {
+        if (marker.timeRangeStartMillis && marker.title) {
+          chapters.push({
+            time: formatSeconds(marker.timeRangeStartMillis / 1000),
+            description: marker.title
+          });
+        }
+      });
+    }
+    
+    return chapters.length > 0 ? chapters : null;
+  } catch (e) {
+    console.log('❌ Error extracting from player response:', e);
+    return null;
+  }
+}
+
+// Extract chapters from video description
+function extractChaptersFromDescription(descriptionText) {
+  try {
+    const chapters = [];
+    const lines = descriptionText.split(/\n|\r/);
+    
+    // Multiple regex patterns for different timestamp formats
+    const patterns = [
+      /^(\d{1,2}:\d{2})\s+(.+)$/,                    // 00:00 Title
+      /^(\d{1,2}:\d{2}:\d{2})\s+(.+)$/,              // 00:00:00 Title
+      /^[\-•*]?\s*(\d{1,2}:\d{2})\s*[\-–—]?\s*(.+)$/, // - 00:00 - Title
+      /^\[(\d{1,2}:\d{2})\]\s*(.+)$/,                // [00:00] Title
+      /^\((\d{1,2}:\d{2})\)\s*(.+)$/,                // (00:00) Title
+      /^(\d{1,2}:\d{2})\s*[\-–—]\s*(.+)$/            // 00:00 - Title
+    ];
+    
+    for (const line of lines) {
+      const cleanLine = line.trim();
+      if (!cleanLine) continue;
+      
+      for (const pattern of patterns) {
+        const match = cleanLine.match(pattern);
+        if (match) {
+          const [, time, desc] = match;
+          // Ensure time format is mm:ss
+          const formattedTime = time.length === 4 ? '0' + time : time;
+          chapters.push({
+            time: formattedTime,
+            description: desc.trim().replace(/^[\-–—•*]+\s*/, '')
+          });
+          break; // Found a match, move to next line
+        }
+      }
+      
+      if (chapters.length >= 10) break; // Limit to 10 chapters
+    }
+    
+    return chapters.length > 0 ? chapters : null;
+  } catch (e) {
+    console.log('❌ Error extracting from description:', e);
+    return null;
+  }
 }
 
 // Format seconds to mm:ss
@@ -351,24 +530,16 @@ async function handleSummarize() {
     }
     const summaryData = apiResp.data || apiResp; // use nested data if present
     
-    // FORCE TIMESTAMPS: If timestamps are enabled but not provided, create fallback
+    // REAL DATA ONLY: Use only actual extracted chapters, no fallbacks
     const timestampsEnabled = document.getElementById('includeTimestamps')?.checked;
-    if (timestampsEnabled && (!summaryData.timestampedSections || summaryData.timestampedSections.length === 0)) {
-      console.log('⚠️ API did not provide timestamps, creating fallback...');
-      
-      // Try to use the chapters we extracted locally
+    if (timestampsEnabled) {
       if (localChapters && localChapters.length > 0) {
-        console.log('🎯 Using locally extracted chapters as fallback');
+        console.log('✅ Using real extracted chapters:', localChapters.length);
         summaryData.timestampedSections = localChapters;
       } else {
-        console.log('📝 Creating basic fallback timestamps');
-        summaryData.timestampedSections = [
-          { time: "00:00", description: "Introduction" },
-          { time: "02:00", description: "Main content begins" },
-          { time: "05:00", description: "Key concepts" },
-          { time: "08:00", description: "Advanced topics" },
-          { time: "12:00", description: "Conclusion" }
-        ];
+        console.log('❌ No real chapters found - timestamps disabled');
+        summaryData.timestampedSections = null;
+        delete summaryData.timestampedSections;
       }
     }
     
@@ -448,56 +619,63 @@ function displaySummary(data) {
     `;
   }
 
-  // COMPREHENSIVE TIMESTAMP DEBUGGING & DISPLAY
+  // REAL DATA TIMESTAMP DISPLAY - NO FALLBACKS
   const timestampsEnabled = document.getElementById('includeTimestamps')?.checked;
   console.log('🔍 FRONTEND TIMESTAMP DEBUG:');
   console.log('- Timestamps enabled:', timestampsEnabled);
   console.log('- Data received:', data);
   console.log('- timestampedSections:', data.timestampedSections);
-  console.log('- Type of timestampedSections:', typeof data.timestampedSections);
-  console.log('- Is array:', Array.isArray(data.timestampedSections));
   
-  if (timestampsEnabled) {
-    const timestamps = data.timestampedSections || [];
-    console.log('- Processed timestamps:', timestamps);
-    console.log('- Timestamps length:', timestamps.length);
+  if (timestampsEnabled && data.timestampedSections && data.timestampedSections.length > 0) {
+    const timestamps = data.timestampedSections;
+    console.log('- Real timestamps found:', timestamps.length);
     
     html += `
       <div class="timestamped-sections">
         <h3>📍 Timestamped Sections</h3>
         <ul>
-          ${timestamps.length > 0 
-            ? timestamps.map(section => {
-                console.log('- Processing section:', section);
-                return `<li><strong>[${section.time || '00:00'}]</strong> ${section.description || 'No description'}</li>`;
-              }).join('') 
-            : '<li><strong>[00:00]</strong> Timestamps not available for this video</li>'
-          }
+          ${timestamps.map(section => {
+              console.log('- Processing real section:', section);
+              return `<li><strong>[${section.time}]</strong> ${section.description}</li>`;
+            }).join('')}
         </ul>
       </div>
     `;
-    console.log(`✅ FRONTEND: Displayed ${timestamps.length} timestamp sections`);
+    console.log(`✅ FRONTEND: Displayed ${timestamps.length} real timestamp sections`);
+  } else if (timestampsEnabled) {
+    console.log('❌ FRONTEND: Timestamps enabled but no real data found');
+    html += `
+      <div class="timestamped-sections">
+        <h3>📍 Timestamped Sections</h3>
+        <p class="text-gray-500 text-sm">No chapters found in this video</p>
+      </div>
+    `;
   } else {
     console.log('❌ FRONTEND: Timestamps disabled by user');
   }
 
   // CODE SNIPPETS: REMOVED - Feature eliminated for simplicity
 
-  // FRONTEND VALIDATION - Always show quiz section if enabled
+  // IMPROVED QUIZ QUESTIONS DISPLAY
   const quizEnabled = document.getElementById('includeQuiz')?.checked;
   if (quizEnabled) {
     const quiz = data.quiz || [];
     html += `
       <div class="quiz-section">
-        <h3>🧪 Test Your Knowledge</h3>
+        <h3>🧪 Test Your Knowledge (${quiz.length} questions)</h3>
         ${quiz.length > 0 
-          ? quiz.map(q => `
+          ? quiz.map((q, index) => `
             <div class="quiz-item">
-              <p><strong>Q:</strong> ${q.question}</p>
-              <p><em>A: ${q.answer}</em></p>
+              <div class="quiz-question">
+                <div class="question-number">${index + 1}</div>
+                <div class="question-content">
+                  <p class="question-text"><strong>Q:</strong> ${q.question || q}</p>
+                  ${q.answer ? `<p class="answer-text"><em>A: ${q.answer}</em></p>` : ''}
+                </div>
+              </div>
             </div>
           `).join('')
-          : '<div class="quiz-item"><p><strong>Q:</strong> No quiz questions available for this video</p></div>'
+          : '<div class="quiz-item"><p class="text-gray-500 text-sm">No quiz questions available for this video</p></div>'
         }
       </div>
     `;

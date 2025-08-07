@@ -1,98 +1,94 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rvised Extension</title>
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        .screen {
-            opacity: 0;
-            transform: translateX(20px);
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            display: none;
-        }
-        .screen.active {
-            opacity: 1;
-            transform: translateX(0);
-            display: block;
-        }
-        .screen.slide-out {
-            opacity: 0;
-            transform: translateX(-20px);
-        }
-        .setup-item, .summary-item {
-            opacity: 0;
-            transform: translateY(10px);
-            animation: itemSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-        .setup-item:nth-child(1), .summary-item:nth-child(1) { animation-delay: 0.05s; }
-        .setup-item:nth-child(2), .summary-item:nth-child(2) { animation-delay: 0.1s; }
-        .setup-item:nth-child(3), .summary-item:nth-child(3) { animation-delay: 0.15s; }
-        .setup-item:nth-child(4), .summary-item:nth-child(4) { animation-delay: 0.2s; }
-        .setup-item:nth-child(5), .summary-item:nth-child(5) { animation-delay: 0.25s; }
-        .setup-item:nth-child(6), .summary-item:nth-child(6) { animation-delay: 0.3s; }
-        .setup-item:nth-child(7), .summary-item:nth-child(7) { animation-delay: 0.35s; }
-        .setup-item:nth-child(8), .summary-item:nth-child(8) { animation-delay: 0.4s; }
-        @keyframes itemSlideUp {
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .custom-radio {
-            appearance: none;
-            width: 16px;
-            height: 16px;
-            border: 2px solid #d1d5db;
-            border-radius: 50%;
-            position: relative;
-            cursor: pointer;
-        }
-        .custom-radio:checked {
-            border-color: #2563eb;
-        }
-        .custom-radio:checked::after {
-            content: '';
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #2563eb;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
-        .custom-checkbox {
-            appearance: none;
-            width: 16px;
-            height: 16px;
-            border: 2px solid #d1d5db;
-            border-radius: 4px;
-            position: relative;
-            cursor: pointer;
-        }
-        .custom-checkbox:checked {
-            border-color: #2563eb;
-            background: #2563eb;
-        }
-        .custom-checkbox:checked::after {
-            content: '✓';
-            color: white;
-            font-size: 10px;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
-        .clickable {
-            cursor: pointer;
-            user-select: none;
-        }
-    </style>
-</head>
+<html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rvised Extension</title>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body {
+font-family: 'Inter', sans-serif;
+}
+.screen {
+opacity: 0;
+transform: translateX(20px);
+transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+display: none;
+}
+.screen.active {
+opacity: 1;
+transform: translateX(0);
+display: block;
+}
+.screen.slide-out {
+opacity: 0;
+transform: translateX(-20px);
+}
+.setup-item, .summary-item {
+opacity: 0;
+transform: translateY(10px);
+animation: itemSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.setup-item:nth-child(1), .summary-item:nth-child(1) { animation-delay: 0.05s; }
+.setup-item:nth-child(2), .summary-item:nth-child(2) { animation-delay: 0.1s; }
+.setup-item:nth-child(3), .summary-item:nth-child(3) { animation-delay: 0.15s; }
+.setup-item:nth-child(4), .summary-item:nth-child(4) { animation-delay: 0.2s; }
+.setup-item:nth-child(5), .summary-item:nth-child(5) { animation-delay: 0.25s; }
+.setup-item:nth-child(6), .summary-item:nth-child(6) { animation-delay: 0.3s; }
+.setup-item:nth-child(7), .summary-item:nth-child(7) { animation-delay: 0.35s; }
+.setup-item:nth-child(8), .summary-item:nth-child(8) { animation-delay: 0.4s; }
+@keyframes itemSlideUp {
+to { opacity: 1; transform: translateY(0); }
+}
+.custom-radio {
+appearance: none;
+width: 16px;
+height: 16px;
+border: 2px solid #d1d5db;
+border-radius: 50%;
+position: relative;
+cursor: pointer;
+}
+.custom-radio:checked {
+border-color: #2563eb;
+}
+.custom-radio:checked::after {
+content: '';
+width: 8px;
+height: 8px;
+border-radius: 50%;
+background: #2563eb;
+position: absolute;
+top: 50%;
+left: 50%;
+transform: translate(-50%, -50%);
+}
+.custom-checkbox {
+appearance: none;
+width: 16px;
+height: 16px;
+border: 2px solid #d1d5db;
+border-radius: 4px;
+position: relative;
+cursor: pointer;
+}
+.custom-checkbox:checked {
+border-color: #2563eb;
+background: #2563eb;
+}
+.custom-checkbox:checked::after {
+content: '✓';
+color: white;
+font-size: 10px;
+position: absolute;
+top: 50%;
+left: 50%;
+transform: translate(-50%, -50%);
+}
+.clickable {
+cursor: pointer;
+user-select: none;
+}
+</style></head>
 <body class="bg-gray-50 p-4">
     <div class="max-w-sm mx-auto">
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden" style="width: 320px; height: 520px;">
@@ -201,7 +197,7 @@
 
                 <div class="px-5 py-4 flex-1 space-y-3">
                     <label class="setup-item flex items-start space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
-                        <input type="radio" name="learningMode" value="student" class="custom-radio mt-1" checked>
+                        <input type="radio" name="learningMode" value="student" class="custom-radio mt-1" checked="">
                         <div class="flex-1">
                             <div class="flex items-center mb-1">
                                 <i data-lucide="graduation-cap" class="w-4 h-4 text-blue-600 mr-2" style="stroke-width: 1.5;"></i>
@@ -277,7 +273,7 @@
                     </label>
 
                     <label class="setup-item flex items-start space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
-                        <input type="radio" name="summaryDepth" value="standard" class="custom-radio mt-1" checked>
+                        <input type="radio" name="summaryDepth" value="standard" class="custom-radio mt-1" checked="">
                         <div class="flex-1">
                             <div class="flex items-center justify-between mb-1">
                                 <span class="text-sm font-medium text-gray-900">Standard</span>
@@ -332,7 +328,7 @@
                 <div class="px-5 py-4 flex-1">
                     <div class="space-y-3">
                         <label class="setup-item flex items-center space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
-                            <input type="radio" name="project" value="general" class="custom-radio" checked>
+                            <input type="radio" name="project" value="general" class="custom-radio" checked="">
                             <div class="w-6 h-6 bg-blue-100 rounded-lg flex items-center justify-center">
                                 <i data-lucide="bookmark" class="w-3 h-3 text-blue-600" style="stroke-width: 1.5;"></i>
                             </div>
@@ -344,7 +340,7 @@
                             <div class="w-6 h-6 bg-green-100 rounded-lg flex items-center justify-center">
                                 <i data-lucide="briefcase" class="w-3 h-3 text-green-600" style="stroke-width: 1.5;"></i>
                             </div>
-                            <span class="text-sm font-medium text-gray-900">Work & Career</span>
+                            <span class="text-sm font-medium text-gray-900">Work &amp; Career</span>
                         </label>
 
                         <label class="setup-item flex items-center space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
@@ -405,7 +401,7 @@
                                         <div class="text-xs text-gray-500">Link to specific video moments</div>
                                     </div>
                                 </div>
-                                <input type="checkbox" id="includeTimestamps" class="custom-checkbox" checked>
+                                <input type="checkbox" class="custom-checkbox" checked="">
                             </label>
                         </div>
 
@@ -418,7 +414,20 @@
                                         <div class="text-xs text-gray-500">Extract actionable tasks</div>
                                     </div>
                                 </div>
-                                <input type="checkbox" id="includeActionItems" class="custom-checkbox" checked>
+                                <input type="checkbox" class="custom-checkbox" checked="">
+                            </label>
+                        </div>
+
+                        <div class="setup-item">
+                            <label class="flex items-center justify-between cursor-pointer">
+                                <div class="flex items-center space-x-3">
+                                    <span class="text-lg">📊</span>
+                                    <div>
+                                        <div class="text-sm font-medium text-gray-900">Code Snippets</div>
+                                        <div class="text-xs text-gray-500">Extract and format code examples</div>
+                                    </div>
+                                </div>
+                                <input type="checkbox" class="custom-checkbox">
                             </label>
                         </div>
 
@@ -431,7 +440,20 @@
                                         <div class="text-xs text-gray-500">Add visual cues to summaries</div>
                                     </div>
                                 </div>
-                                <input type="checkbox" id="includeEmojis" class="custom-checkbox" checked>
+                                <input type="checkbox" class="custom-checkbox" checked="">
+                            </label>
+                        </div>
+
+                        <div class="setup-item">
+                            <label class="flex items-center justify-between cursor-pointer">
+                                <div class="flex items-center space-x-3">
+                                    <span class="text-lg">📝</span>
+                                    <div>
+                                        <div class="text-sm font-medium text-gray-900">Section Headers</div>
+                                        <div class="text-xs text-gray-500">Organize content with clear sections</div>
+                                    </div>
+                                </div>
+                                <input type="checkbox" class="custom-checkbox" checked="">
                             </label>
                         </div>
 
@@ -444,33 +466,8 @@
                                         <div class="text-xs text-gray-500">Generate questions for review</div>
                                     </div>
                                 </div>
-                                <input type="checkbox" id="includeQuiz" class="custom-checkbox">
+                                <input type="checkbox" class="custom-checkbox">
                             </label>
-                        </div>
-
-                        <!-- Quiz Count Selection (only show if quiz is enabled) -->
-                        <div id="quizCountSection" class="setup-item hidden">
-                            <div class="flex items-center space-x-3">
-                                <span class="text-lg">📊</span>
-                                <div class="flex-1">
-                                    <div class="text-sm font-medium text-gray-900">Number of Questions</div>
-                                    <div class="text-xs text-gray-500">How many quiz questions to generate</div>
-                                </div>
-                            </div>
-                            <div class="mt-2 flex space-x-2">
-                                <label class="flex items-center space-x-2">
-                                    <input type="radio" name="quizCount" value="3" class="custom-radio">
-                                    <span class="text-xs">3</span>
-                                </label>
-                                <label class="flex items-center space-x-2">
-                                    <input type="radio" name="quizCount" value="5" class="custom-radio" checked>
-                                    <span class="text-xs">5</span>
-                                </label>
-                                <label class="flex items-center space-x-2">
-                                    <input type="radio" name="quizCount" value="10" class="custom-radio">
-                                    <span class="text-xs">10</span>
-                                </label>
-                            </div>
                         </div>
 
                         <div class="setup-item">
@@ -482,7 +479,7 @@
                                         <div class="text-xs text-gray-500">Suggest similar content</div>
                                     </div>
                                 </div>
-                                <input type="checkbox" id="includeResources" class="custom-checkbox" checked>
+                                <input type="checkbox" class="custom-checkbox" checked="">
                             </label>
                         </div>
 
@@ -495,7 +492,7 @@
                                         <div class="text-xs text-gray-500">Highlight important definitions</div>
                                     </div>
                                 </div>
-                                <input type="checkbox" id="includeKeyTerms" class="custom-checkbox" checked>
+                                <input type="checkbox" class="custom-checkbox" checked="">
                             </label>
                         </div>
                     </div>
@@ -566,6 +563,7 @@
                                 <span class="text-xs bg-white px-2 py-1 rounded-full border text-gray-700">⏱️ Timestamps</span>
                                 <span class="text-xs bg-white px-2 py-1 rounded-full border text-gray-700">🎯 Action Items</span>
                                 <span class="text-xs bg-white px-2 py-1 rounded-full border text-gray-700">😊 Emojis</span>
+                                <span class="text-xs bg-white px-2 py-1 rounded-full border text-gray-700">📝 Headers</span>
                                 <span class="text-xs bg-white px-2 py-1 rounded-full border text-gray-700">🔗 Resources</span>
                                 <span class="text-xs bg-white px-2 py-1 rounded-full border text-gray-700">🔍 Key Terms</span>
                             </div>
@@ -625,6 +623,69 @@
         </div>
     </div>
 
-    <script src="popup.js"></script>
-</body>
-</html>
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Screen navigation
+        function goToScreen(screenNumber) {
+            // Hide current screen
+            const currentScreen = document.querySelector('.screen.active');
+            if (currentScreen) {
+                currentScreen.classList.remove('active');
+                currentScreen.classList.add('slide-out');
+                
+                setTimeout(() => {
+                    currentScreen.classList.remove('slide-out');
+                }, 300);
+            }
+
+            // Show new screen
+            setTimeout(() => {
+                const newScreen = document.getElementById(`screen-${screenNumber}`);
+                if (newScreen) {
+                    newScreen.classList.add('active');
+                    
+                    // Re-initialize icons for the new screen
+                    setTimeout(() => {
+                        lucide.createIcons();
+                    }, 100);
+                }
+            }, 150);
+        }
+
+        // Initialize icons on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            lucide.createIcons();
+        });
+
+        // Handle form interactions
+        document.addEventListener('change', function(e) {
+            if (e.target.type === 'radio') {
+                // Update display values based on selections
+                updateDisplayValues();
+            }
+        });
+
+        function updateDisplayValues() {
+            // Update learning mode display
+            const learningMode = document.querySelector('input[name="learningMode"]:checked');
+            if (learningMode) {
+                const display = document.querySelector('.setup-item:first-child .text-xs');
+                if (display && learningMode.value) {
+                    display.textContent = learningMode.value.charAt(0).toUpperCase() + learningMode.value.slice(1);
+                }
+            }
+
+            // Update summary depth display  
+            const summaryDepth = document.querySelector('input[name="summaryDepth"]:checked');
+            if (summaryDepth) {
+                const display = document.querySelector('.setup-item:nth-child(2) .text-xs');
+                if (display && summaryDepth.value) {
+                    display.textContent = summaryDepth.value.charAt(0).toUpperCase() + summaryDepth.value.slice(1);
+                }
+            }
+        }
+    </script>
+
+</body></html>

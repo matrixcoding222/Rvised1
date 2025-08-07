@@ -494,11 +494,33 @@ export async function POST(request: NextRequest): Promise<NextResponse<Summarize
     console.log(`- Summary length: ${summaryData.summary?.length || 0} chars`)
     console.log(`- Contains emojis: ${/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu.test(summaryData.summary || '')}`)
 
-    // Server-side enforcement of feature toggles
-    if (!settings.includeTimestamps) {
-      summaryData.timestampedSections = null;
-      delete summaryData.timestampedSections;
+    // Server-side enforcement of feature toggles & fallbacks
+    if (settings.includeTimestamps) {
+      // Fallback: If AI did not provide timestampedSections, try to parse from video description
+      if (!summaryData.timestampedSections || !Array.isArray(summaryData.timestampedSections) || summaryData.timestampedSections.length === 0) {
+        const descTimestamps = [] as { time: string; description: string }[]
+        if (metadata.description) {
+          const lines = metadata.description.split(/\n|\r/)
+          const tsRegex = /^(\d{1,2}:\d{2})\s+(.+)/
+          for (const l of lines) {
+            const match = l.trim().match(tsRegex)
+            if (match) {
+              const [ , time, desc ] = match
+              descTimestamps.push({ time: time.length === 4 ? '0'+time : time, description: desc.trim() })
+            }
+            if (descTimestamps.length >= 5) break; // keep 5 sections max
+          }
+        }
+        if (descTimestamps.length) {
+          console.log('🩹 Fallback timestamps generated from description')
+          summaryData.timestampedSections = descTimestamps
+        }
+      }
+    } else {
+      summaryData.timestampedSections = null
+      delete summaryData.timestampedSections
     }
+
     if (!settings.includeQuiz) {
       summaryData.quiz = null;
       delete summaryData.quiz;

@@ -1,7 +1,10 @@
 // Screen navigation
 function goToScreen(screenNumber) {
+    console.log('goToScreen called with:', screenNumber);
+    
     // Hide all screens
     const screens = document.querySelectorAll('.screen');
+    console.log('Found screens:', screens.length);
     screens.forEach(screen => {
         screen.classList.remove('active');
     });
@@ -10,6 +13,9 @@ function goToScreen(screenNumber) {
     const targetScreen = document.getElementById(`screen-${screenNumber}`);
     if (targetScreen) {
         targetScreen.classList.add('active');
+        console.log('Successfully navigated to screen:', screenNumber);
+    } else {
+        console.error('Target screen not found:', screenNumber);
     }
 }
 
@@ -60,6 +66,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
 // Save settings when user finishes setup
 function saveSettings() {
+    console.log('saveSettings called');
     const settings = getCurrentSettings();
     
     // Save to chrome storage
@@ -124,6 +131,7 @@ function loadSettings() {
 
 // Generate summary immediately
 function generateSummaryNow() {
+    console.log('generateSummaryNow called');
     const settings = getCurrentSettings();
     
     // Save settings first
@@ -156,13 +164,20 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Add event listeners for navigation
     document.addEventListener('click', function(e) {
-        console.log('Click event:', e.target);
+        console.log('Click event detected on:', e.target);
+        console.log('Target tagName:', e.target.tagName);
+        console.log('Target className:', e.target.className);
+        console.log('Target id:', e.target.id);
+        console.log('Target textContent:', e.target.textContent);
+        console.log('Target hasAttribute data-screen:', e.target.hasAttribute('data-screen'));
+        console.log('Target data-screen value:', e.target.getAttribute('data-screen'));
         
         // Handle screen navigation buttons
         if (e.target.hasAttribute('data-screen')) {
             const screenNumber = e.target.getAttribute('data-screen');
             console.log('Navigating to screen:', screenNumber);
             goToScreen(screenNumber);
+            return;
         }
         
         // Handle setup item clicks
@@ -172,6 +187,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const screenNumber = setupItem.getAttribute('data-screen');
                 console.log('Setup item clicked, navigating to screen:', screenNumber);
                 goToScreen(screenNumber);
+                return;
             }
         }
         
@@ -180,25 +196,31 @@ document.addEventListener('DOMContentLoaded', function() {
             const screenNumber = e.target.getAttribute('data-screen');
             console.log('Back button clicked, navigating to screen:', screenNumber);
             goToScreen(screenNumber);
+            return;
         }
         
         // Handle finish setup button
         if (e.target.textContent === 'Finish Setup') {
             console.log('Finish Setup clicked');
             saveSettings();
+            return;
         }
         
         // Handle generate summary button
         if (e.target.id === 'generateSummaryBtn') {
             console.log('Generate Summary clicked');
             generateSummaryNow();
+            return;
         }
         
         // Handle start using button
         if (e.target.id === 'startUsingBtn') {
             console.log('Start Using clicked');
             window.close();
+            return;
         }
+        
+        console.log('No specific handler found for this click');
     });
     
     // Handle form interactions
@@ -214,6 +236,15 @@ document.addEventListener('DOMContentLoaded', function() {
     updateDisplayValues();
     
     console.log('Popup initialization complete');
+    
+    // Debug: Check if elements exist
+    console.log('Debug: Checking if elements exist...');
+    console.log('Setup items:', document.querySelectorAll('.setup-item').length);
+    console.log('Buttons with data-screen:', document.querySelectorAll('[data-screen]').length);
+    console.log('Back buttons:', document.querySelectorAll('.back-btn').length);
+    console.log('Finish Setup button:', document.querySelector('button:contains("Finish Setup")'));
+    console.log('Generate Summary button:', document.getElementById('generateSummaryBtn'));
+    console.log('Start Using button:', document.getElementById('startUsingBtn'));
 });
 
 function updateDisplayValues() {

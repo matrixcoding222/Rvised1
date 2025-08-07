@@ -105,47 +105,7 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 })
 
-// Enhanced video type detection
-const VIDEO_TYPES = [
-  { 
-    type: "tutorial", 
-    keywords: ["tutorial", "how to", "step by step", "guide", "learn", "course", "build", "create", "make", "coding", "programming", "walkthrough", "follow along"]
-  },
-  { 
-    type: "lecture", 
-    keywords: ["lecture", "professor", "class", "university", "academic", "education", "explain", "theory", "concept", "fundamentals", "basics", "introduction to"]
-  },
-  { 
-    type: "podcast", 
-    keywords: ["podcast", "interview", "conversation", "discussion", "talk", "chat", "episode", "show", "guest", "host"]
-  }
-]
-
-function detectVideoType(title: string, description: string = "", duration?: string): "tutorial" | "lecture" | "podcast" | "other" {
-  const haystack = `${title} ${description}`.toLowerCase()
-  
-  // Check duration hints (longer videos more likely to be lectures/podcasts)
-  const isLongForm = duration && (duration.includes('H') || parseInt(duration.replace(/\D/g, '')) > 30)
-  
-  // Score each type
-  const scores = VIDEO_TYPES.map(entry => ({
-    type: entry.type,
-    score: entry.keywords.reduce((acc, keyword) => {
-      const matches = (haystack.match(new RegExp(keyword, 'g')) || []).length
-      return acc + matches
-    }, 0)
-  }))
-  
-  // Boost podcast/lecture scores for long-form content
-  if (isLongForm) {
-    scores.find(s => s.type === 'podcast')!.score *= 1.5
-    scores.find(s => s.type === 'lecture')!.score *= 1.3
-  }
-  
-  // Return highest scoring type, or "other" if no matches
-  const bestMatch = scores.reduce((max, current) => current.score > max.score ? current : max)
-  return bestMatch.score > 0 ? bestMatch.type as any : "other"
-}
+// Removed unreliable video type detection - let AI determine content type naturally from transcript
 
 interface SummarizeResponse {
   success: boolean
@@ -153,7 +113,6 @@ interface SummarizeResponse {
     videoTitle: string
     videoId: string
     duration: string
-    videoType: "tutorial" | "lecture" | "podcast" | "other"
     mainTakeaway: string
     summary: string
     techStack?: string[]
@@ -216,7 +175,7 @@ async function getVideoMetadata(videoId: string) {
   }
 }
 
-async function generateSummary(content: string, videoTitle: string, contentSource: string, videoType: string, settings?: any): Promise<{ 
+async function generateSummary(content: string, videoTitle: string, contentSource: string, settings?: any): Promise<{ 
   mainTakeaway: string
   summary: string
   techStack?: string[]
@@ -233,13 +192,6 @@ async function generateSummary(content: string, videoTitle: string, contentSourc
     'description': 'video description', 
     'metadata': 'video title and metadata'
   }[contentSource] || 'available content'
-
-  const videoTypePrompts = {
-    'tutorial': 'Focus on step-by-step instructions, code examples, and actionable learning outcomes. Extract specific tech stack, implementation details, and practical examples from the content.',
-    'lecture': 'Emphasize theoretical concepts, academic insights, and foundational knowledge. Structure for educational comprehension with detailed explanations.',
-    'podcast': 'Highlight key discussion points, guest insights, and conversational takeaways. Focus on perspectives, opinions, and detailed conversations shared.',
-    'other': 'Provide a comprehensive summary capturing the main value and detailed learnings from the content.'
-  }
 
   const contentQualityNote = contentSource === 'transcript' 
     ? 'You have access to the full video transcript. Use this rich content to create detailed, comprehensive summaries with specific examples and quotes.' 
@@ -259,52 +211,50 @@ async function generateSummary(content: string, videoTitle: string, contentSourc
     deep: 'SUMMARY MUST BE 600-800 WORDS. Provide extensive analysis with detailed insights (7+) and thorough actionable steps (5+).'
   }
 
-  // Explicit feature instructions
+  // Explicit feature instructions with stronger enforcement
   const featureInstructions: string[] = []
   
   if (settings?.includeEmojis) {
-    featureInstructions.push('REQUIRED: Use relevant emojis in ALL section headings and key points for visual appeal.')
+    featureInstructions.push('✅ EMOJIS: Use relevant emojis in section headings and key points.')
   } else {
-    featureInstructions.push('FORBIDDEN: Do NOT use any emojis anywhere in the response.')
+    featureInstructions.push('🚫 NO EMOJIS: Absolutely NO emojis anywhere. Use plain text only.')
   }
   
   if (settings?.includeCode && contentSource === 'transcript') {
-    featureInstructions.push('REQUIRED: Include "codeSnippets" section with actual code examples from the video (if any code is discussed).')
+    featureInstructions.push('✅ CODE: Include codeSnippets section with actual code examples if discussed.')
   } else {
-    featureInstructions.push('FORBIDDEN: Set "codeSnippets": null - do not include this section.')
+    featureInstructions.push('🚫 NO CODE: Set codeSnippets to null.')
   }
   
   if (settings?.generateQuiz) {
-    featureInstructions.push('REQUIRED: Include "quiz" section with 2-3 challenging questions that test deep understanding.')
+    featureInstructions.push('✅ QUIZ: Include quiz section with 2-3 challenging questions.')
   } else {
-    featureInstructions.push('FORBIDDEN: Set "quiz": null - do not include quiz questions.')
+    featureInstructions.push('🚫 NO QUIZ: Set quiz to null.')
   }
   
   if (settings?.includeTimestamps && contentSource === 'transcript') {
-    featureInstructions.push('REQUIRED: Include "timestampedSections" with [mm:ss] timestamps for major video sections.')
+    featureInstructions.push('✅ TIMESTAMPS: Include timestampedSections with [mm:ss] markers.')
   } else {
-    featureInstructions.push('FORBIDDEN: Set "timestampedSections": null - do not include timestamps.')
+    featureInstructions.push('🚫 NO TIMESTAMPS: Set timestampedSections to null.')
   }
 
   const prompt = `
 Video: "${videoTitle}"
-Type: ${videoType} | Source: ${sourceDescription}
-Mode: ${settings?.learningMode || 'student'} | Depth: ${settings?.summaryDepth || 'standard'}
+Source: ${sourceDescription} | Mode: ${settings?.learningMode || 'student'} | Depth: ${settings?.summaryDepth || 'standard'}
 
 ${contentQualityNote}
 
 CONTENT:
 ${content}
 
-INSTRUCTIONS:
-${videoTypePrompts[videoType as keyof typeof videoTypePrompts]}
-
 DEPTH REQUIREMENT: ${depthInstructions[settings?.summaryDepth as keyof typeof depthInstructions] || depthInstructions.standard}
 
 FEATURE REQUIREMENTS:
 ${featureInstructions.join('\n')}
 
-Respond with PURE JSON only - no markdown, no explanations:
+Extract meaningful insights and actionable content from this video. Focus on accuracy and avoid assumptions about video type.
+
+Respond with PURE JSON only:
 
 {
   "mainTakeaway": "Single powerful sentence capturing core value",
@@ -511,17 +461,52 @@ export async function POST(request: NextRequest): Promise<NextResponse<Summarize
       contentSource = 'title-description'
     }
 
-    // Detect video type first
-    const detectedVideoType = detectVideoType(metadata.title, metadata.description, metadata.duration)
-    
-    // Generate summary with OpenAI
+    // Generate summary with OpenAI (no video type detection - let AI determine content naturally)
     console.log(`Generating summary from ${contentSource} with settings:`, settings)
-    const summaryData = await generateSummary(contentToSummarize, metadata.title, contentSource, detectedVideoType, settings)
+    const summaryData = await generateSummary(contentToSummarize, metadata.title, contentSource, settings)
 
-    // Apply feature toggles
-    if (!settings.includeTimestamps) delete summaryData.timestampedSections;
-    if (!settings.includeQuiz) delete summaryData.quiz;
-    if (!settings.includeCode) delete summaryData.codeSnippets;
+    // Server-side enforcement of feature toggles
+    if (!settings.includeTimestamps) {
+      summaryData.timestampedSections = null;
+      delete summaryData.timestampedSections;
+    }
+    if (!settings.includeQuiz) {
+      summaryData.quiz = null;
+      delete summaryData.quiz;
+    }
+    if (!settings.includeCode) {
+      summaryData.codeSnippets = null;
+      delete summaryData.codeSnippets;
+    }
+
+    // Critical: Strip ALL emojis if toggle is OFF
+    if (!settings.includeEmojis) {
+      const emojiRegex = /[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu;
+      
+      // Strip emojis from all text fields
+      summaryData.mainTakeaway = summaryData.mainTakeaway?.replace(emojiRegex, '').trim() || '';
+      summaryData.summary = summaryData.summary?.replace(emojiRegex, '').trim() || '';
+      
+      if (summaryData.keyInsights) {
+        summaryData.keyInsights = summaryData.keyInsights.map(insight => 
+          insight.replace(emojiRegex, '').trim()
+        );
+      }
+      
+      if (summaryData.actionItems) {
+        summaryData.actionItems = summaryData.actionItems.map(item => 
+          item.replace(emojiRegex, '').trim()
+        );
+      }
+      
+      if (summaryData.keyPoints) {
+        summaryData.keyPoints = summaryData.keyPoints.map(point => 
+          point.replace(emojiRegex, '').trim()
+        );
+      }
+      
+      console.log('🚫 Emojis stripped from response due to toggle being OFF');
+    }
 
     return NextResponse.json({
       success: true,
@@ -531,7 +516,6 @@ export async function POST(request: NextRequest): Promise<NextResponse<Summarize
         channel: metadata.channel || '',
         videoId,
         duration: metadata.duration,
-        videoType: detectedVideoType,
         ...summaryData
       }
     }, {

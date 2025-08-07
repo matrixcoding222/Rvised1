@@ -323,43 +323,64 @@ function displaySummary(data) {
     `;
   }
 
-  if (data.timestampedSections && data.timestampedSections.length > 0) {
+  // STEP 3: FRONTEND VALIDATION - Always show timestamp section if enabled
+  const timestampsEnabled = document.getElementById('includeTimestamps')?.checked;
+  if (timestampsEnabled) {
+    const timestamps = data.timestampedSections || [];
     html += `
       <div class="timestamped-sections">
         <h3>📍 Timestamped Sections</h3>
         <ul>
-          ${data.timestampedSections.map(section => `<li><strong>[${section.time}]</strong> ${section.description}</li>`).join('')}
+          ${timestamps.length > 0 
+            ? timestamps.map(section => `<li><strong>[${section.time}]</strong> ${section.description}</li>`).join('') 
+            : '<li><strong>[00:00]</strong> Timestamps not available for this video</li>'
+          }
         </ul>
       </div>
     `;
+    console.log(`✅ FRONTEND: Displayed ${timestamps.length} timestamp sections`);
   }
 
-  if (data.codeSnippets && data.codeSnippets.length > 0) {
+  // FRONTEND VALIDATION - Always show code section if enabled
+  const codeEnabled = document.getElementById('includeCode')?.checked;
+  if (codeEnabled) {
+    const codeSnippets = data.codeSnippets || [];
     html += `
       <div class="code-snippets">
         <h3>💻 Code Snippets</h3>
-        ${data.codeSnippets.map(snippet => `
-          <div class="snippet">
-            <div class="snippet-header">${snippet.language}: ${snippet.description}</div>
-            <pre><code>${snippet.code}</code></pre>
-          </div>
-        `).join('')}
+        ${codeSnippets.length > 0 
+          ? codeSnippets.map(snippet => `
+            <div class="snippet">
+              <div class="snippet-header">${snippet.language}: ${snippet.description}</div>
+              <pre><code>${snippet.code}</code></pre>
+            </div>
+          `).join('')
+          : '<div class="snippet"><div class="snippet-header">No code examples found in this video</div></div>'
+        }
       </div>
     `;
+    console.log(`✅ FRONTEND: Displayed ${codeSnippets.length} code snippets`);
   }
 
-  if (data.quiz && data.quiz.length > 0) {
+  // FRONTEND VALIDATION - Always show quiz section if enabled
+  const quizEnabled = document.getElementById('includeQuiz')?.checked;
+  if (quizEnabled) {
+    const quiz = data.quiz || [];
     html += `
       <div class="quiz-section">
         <h3>🧪 Test Your Knowledge</h3>
-        ${data.quiz.map(q => `
-          <div class="quiz-item">
-            <p><strong>Q:</strong> ${q.question}</p>
-            <p><em>A: ${q.answer}</em></p>
-          </div>
-        `).join('')}
+        ${quiz.length > 0 
+          ? quiz.map(q => `
+            <div class="quiz-item">
+              <p><strong>Q:</strong> ${q.question}</p>
+              <p><em>A: ${q.answer}</em></p>
+            </div>
+          `).join('')
+          : '<div class="quiz-item"><p><strong>Q:</strong> No quiz questions available for this video</p></div>'
+        }
       </div>
     `;
+    console.log(`✅ FRONTEND: Displayed ${quiz.length} quiz questions`);
   }
 
   

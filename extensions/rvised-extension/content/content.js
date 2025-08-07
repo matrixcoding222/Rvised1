@@ -13,7 +13,7 @@ function getVideoId() {
   return urlParams.get('v');
 }
 
-// Extract transcript directly from YouTube's player data
+// Extract transcript WITH TIMESTAMPS directly from YouTube's player data  
 function extractTranscriptFromPage() {
   return new Promise((resolve) => {
     try {
@@ -36,34 +36,80 @@ function extractTranscriptFromPage() {
       }
       
       if (transcriptData && transcriptData.length > 0) {
-        // Found transcript data, fetch the actual transcript
+        // Found transcript data, fetch the actual transcript WITH TIMESTAMPS
         const englishTrack = transcriptData.find(track => 
           track.languageCode && track.languageCode.startsWith('en')
         ) || transcriptData[0];
         
         if (englishTrack && englishTrack.baseUrl) {
           let trackUrl = englishTrack.baseUrl.replace(/\\u0026/g, '&');
+          // Request JSON format to get timestamps
           if (!trackUrl.includes('fmt=')) {
-            trackUrl += '&fmt=vtt';
+            trackUrl += '&fmt=json3';
           }
           
           fetch(trackUrl)
-            .then(response => response.text())
-            .then(vtt => {
-              const lines = vtt
-                .split('\n')
-                .map(line => line.trim())
-                .filter(line => 
-                  line && 
-                  !line.startsWith('WEBVTT') && 
-                  !/^\d+$/.test(line) && 
-                  !/^\d{2}:\d{2}:\d{2}\.\d{3}/.test(line)
-                );
-              resolve(lines.join(' '));
+            .then(response => response.json())
+            .then(json => {
+              if (json?.events) {
+                // Extract both text and timing information
+                let transcriptWithTimestamps = '';
+                let currentTime = 0;
+                
+                json.events.forEach(event => {
+                  if (event.tStartMs !== undefined) {
+                    currentTime = Math.floor(event.tStartMs / 1000);
+                  }
+                  if (event.segs) {
+                    const minutes = Math.floor(currentTime / 60);
+                    const seconds = currentTime % 60;
+                    const timeStamp = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                    
+                    const text = event.segs.map(seg => seg.utf8).join('').trim();
+                    if (text) {
+                      transcriptWithTimestamps += `[${timeStamp}] ${text} `;
+                    }
+                  }
+                });
+                
+                console.log('✅ Extracted transcript with timestamps');
+                resolve(transcriptWithTimestamps.trim());
+              } else {
+                // Fallback to VTT if JSON doesn't work
+                let vttUrl = englishTrack.baseUrl.replace(/\\u0026/g, '&') + '&fmt=vtt';
+                return fetch(vttUrl).then(r => r.text()).then(vtt => {
+                  const lines = vtt
+                    .split('\n')
+                    .map(line => line.trim())
+                    .filter(line => 
+                      line && 
+                      !line.startsWith('WEBVTT') && 
+                      !/^\d+$/.test(line) && 
+                      !/^\d{2}:\d{2}:\d{2}\.\d{3}/.test(line)
+                    );
+                  resolve(lines.join(' '));
+                });
+              }
             })
             .catch(err => {
-              console.log('Failed to fetch transcript:', err);
-              resolve(null);
+              console.log('Failed to fetch JSON transcript, trying VTT fallback:', err);
+              // Fallback to VTT format
+              let vttUrl = englishTrack.baseUrl.replace(/\\u0026/g, '&') + '&fmt=vtt';
+              fetch(vttUrl)
+                .then(response => response.text())
+                .then(vtt => {
+                  const lines = vtt
+                    .split('\n')
+                    .map(line => line.trim())
+                    .filter(line => 
+                      line && 
+                      !line.startsWith('WEBVTT') && 
+                      !/^\d+$/.test(line) && 
+                      !/^\d{2}:\d{2}:\d{2}\.\d{3}/.test(line)
+                    );
+                  resolve(lines.join(' '));
+                })
+                .catch(() => resolve(null));
             });
         } else {
           resolve(null);

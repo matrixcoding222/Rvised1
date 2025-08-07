@@ -232,8 +232,8 @@ async function generateSummary(content: string, videoTitle: string, contentSourc
     featureInstructions.push('🚫 NO QUIZ: Set quiz to null.')
   }
   
-  if (settings?.includeTimestamps && contentSource === 'transcript') {
-    featureInstructions.push('✅ TIMESTAMPS: Include timestampedSections with [mm:ss] markers.')
+  if (settings?.includeTimestamps) {
+    featureInstructions.push('✅ TIMESTAMPS: Create timestampedSections array breaking down video into 3-5 major sections with [mm:ss] timestamps. Extract timing from transcript if available, or estimate based on content flow.')
   } else {
     featureInstructions.push('🚫 NO TIMESTAMPS: Set timestampedSections to null.')
   }
@@ -262,7 +262,7 @@ Respond with PURE JSON only:
   "techStack": ["tech1", "tech2"] // null if not technical,
   "keyInsights": ["insight with examples", "..."], // Match depth requirements
   "actionItems": ["specific actionable step", "..."], // Match depth requirements  
-  ${settings?.includeTimestamps && contentSource === 'transcript' ? '"timestampedSections": [{"time": "mm:ss", "description": "section"}],' : '"timestampedSections": null,'}
+  ${settings?.includeTimestamps ? '"timestampedSections": [{"time": "mm:ss", "description": "section"}],' : '"timestampedSections": null,'}
   ${settings?.includeCode ? '"codeSnippets": [{"language": "js", "code": "code", "description": "what it does"}],' : '"codeSnippets": null,'}
   ${settings?.generateQuiz ? '"quiz": [{"question": "challenging question", "answer": "detailed answer"}],' : '"quiz": null,'}
   "resources": [{"title": "name", "url": "if_mentioned", "type": "type"}], // null if none

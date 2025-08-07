@@ -547,14 +547,25 @@ async function handleSummarize() {
   summarizeBtn.textContent = 'Processing...';
   
   try {
-    // Get settings from UI
-    const settings = {
-      learningMode: document.getElementById('learningMode').value,
-      summaryDepth: document.getElementById('summaryDepth').value,
-      includeEmojis: document.getElementById('includeEmojis').checked,
-      includeQuiz: document.getElementById('includeQuiz').checked,
-      includeTimestamps: document.getElementById('includeTimestamps').checked
-    };
+    // Get settings from popup or fallback to UI
+    let settings = window.rvisedSettings;
+    
+    if (!settings) {
+      // Fallback to UI elements if popup settings not available
+      settings = {
+        learningMode: document.getElementById('learningMode')?.value || 'student',
+        summaryDepth: document.getElementById('summaryDepth')?.value || 'standard',
+        includeEmojis: document.getElementById('includeEmojis')?.checked || false,
+        includeQuiz: document.getElementById('includeQuiz')?.checked || false,
+        includeTimestamps: document.getElementById('includeTimestamps')?.checked || false,
+        includeActionItems: document.getElementById('includeActionItems')?.checked || false,
+        includeResources: document.getElementById('includeResources')?.checked || false,
+        includeKeyTerms: document.getElementById('includeKeyTerms')?.checked || false,
+        quizCount: document.querySelector('input[name="quizCount"]:checked')?.value || '5'
+      };
+    }
+    
+    console.log('⚙️ Using settings:', settings);
     
     // Extract both transcript and chapters locally
     console.log('🔍 Attempting to extract transcript and chapters locally...');
@@ -588,7 +599,7 @@ async function handleSummarize() {
     const summaryData = apiResp.data || apiResp; // use nested data if present
     
     // REAL DATA ONLY: Use only actual extracted chapters, no fallbacks
-    const timestampsEnabled = document.getElementById('includeTimestamps')?.checked;
+    const timestampsEnabled = settings.includeTimestamps;
     if (timestampsEnabled) {
       if (localChapters && localChapters.length > 0) {
         console.log('✅ Using real extracted chapters:', localChapters.length);
@@ -806,7 +817,12 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 
 // Update settings from popup
 function updateSettingsFromPopup(settings) {
-  // Update UI elements with new settings
+  console.log('⚙️ Received settings from popup:', settings);
+  
+  // Store settings globally for use in handleSummarize
+  window.rvisedSettings = settings;
+  
+  // Update UI elements with new settings if they exist
   if (settings.learningMode) {
     const learningModeSelect = document.getElementById('learningMode');
     if (learningModeSelect) {

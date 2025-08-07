@@ -1,6 +1,5 @@
 {
-  "rootDirectory": "rvised",
-  "buildCommand": "npm run build",
-  "outputDirectory": ".next",
-  "installCommand": "npm install"
+  "buildCommand": "cd rvised && npm run build",
+  "outputDirectory": "rvised/.next",
+  "installCommand": "cd rvised && npm install"
 }

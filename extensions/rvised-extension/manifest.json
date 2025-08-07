@@ -1,0 +1,43 @@
+{
+  "manifest_version": 3,
+  "name": "Rvised - YouTube Video Summarizer",
+  "version": "1.0.0",
+  "description": "Transform any YouTube video into structured learning content with AI-powered summaries",
+  
+  "permissions": [
+    "activeTab",
+    "storage",
+    "contextMenus"
+  ],
+  
+  "host_permissions": [
+    "https://www.youtube.com/*",
+    "https://rvised.vercel.app/*",
+    "https://localhost:3000/*"
+  ],
+  
+  "content_scripts": [
+    {
+      "matches": ["https://www.youtube.com/watch*"],
+      "js": ["content/content.js"],
+      "css": ["content/overlay.css"],
+      "run_at": "document_end"
+    }
+  ],
+  
+  "background": {
+    "service_worker": "background/background.js"
+  },
+  
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_title": "Rvised - Summarize Video"
+  },
+  
+  "web_accessible_resources": [
+    {
+      "resources": ["content/*"],
+      "matches": ["https://www.youtube.com/*"]
+    }
+  ]
+}

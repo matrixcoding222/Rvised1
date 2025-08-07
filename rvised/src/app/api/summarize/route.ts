@@ -3,16 +3,20 @@ import { YoutubeTranscript } from 'youtube-transcript'
 
 import { Innertube } from 'youtubei.js'
 
-// Fallback 0 – Innertube API (robust, no scraping)
+// CORS headers for Chrome extension
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  'Access-Control-Max-Age': '86400'
+}
+
+// Fallback 0 – Innertube API (temporarily disabled due to API changes)
 async function fetchTranscriptInnertube(videoId: string): Promise<string[]> {
   try {
-    const youtube = await Innertube.create();
-    const info = await youtube.getInfo(videoId);
-    const transcript = await info.getTranscript('en'); // prefer English
-    if (!transcript?.content?.body?.initial_segments?.length) return [];
-    return transcript.content.body.initial_segments
-      .filter((seg:any)=> seg.text)
-      .map((seg:any)=> seg.text);
+    // TODO: Fix Innertube API integration after library update
+    console.log('Innertube method temporarily disabled for deployment');
+    return [];
   } catch (e) {
     console.log('Innertube transcript error:', e instanceof Error ? e.message : 'Unknown error');
     return [];
@@ -21,6 +25,8 @@ async function fetchTranscriptInnertube(videoId: string): Promise<string[]> {
 
 // Direct transcript fetch fallback (parses captionTracks JSON directly from the watch page)
 async function fetchTranscriptDirect(videoId: string): Promise<string[]> {
+  // Returns [] if nothing found; does not throw
+
   try {
     const watchUrl = `https://www.youtube.com/watch?v=${videoId}&hl=en`
     const html = await fetch(watchUrl).then(res => res.text())
@@ -70,6 +76,24 @@ async function fetchTranscriptDirect(videoId: string): Promise<string[]> {
     return lines
   } catch (err) {
     console.log('❌ Direct transcript fetch error:', err instanceof Error ? err.message : 'Unknown error')
+    return []
+  }
+}
+
+// Timed-text JSON fallback (auto captions)
+async function fetchTranscriptTimedText(videoId: string): Promise<string[]> {
+  try {
+    const json3 = await fetch(`https://video.google.com/timedtext?v=${videoId}&lang=en&fmt=json3`).then(r => r.ok ? r.json() : null)
+    if (json3?.events?.length) {
+      const lines = json3.events
+        .filter((e:any)=>e.segs)
+        .flatMap((e:any)=> e.segs.map((s:any)=> s.utf8.trim()))
+        .filter((t:string)=> t.length)
+      return lines
+    }
+    return []
+  } catch(err) {
+    console.log('Timed-text JSON error:', err instanceof Error ? err.message : 'Unknown')
     return []
   }
 }
@@ -178,6 +202,7 @@ async function getVideoMetadata(videoId: string) {
       const video = data.items[0]
       return {
         title: video.snippet.title,
+        channel: video.snippet.channelTitle,
         duration: video.contentDetails.duration,
         description: video.snippet.description
       }
@@ -217,77 +242,82 @@ async function generateSummary(content: string, videoTitle: string, contentSourc
   }
 
   const contentQualityNote = contentSource === 'transcript' 
-    ? 'You have access to the full video transcript. Use this rich content to create detailed, comprehensive summaries with specific examples and quotes.'
+    ? 'You have access to the full video transcript. Use this rich content to create detailed, comprehensive summaries with specific examples and quotes.' 
     : 'Limited to video description only. Extract maximum value from available content.'
 
-  // Settings-based customization
-  const learningModeInstructions = {
-    'student': 'Focus on clear explanations, step-by-step learning, and educational value. Make concepts easy to understand.',
-    'build': 'Emphasize practical implementation, actionable steps, and hands-on guidance. Focus on what can be built or done.',
-    'understand': 'Provide deep theoretical insights, conceptual understanding, and comprehensive analysis. Focus on the "why" behind concepts.'
+  // Strong learning mode personalities for system prompt
+  const learningModePersonalities = {
+    'student': 'You are a patient educator who explains complex topics in simple terms. Use clear language, break down concepts step-by-step, and ensure educational clarity.',
+    'build': 'You are a hands-on coding mentor focused on practical implementation. Emphasize actionable steps, concrete examples, and what can be built immediately.',
+    'understand': 'You are a theoretical expert who dives deep into concepts. Focus on the "why" behind ideas, provide comprehensive analysis, and explore underlying principles.'
   }
 
+  // Explicit word count limits for depth
   const depthInstructions = {
-    'quick': 'Create a concise summary focused on key highlights (2-3 min read).',
-    'standard': 'Provide a balanced, comprehensive summary (5-7 min read).',
-    'deep': 'Generate an in-depth, detailed analysis with extensive insights (10+ min read).'
+    quick: 'SUMMARY MUST BE 150-200 WORDS. Provide only the most essential insights (3 max) and immediate actions (2 max).',
+    standard: 'SUMMARY MUST BE 300-450 WORDS. Include comprehensive insights (5-7) and practical actions (3-5).',
+    deep: 'SUMMARY MUST BE 600-800 WORDS. Provide extensive analysis with detailed insights (7+) and thorough actionable steps (5+).'
   }
 
-  const featureInstructions = [
-    settings?.includeEmojis ? 'Use relevant emojis and visual indicators throughout the summary.' : 'Use minimal emojis, focus on professional text.',
-    settings?.includeCode ? 'Extract and include any code examples or technical snippets mentioned.' : 'Summarize code concepts without including actual code.',
-    settings?.generateQuiz ? 'Include 2-3 quiz questions to test understanding.' : 'Do not include quiz questions.',
-    settings?.includeTimestamps && contentSource === 'transcript' ? 'Include timestamped sections for major topics.' : 'Do not include timestamp information.'
-  ].filter(Boolean).join(' ')
+  // Explicit feature instructions
+  const featureInstructions: string[] = []
+  
+  if (settings?.includeEmojis) {
+    featureInstructions.push('REQUIRED: Use relevant emojis in ALL section headings and key points for visual appeal.')
+  } else {
+    featureInstructions.push('FORBIDDEN: Do NOT use any emojis anywhere in the response.')
+  }
+  
+  if (settings?.includeCode && contentSource === 'transcript') {
+    featureInstructions.push('REQUIRED: Include "codeSnippets" section with actual code examples from the video (if any code is discussed).')
+  } else {
+    featureInstructions.push('FORBIDDEN: Set "codeSnippets": null - do not include this section.')
+  }
+  
+  if (settings?.generateQuiz) {
+    featureInstructions.push('REQUIRED: Include "quiz" section with 2-3 challenging questions that test deep understanding.')
+  } else {
+    featureInstructions.push('FORBIDDEN: Set "quiz": null - do not include quiz questions.')
+  }
+  
+  if (settings?.includeTimestamps && contentSource === 'transcript') {
+    featureInstructions.push('REQUIRED: Include "timestampedSections" with [mm:ss] timestamps for major video sections.')
+  } else {
+    featureInstructions.push('FORBIDDEN: Set "timestampedSections": null - do not include timestamps.')
+  }
 
   const prompt = `
-You are an expert at creating comprehensive, actionable summaries of YouTube videos optimized for busy developers and students.
-
-Video Details:
-- Title: "${videoTitle}"
-- Type: ${videoType}
-- Content Source: ${sourceDescription}
-- Learning Mode: ${settings?.learningMode || 'student'}
-- Summary Depth: ${settings?.summaryDepth || 'standard'}
+Video: "${videoTitle}"
+Type: ${videoType} | Source: ${sourceDescription}
+Mode: ${settings?.learningMode || 'student'} | Depth: ${settings?.summaryDepth || 'standard'}
 
 ${contentQualityNote}
 
-Content:
+CONTENT:
 ${content}
 
 INSTRUCTIONS:
 ${videoTypePrompts[videoType as keyof typeof videoTypePrompts]}
 
-LEARNING MODE: ${learningModeInstructions[settings?.learningMode as keyof typeof learningModeInstructions] || learningModeInstructions.student}
+DEPTH REQUIREMENT: ${depthInstructions[settings?.summaryDepth as keyof typeof depthInstructions] || depthInstructions.standard}
 
-DEPTH: ${depthInstructions[settings?.summaryDepth as keyof typeof depthInstructions] || depthInstructions.standard}
+FEATURE REQUIREMENTS:
+${featureInstructions.join('\n')}
 
-FEATURES: ${featureInstructions}
-
-IMPORTANT: ${contentSource === 'transcript' ? 'Use the full transcript to create detailed, specific summaries with exact quotes, timestamps, and comprehensive insights.' : 'Based on limited description - extract maximum value possible.'}
-
-Create a comprehensive learning resource with the following structure. Respond with PURE JSON only:
+Respond with PURE JSON only - no markdown, no explanations:
 
 {
-  "mainTakeaway": "Single sentence capturing the core value/lesson",
-  "summary": "${contentSource === 'transcript' ? 'Detailed 300-500 word summary with specific examples from the transcript' : 'Comprehensive 200-300 word summary based on available content'}",
-  "techStack": ["Technology1", "Technology2"] // Only if technical content, otherwise null,
-  "keyInsights": ["${contentSource === 'transcript' ? 'Detailed insight with specific examples/quotes' : 'Key insight from available content'}", "..."] // 5-7 detailed learnings,
-  "actionItems": ["${contentSource === 'transcript' ? 'Specific actionable step mentioned in video' : 'General actionable step'}", "..."] // 3-7 specific next steps,
-  ${contentSource === 'transcript' ? '"timestampedSections": [{"time": "00:00", "description": "Section description"}], // Major sections if transcript available' : '"timestampedSections": null, // No transcript available'}
-  "codeSnippets": [{"language": "javascript", "code": "example code", "description": "What this does"}] // Only if code is mentioned, otherwise null,
-  "quiz": [{"question": "Test question", "answer": "Correct answer"}] // 2-3 questions, otherwise null,
-  "resources": [{"title": "Resource name", "url": "if_mentioned", "type": "documentation|tool|course"}] // Mentioned resources, otherwise null,
-  "keyPoints": ["Point 1", "Point 2"] // Legacy field - copy from keyInsights
-}
-
-Important:
-- Return PURE JSON with no markdown formatting
-- Use null for optional fields that don't apply
-- Keep actionItems specific and immediately actionable
-- Make quiz questions test understanding, not memorization
-- Only include codeSnippets if actual code is discussed
-`
+  "mainTakeaway": "Single powerful sentence capturing core value",
+  "summary": "EXACT word count as specified in depth requirement above",
+  "techStack": ["tech1", "tech2"] // null if not technical,
+  "keyInsights": ["insight with examples", "..."], // Match depth requirements
+  "actionItems": ["specific actionable step", "..."], // Match depth requirements  
+  ${settings?.includeTimestamps && contentSource === 'transcript' ? '"timestampedSections": [{"time": "mm:ss", "description": "section"}],' : '"timestampedSections": null,'}
+  ${settings?.includeCode ? '"codeSnippets": [{"language": "js", "code": "code", "description": "what it does"}],' : '"codeSnippets": null,'}
+  ${settings?.generateQuiz ? '"quiz": [{"question": "challenging question", "answer": "detailed answer"}],' : '"quiz": null,'}
+  "resources": [{"title": "name", "url": "if_mentioned", "type": "type"}], // null if none
+  "keyPoints": [] // copy from keyInsights for legacy
+}`
 
   try {
     const completion = await openai.chat.completions.create({
@@ -295,7 +325,7 @@ Important:
       messages: [
         {
           role: "system", 
-          content: "You are an expert content summarizer specializing in educational and technical content. Always respond with valid JSON."
+          content: `${learningModePersonalities[settings?.learningMode as keyof typeof learningModePersonalities] || learningModePersonalities.student} Always respond with valid JSON. Never use markdown formatting.`
         },
         {
           role: "user",
@@ -303,9 +333,9 @@ Important:
         }
       ],
       temperature: 0.3,
-      max_tokens: settings?.summaryDepth === 'deep' ? 2500 : 
-                  settings?.summaryDepth === 'quick' ? 1000 : 
-                  2000, // Dynamic token allocation based on depth setting
+      max_tokens: settings?.summaryDepth === 'deep' ? 2800 : 
+                  settings?.summaryDepth === 'quick' ? 1200 : 
+                  2000, // Adjusted for stricter word limits
     })
 
     const content = completion.choices[0]?.message?.content
@@ -342,16 +372,39 @@ Important:
   }
 }
 
+// Handle CORS preflight requests
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 200,
+    headers: corsHeaders
+  })
+}
+
 export async function POST(request: NextRequest): Promise<NextResponse<SummarizeResponse>> {
   try {
-    const { videoUrl, settings } = await request.json()
+    const rawBody = await request.json()
+    // Normalize settings keys to lowercase to ensure prompt matches
+    const settings = {
+      learningMode: (rawBody.settings?.learningMode || 'student').toLowerCase(),
+      summaryDepth: (rawBody.settings?.summaryDepth || 'standard').toLowerCase(),
+      includeEmojis: !!rawBody.settings?.includeEmojis,
+      includeCode: !!rawBody.settings?.includeCode,
+      includeQuiz: !!rawBody.settings?.includeQuiz,
+      includeTimestamps: !!rawBody.settings?.includeTimestamps
+    }
+    const videoUrl: string = rawBody.videoUrl || rawBody.url // support old key
+    const extensionTranscript = rawBody.extensionTranscript
     console.log('Request received with settings:', settings)
+    console.log('Extension transcript provided:', !!extensionTranscript)
 
     if (!videoUrl) {
       return NextResponse.json({ 
         success: false, 
         error: 'Video URL is required' 
-      }, { status: 400 })
+      }, { 
+        status: 400,
+        headers: corsHeaders
+      })
     }
 
     // Extract video ID
@@ -360,7 +413,10 @@ export async function POST(request: NextRequest): Promise<NextResponse<Summarize
       return NextResponse.json({ 
         success: false, 
         error: 'Invalid YouTube URL' 
-      }, { status: 400 })
+      }, { 
+        status: 400,
+        headers: corsHeaders
+      })
     }
 
     // Get video metadata
@@ -369,7 +425,10 @@ export async function POST(request: NextRequest): Promise<NextResponse<Summarize
       return NextResponse.json({ 
         success: false, 
         error: 'Could not fetch video information. Video may be private or unavailable.' 
-      }, { status: 404 })
+      }, { 
+        status: 404,
+        headers: corsHeaders
+      })
     }
 
     // ONLY use transcripts - no description fallback as requested
@@ -377,65 +436,79 @@ export async function POST(request: NextRequest): Promise<NextResponse<Summarize
     let contentSource = ''
 
     try {
-      console.log('📝 Simple transcript extraction (exact user example)...')
+      console.log('📝 Transcript extraction starting...')
       
-      // Use the EXACT syntax from user's example
-      let transcript: any[] = []
-      try {
-        transcript = await YoutubeTranscript.fetchTranscript(videoId)
-      } catch (libErr) {
-        console.log('Library fetch failed:', libErr instanceof Error ? libErr.message : 'Unknown error')
-      }
-
-      // If library returns empty, try Innertube first, then direct scrape
-      if (!transcript || transcript.length === 0) {
-        console.log('📡 Library empty. Trying Innertube API...')
-        const tubeLines = await fetchTranscriptInnertube(videoId)
-        if (tubeLines.length) {
-          transcript = tubeLines.map(text => ({ text }))
-        } else {
-          console.log('🌐 Innertube empty. Trying captionTracks scraping...')
-          const directLines = await fetchTranscriptDirect(videoId)
-          transcript = directLines.map(text => ({ text }))
-        }
-      }
-      
-      console.log('✅ Raw transcript response:')
-      console.log('Type:', typeof transcript)
-      console.log('Is array:', Array.isArray(transcript))
-      console.log('Length:', transcript?.length || 0)
-      
-      if (transcript && Array.isArray(transcript) && transcript.length > 0) {
-        console.log('✅ First transcript item:', transcript[0])
-        
-        // Simple processing - just extract text
-        const transcriptText = transcript
-          .map(item => item.text || '')
-          .filter(text => text.trim().length > 0)
-          .join(' ')
-          .trim()
-        
-        console.log(`📊 Transcript processed: ${transcriptText.length} characters`)
-        console.log(`Preview: "${transcriptText.substring(0, 300)}..."`)
-        
-        if (transcriptText.length > 50) {
-          contentToSummarize = transcriptText
-          contentSource = 'transcript'
-          console.log(`🎉 SUCCESS: Using transcript for AI summarization`)
-        } else {
-          throw new Error(`Transcript exists but too short: ${transcriptText.length} characters`)
-        }
+      // Prioritize extension-provided transcript
+      if (extensionTranscript && extensionTranscript.length > 50) {
+        console.log('🔌 Using transcript from Chrome extension')
+        contentToSummarize = extensionTranscript.trim()
+        contentSource = 'extension-transcript'
+        console.log(`📊 Extension transcript: ${contentToSummarize.length} characters`)
       } else {
-        throw new Error('Transcript response was empty or invalid format')
+        console.log('📡 Extension transcript not available, using server-side extraction...')
+        
+        // Use the EXACT syntax from user's example
+        let transcript: any[] = []
+        try {
+          transcript = await YoutubeTranscript.fetchTranscript(videoId)
+        } catch (libErr) {
+          console.log('Library fetch failed:', libErr instanceof Error ? libErr.message : 'Unknown error')
+        }
+
+        // If library returns empty, try Innertube first, then direct scrape
+        if (!transcript || transcript.length === 0) {
+          console.log('📡 Library empty. Trying Innertube API...')
+          const tubeLines = await fetchTranscriptInnertube(videoId)
+          if (tubeLines.length) {
+            transcript = tubeLines.map(text => ({ text }))
+          } else {
+            console.log('🌐 Innertube empty. Trying captionTracks scraping...')
+            const directLines = await fetchTranscriptDirect(videoId)
+            transcript = directLines.map(text => ({ text }))
+            if (transcript.length === 0) {
+              console.log('⚠️ Direct scrape empty, trying timed-text JSON endpoint…')
+              const timedLines = await fetchTranscriptTimedText(videoId)
+              transcript = timedLines.map(text => ({ text }))
+            }
+          }
+        }
+        
+        console.log('✅ Raw transcript response:')
+        console.log('Type:', typeof transcript)
+        console.log('Is array:', Array.isArray(transcript))
+        console.log('Length:', transcript?.length || 0)
+        
+        if (transcript && Array.isArray(transcript) && transcript.length > 0) {
+          console.log('✅ First transcript item:', transcript[0])
+          
+          // Simple processing - just extract text
+          const transcriptText = transcript
+            .map(item => item.text || '')
+            .filter(text => text.trim().length > 0)
+            .join(' ')
+            .trim()
+          
+          console.log(`📊 Transcript processed: ${transcriptText.length} characters`)
+          console.log(`Preview: "${transcriptText.substring(0, 300)}..."`)
+          
+          if (transcriptText.length > 50) {
+            contentToSummarize = transcriptText
+            contentSource = 'transcript'
+            console.log(`🎉 SUCCESS: Using transcript for AI summarization`)
+          } else {
+            throw new Error(`Transcript exists but too short: ${transcriptText.length} characters`)
+          }
+        } else {
+          throw new Error('Transcript response was empty or invalid format')
+        }
       }
     } catch (transcriptError) {
       console.log('❌ Transcript failed:', transcriptError instanceof Error ? transcriptError.message : 'Unknown error')
       
-      // NO FALLBACK TO DESCRIPTION - return error as requested
-      return NextResponse.json({ 
-        success: false, 
-        error: `This video does not have accessible transcripts. Error: ${transcriptError instanceof Error ? transcriptError.message : 'Unknown error'}. Please try a different video with captions/subtitles enabled.` 
-      }, { status: 422 })
+      // Fallback: use title + description when transcript unavailable
+      console.log('📄 Falling back to title + description for summarization')
+      contentToSummarize = `${metadata.title}\n\n${metadata.description || ''}`.trim()
+      contentSource = 'title-description'
     }
 
     // Detect video type first
@@ -445,31 +518,34 @@ export async function POST(request: NextRequest): Promise<NextResponse<Summarize
     console.log(`Generating summary from ${contentSource} with settings:`, settings)
     const summaryData = await generateSummary(contentToSummarize, metadata.title, contentSource, detectedVideoType, settings)
 
+    // Apply feature toggles
+    if (!settings.includeTimestamps) delete summaryData.timestampedSections;
+    if (!settings.includeQuiz) delete summaryData.quiz;
+    if (!settings.includeCode) delete summaryData.codeSnippets;
+
     return NextResponse.json({
       success: true,
       data: {
         videoTitle: metadata.title,
+        title: metadata.title,
+        channel: metadata.channel || '',
         videoId,
         duration: metadata.duration,
         videoType: detectedVideoType,
-        mainTakeaway: summaryData.mainTakeaway,
-        summary: summaryData.summary,
-        techStack: summaryData.techStack,
-        keyInsights: summaryData.keyInsights,
-        actionItems: summaryData.actionItems,
-        timestampedSections: summaryData.timestampedSections,
-        codeSnippets: summaryData.codeSnippets,
-        quiz: summaryData.quiz,
-        resources: summaryData.resources,
-        keyPoints: summaryData.keyPoints // Legacy compatibility
+        ...summaryData
       }
-    })
+    }, {
+      headers: corsHeaders
+    });
 
   } catch (error) {
     console.error('Summarization error:', error)
     return NextResponse.json({ 
       success: false, 
       error: error instanceof Error ? error.message : 'Failed to process video' 
-    }, { status: 500 })
+    }, { 
+      status: 500,
+      headers: corsHeaders
+    })
   }
 }

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 // Test endpoint to validate individual features work
-export async function GET(request: NextRequest) {
+export async function GET() {
   const testCases = [
     {
       name: "Emojis ON + Timestamps ON",

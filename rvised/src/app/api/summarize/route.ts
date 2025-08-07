@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { YoutubeTranscript } from 'youtube-transcript'
 
-import { Innertube } from 'youtubei.js'
-
 // CORS headers for Chrome extension
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -12,7 +10,7 @@ const corsHeaders = {
 }
 
 // Fallback 0 – Innertube API (temporarily disabled due to API changes)
-async function fetchTranscriptInnertube(videoId: string): Promise<string[]> {
+async function fetchTranscriptInnertube(): Promise<string[]> {
   try {
     // TODO: Fix Innertube API integration after library update
     console.log('Innertube method temporarily disabled for deployment');
@@ -187,29 +185,7 @@ async function generateSummary(content: string, videoTitle: string, contentSourc
   resources?: { title: string; url?: string; type: string }[]
   keyPoints: string[] // Legacy compatibility
 }> {
-  const sourceDescription = {
-    'transcript': 'video transcript',
-    'description': 'video description', 
-    'metadata': 'video title and metadata'
-  }[contentSource] || 'available content'
-
-  const contentQualityNote = contentSource === 'transcript' 
-    ? 'You have access to the full video transcript. Use this rich content to create detailed, comprehensive summaries with specific examples and quotes.' 
-    : 'Limited to video description only. Extract maximum value from available content.'
-
-  // Strong learning mode personalities for system prompt
-  const learningModePersonalities = {
-    'student': 'You are a patient educator who explains complex topics in simple terms. Use clear language, break down concepts step-by-step, and ensure educational clarity.',
-    'build': 'You are a hands-on coding mentor focused on practical implementation. Emphasize actionable steps, concrete examples, and what can be built immediately.',
-    'understand': 'You are a theoretical expert who dives deep into concepts. Focus on the "why" behind ideas, provide comprehensive analysis, and explore underlying principles.'
-  }
-
-  // Explicit word count limits for depth
-  const depthInstructions = {
-    quick: 'SUMMARY MUST BE 150-200 WORDS. Provide only the most essential insights (3 max) and immediate actions (2 max).',
-    standard: 'SUMMARY MUST BE 300-450 WORDS. Include comprehensive insights (5-7) and practical actions (3-5).',
-    deep: 'SUMMARY MUST BE 600-800 WORDS. Provide extensive analysis with detailed insights (7+) and thorough actionable steps (5+).'
-  }
+  // Simplified approach - removed unused variables
 
   // ULTRA-EXPLICIT feature instructions to force compliance
   const featureCommands: string[] = []
@@ -504,9 +480,9 @@ export async function POST(request: NextRequest): Promise<NextResponse<Summarize
             const cleanLine = line.trim()
             if (!cleanLine) continue
             
-            let match = cleanLine.match(chapterRegex) || 
-                       cleanLine.match(enhancedRegex) || 
-                       cleanLine.match(bracketRegex)
+            const match = cleanLine.match(chapterRegex) || 
+                         cleanLine.match(enhancedRegex) || 
+                         cleanLine.match(bracketRegex)
             
             if (match) {
               const [, time, desc] = match

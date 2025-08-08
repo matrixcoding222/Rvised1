@@ -592,48 +592,10 @@ function createRvisedOverlay() {
   
   document.body.appendChild(rvisedOverlay);
   
-  // Add event listeners
-  // Wizard navigation & actions
-  function goToScreenOverlay(n){
-    const screens = rvisedOverlay.querySelectorAll('.screen');
-    screens.forEach(s=> s.style.display = 'none');
-    const t = rvisedOverlay.querySelector(`#screen-${n}`);
-    if (t) t.style.display = 'flex';
-  }
-
-  // Start at screen 1 on initial inject
-  goToScreenOverlay(1);
-
-  function getOverlaySettings(){
-    const getChecked = (name)=>{
-      const el = rvisedOverlay.querySelector(`input[name="${name}"]:checked`);
-      return el ? el.value : undefined;
-    };
-    return {
-      learningMode: getChecked('learningMode') || 'student',
-      summaryDepth: getChecked('summaryDepth') || 'standard',
-      project: (rvisedOverlay.querySelector('input[name="project"]:checked')||{}).value || 'general',
-      includeEmojis: !!rvisedOverlay.querySelector('#includeEmojis')?.checked,
-      includeQuiz: !!rvisedOverlay.querySelector('#includeQuiz')?.checked,
-      includeTimestamps: !!rvisedOverlay.querySelector('#includeTimestamps')?.checked,
-      includeActionItems: !!rvisedOverlay.querySelector('#includeActionItems')?.checked
-    };
-  }
-
-  rvisedOverlay.addEventListener('click', (e)=>{
-    const nav = e.target.closest('[data-screen]');
-    if (nav){
-      const n = nav.getAttribute('data-screen');
-      goToScreenOverlay(n);
-      return;
-    }
-    if (e.target.id === 'generateSummaryBtn'){
-      window.rvisedSettings = getOverlaySettings();
-      handleSummarize();
-    }
-    if (e.target.closest('.rvised-close')){
-      rvisedOverlay.style.display = 'none';
-    }
+  // Listen for generate event from wizard controller
+  window.addEventListener('rvised-generate', (evt) => {
+    window.rvisedSettings = evt.detail?.settings;
+    handleSummarize();
   });
   
   // Add close button functionality

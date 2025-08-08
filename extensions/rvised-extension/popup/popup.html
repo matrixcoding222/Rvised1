@@ -252,7 +252,7 @@
     </style>
 </head>
 <body>
-    <div class="container">
+    <div id="popup-root" class="container">
         <!-- Screen 1: Setup Overview -->
         <div id="screen-1" class="screen active">
             <div class="header">
@@ -645,6 +645,18 @@
         </div>
     </div>
 
+    <script>
+      (async function(){
+        try {
+          const url = chrome.runtime.getURL('shared/wizard.html');
+          const html = await (await fetch(url)).text();
+          document.getElementById('popup-root').innerHTML = html;
+          const modUrl = chrome.runtime.getURL('shared/wizard.js');
+          const mod = await import(modUrl);
+          mod.initWizard(document.getElementById('popup-root'), { mode: 'popup' });
+        } catch (e) { console.error('Wizard load failed', e); }
+      })();
+    </script>
     <script src="popup.js"></script>
 </body>
 </html>

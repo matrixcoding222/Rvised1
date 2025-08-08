@@ -1,0 +1,315 @@
+<div class="container">
+  <!-- Screen 1: Setup Overview -->
+  <div id="screen-1" class="screen active">
+    <div class="header">
+      <h1>Rvised</h1>
+      <p>Set up your YouTube learning experience</p>
+    </div>
+
+    <div class="content">
+      <div class="setup-item" data-screen="2">
+        <div class="title">Learning Mode</div>
+        <div class="subtitle">Student</div>
+      </div>
+
+      <div class="setup-item" data-screen="3">
+        <div class="title">Summary Depth</div>
+        <div class="subtitle">Standard</div>
+      </div>
+
+      <div class="setup-item" data-screen="4">
+        <div class="title">Default Project</div>
+        <div class="subtitle">General Learning</div>
+      </div>
+
+      <div class="setup-item" data-screen="5">
+        <div class="title">Preferences</div>
+        <div class="subtitle">Format options</div>
+      </div>
+    </div>
+
+    <div class="progress-dots">
+      <div class="progress-dot active"></div>
+      <div class="progress-dot"></div>
+      <div class="progress-dot"></div>
+      <div class="progress-dot"></div>
+      <div class="progress-dot"></div>
+    </div>
+
+    <div class="footer">
+      <button class="btn btn-primary" data-screen="2">Continue Setup</button>
+      <div style="height:8px"></div>
+      <button class="btn btn-secondary" data-screen="6">Skip for now</button>
+    </div>
+  </div>
+
+  <!-- Screen 2: Learning Mode -->
+  <div id="screen-2" class="screen">
+    <div class="header">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <button class="back-btn" data-screen="1">←</button>
+        <h1>Learning Mode</h1>
+        <div style="width:24px;"></div>
+      </div>
+      <p>How do you prefer to learn from videos?</p>
+    </div>
+    <div class="content">
+      <div class="radio-group">
+        <label class="radio-option">
+          <input type="radio" name="learningMode" value="student" checked>
+          <div class="content">
+            <div class="title">Student</div>
+            <div class="description">Detailed explanations and key concepts for learning</div>
+          </div>
+        </label>
+        <label class="radio-option">
+          <input type="radio" name="learningMode" value="build">
+          <div class="content">
+            <div class="title">Build</div>
+            <div class="description">Practical steps and implementation guides</div>
+          </div>
+        </label>
+        <label class="radio-option">
+          <input type="radio" name="learningMode" value="understand">
+          <div class="content">
+            <div class="title">Understand</div>
+            <div class="description">Deep insights and comprehensive analysis</div>
+          </div>
+        </label>
+      </div>
+    </div>
+    <div class="progress-dots">
+      <div class="progress-dot"></div>
+      <div class="progress-dot active"></div>
+      <div class="progress-dot"></div>
+      <div class="progress-dot"></div>
+      <div class="progress-dot"></div>
+    </div>
+    <div class="footer">
+      <button class="btn btn-primary" data-screen="3">Continue</button>
+    </div>
+  </div>
+
+  <!-- Screen 3: Summary Depth -->
+  <div id="screen-3" class="screen">
+    <div class="header">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <button class="back-btn" data-screen="2">←</button>
+        <h1>Summary Depth</h1>
+        <div style="width:24px;"></div>
+      </div>
+      <p>Choose your preferred summary detail level</p>
+    </div>
+    <div class="content">
+      <div class="radio-group">
+        <label class="radio-option">
+          <input type="radio" name="summaryDepth" value="quick">
+          <div class="content">
+            <div class="title">Quick <span style="color:#6b7280;font-weight:normal;">(2-3 min read)</span></div>
+            <div class="description">Essential points and main takeaways</div>
+          </div>
+        </label>
+        <label class="radio-option">
+          <input type="radio" name="summaryDepth" value="standard" checked>
+          <div class="content">
+            <div class="title">Standard <span style="color:#6b7280;font-weight:normal;">(5-7 min read)</span></div>
+            <div class="description">Balanced overview with key details</div>
+          </div>
+        </label>
+        <label class="radio-option">
+          <input type="radio" name="summaryDepth" value="deep">
+          <div class="content">
+            <div class="title">Deep <span style="color:#6b7280;font-weight:normal;">(10+ min read)</span></div>
+            <div class="description">Comprehensive analysis with examples</div>
+          </div>
+        </label>
+      </div>
+    </div>
+    <div class="progress-dots">
+      <div class="progress-dot"></div>
+      <div class="progress-dot"></div>
+      <div class="progress-dot active"></div>
+      <div class="progress-dot"></div>
+      <div class="progress-dot"></div>
+    </div>
+    <div class="footer">
+      <button class="btn btn-primary" data-screen="4">Continue</button>
+    </div>
+  </div>
+
+  <!-- Screen 4: Default Project -->
+  <div id="screen-4" class="screen">
+    <div class="header">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <button class="back-btn" data-screen="3">←</button>
+        <h1>Default Project</h1>
+        <div style="width:24px;"></div>
+      </div>
+      <p>Where should we save your video summaries?</p>
+    </div>
+    <div class="content">
+      <div class="radio-group">
+        <label class="radio-option">
+          <input type="radio" name="project" value="general" checked>
+          <div class="content">
+            <div class="title">General Learning</div>
+            <div class="description">Default save location</div>
+          </div>
+        </label>
+        <label class="radio-option">
+          <input type="radio" name="project" value="work">
+          <div class="content">
+            <div class="title">Work & Career</div>
+            <div class="description">Professional development</div>
+          </div>
+        </label>
+        <label class="radio-option">
+          <input type="radio" name="project" value="tech">
+          <div class="content">
+            <div class="title">Technology</div>
+            <div class="description">Tech tutorials and guides</div>
+          </div>
+        </label>
+      </div>
+    </div>
+    <div class="progress-dots">
+      <div class="progress-dot"></div>
+      <div class="progress-dot"></div>
+      <div class="progress-dot"></div>
+      <div class="progress-dot active"></div>
+      <div class="progress-dot"></div>
+    </div>
+    <div class="footer">
+      <button class="btn btn-primary" data-screen="5">Continue</button>
+    </div>
+  </div>
+
+  <!-- Screen 5: Preferences -->
+  <div id="screen-5" class="screen">
+    <div class="header">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <button class="back-btn" data-screen="4">←</button>
+        <h1>Preferences</h1>
+        <div style="width:24px;"></div>
+      </div>
+      <p>Customize your summary format</p>
+    </div>
+    <div class="content">
+      <div class="checkbox-option">
+        <div class="content">
+          <span class="emoji">⏱️</span>
+          <div class="text">
+            <div class="title">Include Timestamps</div>
+            <div class="description">Link to specific video moments</div>
+          </div>
+        </div>
+        <input type="checkbox" id="includeTimestamps" checked>
+      </div>
+      <div class="checkbox-option">
+        <div class="content">
+          <span class="emoji">🎯</span>
+          <div class="text">
+            <div class="title">Action Items</div>
+            <div class="description">Extract actionable tasks</div>
+          </div>
+        </div>
+        <input type="checkbox" id="includeActionItems" checked>
+      </div>
+      <div class="checkbox-option">
+        <div class="content">
+          <span class="emoji">😊</span>
+          <div class="text">
+            <div class="title">Use Emojis</div>
+            <div class="description">Add visual cues to summaries</div>
+          </div>
+        </div>
+        <input type="checkbox" id="includeEmojis" checked>
+      </div>
+      <div class="checkbox-option">
+        <div class="content">
+          <span class="emoji">❓</span>
+          <div class="text">
+            <div class="title">Quiz Questions</div>
+            <div class="description">Generate questions for review</div>
+          </div>
+        </div>
+        <input type="checkbox" id="includeQuiz">
+      </div>
+      <div class="checkbox-option">
+        <div class="content">
+          <span class="emoji">🔗</span>
+          <div class="text">
+            <div class="title">Related Resources</div>
+            <div class="description">Suggest similar content</div>
+          </div>
+        </div>
+        <input type="checkbox" id="includeResources" checked>
+      </div>
+      <div class="checkbox-option">
+        <div class="content">
+          <span class="emoji">🔍</span>
+          <div class="text">
+            <div class="title">Key Terms</div>
+            <div class="description">Highlight important definitions</div>
+          </div>
+        </div>
+        <input type="checkbox" id="includeKeyTerms" checked>
+      </div>
+    </div>
+    <div class="progress-dots">
+      <div class="progress-dot"></div>
+      <div class="progress-dot"></div>
+      <div class="progress-dot"></div>
+      <div class="progress-dot"></div>
+      <div class="progress-dot active"></div>
+    </div>
+    <div class="footer">
+      <button class="btn btn-primary" data-screen="6">Finish Setup</button>
+    </div>
+  </div>
+
+  <!-- Screen 6: Setup Complete -->
+  <div id="screen-6" class="screen">
+    <div class="header">
+      <div class="success-icon">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+      </div>
+      <h1>All Set!</h1>
+      <p>Your Rvised extension is ready to enhance your YouTube learning experience</p>
+    </div>
+    <div class="content">
+      <div style="text-align:center;color:#6b7280;font-size:14px;line-height:1.5;">
+        <p>🎓 <strong>Learning Mode:</strong> Student</p>
+        <p>⚙️ <strong>Summary:</strong> Standard</p>
+        <p>📁 <strong>Project:</strong> General Learning</p>
+        <p>✨ <strong>Features:</strong> Timestamps, Action Items, Emojis, Resources, Key Terms</p>
+      </div>
+    </div>
+    <div class="footer">
+      <button class="btn btn-gradient" id="generateSummaryBtn">🚀 Generate Summary Now</button>
+      <button class="btn btn-secondary" data-screen="7" style="margin-top:8px;">Start Learning</button>
+      <button class="btn btn-secondary" data-screen="1" style="margin-top:8px;">Modify Settings</button>
+    </div>
+  </div>
+
+  <!-- Screen 7: Ready to Use -->
+  <div id="screen-7" class="screen">
+    <div class="header">
+      <h1>Ready to Learn!</h1>
+      <p>Navigate to any YouTube video and you'll see the Rvised button appear. Click it to generate your personalized summary.</p>
+    </div>
+    <div class="content" style="display:flex;align-items:center;justify-content:center;">
+      <div style="text-align:center;">
+        <div style="background:#ef4444;color:#fff;padding:8px 16px;border-radius:8px;margin-bottom:16px;display:inline-block;">📺 YouTube Video</div>
+        <div style="margin:16px 0;color:#6b7280;">↓</div>
+        <div style="background:#3b82f6;color:#fff;padding:8px 16px;border-radius:8px;display:inline-block;">🎓 Rvised Summary</div>
+      </div>
+    </div>
+    <div class="footer">
+      <p style="text-align:center;font-size:12px;color:#6b7280;margin-bottom:16px;">You can always change your preferences in the extension settings</p>
+      <button class="btn btn-gradient" id="startUsingBtn">Start Using Rvised</button>
+    </div>
+  </div>
+</div>
+
+

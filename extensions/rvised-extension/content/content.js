@@ -763,8 +763,10 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
     }
     
     // Show overlay if hidden
-    if (!rvisedOverlay || rvisedOverlay.style.display === 'none') {
+    if (!rvisedOverlay) {
       createRvisedOverlay();
+    } else if (rvisedOverlay.style.display === 'none') {
+      rvisedOverlay.style.display = 'block';
     }
     
     // Trigger summarization
@@ -836,11 +838,8 @@ function initializeRvised() {
   // Only run on YouTube watch pages
   if (window.location.pathname === '/watch') {
     console.log('🎬 YouTube video page detected, initializing Rvised...');
-    
-    // Wait a bit for YouTube to load
-    setTimeout(() => {
-      createRvisedOverlay();
-    }, 2000);
+    // Do not auto-render the overlay. We will create it only when the user triggers summarization
+    // via popup or explicit message. This prevents the overlay card appearing alongside the popup.
   }
 }
 

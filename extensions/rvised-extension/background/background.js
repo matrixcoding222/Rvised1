@@ -41,6 +41,17 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
     checkApiStatus(sendResponse);
     return true; // Keep the message channel open for async response
   }
+  
+  // Allow popup to request showing overlay explicitly so both UIs stay consistent
+  if (message.action === 'showOverlay') {
+    chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
+      const tab = tabs[0];
+      if (tab && tab.url && tab.url.includes('youtube.com/watch')) {
+        chrome.tabs.sendMessage(tab.id, {action: 'startSummarization', settings: message.settings || {}}, ()=>{});
+      }
+    });
+    sendResponse({success: true});
+  }
 });
 
 // Handle video summarization

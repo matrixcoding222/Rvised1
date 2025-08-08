@@ -28,6 +28,9 @@
   "background": {
     "service_worker": "background/background.js"
   },
+  "sandbox": {
+    "pages": []
+  },
   
   "action": {
     "default_popup": "popup/popup.html",

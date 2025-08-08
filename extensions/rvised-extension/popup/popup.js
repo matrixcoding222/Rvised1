@@ -207,6 +207,13 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
+        // Allow popup to request overlay show on current tab (keeps UX consistent)
+        if (e.target.id === 'showOverlayBtn') {
+            const settings = getCurrentSettings();
+            chrome.runtime.sendMessage({action: 'showOverlay', settings});
+            return;
+        }
+        
         // Handle start using button
         if (e.target.id === 'startUsingBtn') {
             console.log('Start Using clicked');

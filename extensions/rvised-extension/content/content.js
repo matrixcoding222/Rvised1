@@ -447,6 +447,8 @@ function createRvisedOverlay() {
             </div>
             <div style="padding:12px 16px;">
               <button class="btn-primary" data-screen="2" style="width:100%;background:#3b82f6;color:#fff;border:none;border-radius:8px;padding:10px 14px;cursor:pointer;">Continue Setup</button>
+              <div style="height:8px"></div>
+              <button class="btn-secondary" data-screen="6" style="width:100%;background:#f3f4f6;color:#374151;border:none;border-radius:8px;padding:10px 14px;cursor:pointer;">Skip for now</button>
             </div>
           </div>
 

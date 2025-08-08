@@ -8,6 +8,12 @@ const API_BASE_URL = 'https://rvised.vercel.app';
 chrome.runtime.onInstalled.addListener(function(details) {
   console.log('📚 Rvised extension installed/updated');
   
+  // Avoid duplicate context menu creation
+  try {
+    chrome.contextMenus.remove('summarizeVideo', () => void chrome.runtime.lastError);
+  } catch (_) {}
+  createOrUpdateContextMenu();
+
   if (details.reason === 'install') {
     // Open welcome page on first install
     chrome.tabs.create({
@@ -76,7 +82,7 @@ async function handleVideoSummarization(data, sender, sendResponse) {
     try {
       chrome.runtime.sendMessage({
         type: 'summaryComplete',
-        data: result
+        data: summaryData
       });
     } catch (e) {
       // Popup might not be open, that's fine
@@ -131,12 +137,26 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
 });
 
 // Context menu for quick summarization (optional enhancement)
-chrome.contextMenus.create({
-  id: 'summarizeVideo',
-  title: '📚 Summarize with Rvised',
-  contexts: ['page'],
-  documentUrlPatterns: ['https://www.youtube.com/watch*']
-});
+function createOrUpdateContextMenu() {
+  chrome.contextMenus.create({
+    id: 'summarizeVideo',
+    title: '📚 Summarize with Rvised',
+    contexts: ['page'],
+    documentUrlPatterns: ['https://www.youtube.com/watch*']
+  }, () => {
+    if (chrome.runtime.lastError) {
+      // If duplicate, remove and recreate once
+      chrome.contextMenus.remove('summarizeVideo', () => {
+        chrome.contextMenus.create({
+          id: 'summarizeVideo',
+          title: '📚 Summarize with Rvised',
+          contexts: ['page'],
+          documentUrlPatterns: ['https://www.youtube.com/watch*']
+        }, () => void chrome.runtime.lastError);
+      });
+    }
+  });
+}
 
 chrome.contextMenus.onClicked.addListener(function(info, tab) {
   if (info.menuItemId === 'summarizeVideo') {

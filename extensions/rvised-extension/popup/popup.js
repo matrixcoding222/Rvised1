@@ -199,8 +199,8 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        // Handle finish setup button
-        if (e.target.textContent === 'Finish Setup') {
+        // Handle finish setup button (text or data-screen=6)
+        if (e.target.textContent === 'Finish Setup' || (e.target.matches('button[data-screen="6"]') && e.target.closest('#screen-5'))) {
             console.log('Finish Setup clicked');
             saveSettings();
             return;

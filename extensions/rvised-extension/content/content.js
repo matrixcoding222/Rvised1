@@ -144,34 +144,6 @@ function extractChaptersFromPage() {
     return null;
   }
 }
-    
-    // Method 2: Look for chapters in DOM elements
-    const chapterElements = document.querySelectorAll('[data-segment-time], .ytp-chapter-title, .segment-timestamp');
-    if (chapterElements.length > 0) {
-      const chapters = [];
-      chapterElements.forEach(el => {
-        const timeAttr = el.getAttribute('data-segment-time') || el.getAttribute('data-start-time');
-        const titleEl = el.querySelector('.segment-title') || el.textContent;
-        if (timeAttr && titleEl) {
-          chapters.push({
-            time: formatSeconds(parseInt(timeAttr)),
-            description: titleEl.trim()
-          });
-        }
-      });
-      if (chapters.length > 0) {
-        console.log('📖 Extracted chapters from DOM:', chapters);
-        return chapters;
-      }
-    }
-    
-    console.log('❌ No chapters found in page data');
-    return null;
-  } catch (error) {
-    console.log('❌ Error extracting chapters:', error);
-    return null;
-  }
-}
 
 // Parse YouTube chapter data format
 function parseChapterData(chapters) {
@@ -426,8 +398,7 @@ function createRvisedOverlay() {
           </div>
           <span class="text-lg font-semibold">Rvised</span>
         </div>
-        <button class="rvised-close text-white hover:bg-white/20 rounded-lg w-8 h-8 flex items-center justify-center transition-colors"
-                onclick="document.getElementById('rvised-overlay').style.display='none'">
+        <button class="rvised-close text-white hover:bg-white/20 rounded-lg w-8 h-8 flex items-center justify-center transition-colors">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
           </svg>

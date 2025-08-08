@@ -387,89 +387,202 @@ function createRvisedOverlay() {
   rvisedOverlay.id = 'rvised-overlay';
   rvisedOverlay.className = 'rvised-overlay-container';
   
-  // Create overlay HTML with Tailwind classes
+  // Create overlay HTML using the same multi-screen wizard design as popup (CSP-safe, no CDNs)
   rvisedOverlay.innerHTML = `
     <div class="rvised-container bg-white rounded-xl shadow-2xl">
-      <!-- Header -->
-      <div class="rvised-header bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-4 rounded-t-xl flex justify-between items-center">
-        <div class="flex items-center gap-2">
-          <div class="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
-            <span class="text-white font-bold">R</span>
-          </div>
-          <span class="text-lg font-semibold">Rvised</span>
+      <div class="rvised-header" style="background:linear-gradient(90deg,#2563eb,#7c3aed);color:#fff;padding:12px 16px;border-top-left-radius:12px;border-top-right-radius:12px;display:flex;align-items:center;justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div style="width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-weight:700;">R</div>
+          <span style="font-weight:600">Rvised</span>
         </div>
-        <button class="rvised-close text-white hover:bg-white/20 rounded-lg w-8 h-8 flex items-center justify-center transition-colors">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-          </svg>
+        <button class="rvised-close" style="color:#fff;width:28px;height:28px;border:none;background:transparent;border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </button>
       </div>
-      
-      <div class="rvised-content p-6 space-y-4">
-        <!-- Settings Section -->
-        <div class="rvised-settings space-y-4">
-          <!-- Learning Mode -->
-          <div class="setting-group">
-            <label class="block text-sm font-medium text-gray-700 mb-2">Learning Mode</label>
-            <select id="learningMode" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-              <option value="student">🎓 Student - Clear explanations</option>
-              <option value="build" selected>🔧 Build - Practical steps</option>
-              <option value="understand">🧠 Understand - Deep insights</option>
-            </select>
+
+      <div class="rvised-content" style="padding:16px;">
+        <div class="container" style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;">
+          <div id="screen-1" class="screen active" style="display:flex;flex-direction:column;height:100%;">
+            <div class="header" style="padding:16px;border-bottom:1px solid #f3f4f6;text-align:center;">
+              <h1 style="font-size:16px;font-weight:600;color:#111827;margin:0 0 6px;">Rvised</h1>
+              <p style="font-size:13px;color:#6b7280;margin:0">Set up your YouTube learning experience</p>
+            </div>
+            <div class="content" style="padding:16px;">
+              <div class="setup-item" data-screen="2" style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:12px;margin-bottom:8px;cursor:pointer;">
+                <div style="display:flex;align-items:center;justify-content:space-between;">
+                  <div style="display:flex;align-items:center;gap:12px;">
+                    <div style="width:28px;height:28px;border-radius:8px;background:#dbeafe;color:#2563eb;display:flex;align-items:center;justify-content:center;">🎓</div>
+                    <div><div class="title" style="font-size:14px;font-weight:500;color:#111827">Learning Mode</div><div class="subtitle" style="font-size:12px;color:#6b7280">Student</div></div>
+                  </div>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                </div>
+              </div>
+              <div class="setup-item" data-screen="3" style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:12px;margin-bottom:8px;cursor:pointer;">
+                <div style="display:flex;align-items:center;justify-content:space-between;">
+                  <div style="display:flex;align-items:center;gap:12px;">
+                    <div style="width:28px;height:28px;border-radius:8px;background:#dcfce7;color:#16a34a;display:flex;align-items:center;justify-content:center;">✔</div>
+                    <div><div class="title" style="font-size:14px;font-weight:500;color:#111827">Summary Depth</div><div class="subtitle" style="font-size:12px;color:#6b7280">Standard</div></div>
+                  </div>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                </div>
+              </div>
+              <div class="setup-item" data-screen="4" style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:12px;margin-bottom:8px;cursor:pointer;">
+                <div style="display:flex;align-items:center;justify-content:space-between;">
+                  <div style="display:flex;align-items:center;gap:12px;">
+                    <div style="width:28px;height:28px;border-radius:8px;background:#ede9fe;color:#7c3aed;display:flex;align-items:center;justify-content:center;">📁</div>
+                    <div><div class="title" style="font-size:14px;font-weight:500;color:#111827">Default Project</div><div class="subtitle" style="font-size:12px;color:#6b7280">General Learning</div></div>
+                  </div>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                </div>
+              </div>
+              <div class="setup-item" data-screen="5" style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:12px;margin-bottom:8px;cursor:pointer;">
+                <div style="display:flex;align-items:center;justify-content:space-between;">
+                  <div style="display:flex;align-items:center;gap:12px;">
+                    <div style="width:28px;height:28px;border-radius:8px;background:#ffedd5;color:#ea580c;display:flex;align-items:center;justify-content:center;">📊</div>
+                    <div><div class="title" style="font-size:14px;font-weight:500;color:#111827">Preferences</div><div class="subtitle" style="font-size:12px;color:#6b7280">Format options</div></div>
+                  </div>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                </div>
+              </div>
+            </div>
+            <div style="padding:12px 16px;">
+              <button class="btn-primary" data-screen="2" style="width:100%;background:#3b82f6;color:#fff;border:none;border-radius:8px;padding:10px 14px;cursor:pointer;">Continue Setup</button>
+            </div>
           </div>
-          
-          <!-- Summary Depth -->
-          <div class="setting-group">
-            <label class="block text-sm font-medium text-gray-700 mb-2">Summary Depth</label>
-            <select id="summaryDepth" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-              <option value="quick">⚡ Quick (2-3 min read)</option>
-              <option value="standard" selected>📋 Standard (5-7 min read)</option>
-              <option value="deep">🔍 Deep (10+ min read)</option>
-            </select>
+
+          <!-- Screen 2 Learning Mode -->
+          <div id="screen-2" class="screen" style="display:none;flex-direction:column;">
+            <div class="header" style="padding:12px 16px;border-bottom:1px solid #f3f4f6;display:flex;align-items:center;justify-content:space-between;">
+              <button class="back-btn" data-screen="1">←</button>
+              <h1 style="font-size:16px;font-weight:600;color:#111827;margin:0">Learning Mode</h1>
+              <div style="width:24px"></div>
+            </div>
+            <div class="content" style="padding:16px;">
+              <label style="display:flex;gap:12px;align-items:flex-start;border:1px solid #e5e7eb;border-radius:8px;padding:12px;margin-bottom:8px;cursor:pointer;">
+                <input type="radio" name="learningMode" value="student" checked style="margin-top:2px;">
+                <div><div style="font-size:14px;font-weight:500;color:#111827">Student</div><div style="font-size:12px;color:#6b7280">Detailed explanations and key concepts</div></div>
+              </label>
+              <label style="display:flex;gap:12px;align-items:flex-start;border:1px solid #e5e7eb;border-radius:8px;padding:12px;margin-bottom:8px;cursor:pointer;">
+                <input type="radio" name="learningMode" value="build" style="margin-top:2px;">
+                <div><div style="font-size:14px;font-weight:500;color:#111827">Build</div><div style="font-size:12px;color:#6b7280">Practical steps and implementation</div></div>
+              </label>
+              <label style="display:flex;gap:12px;align-items:flex-start;border:1px solid #e5e7eb;border-radius:8px;padding:12px;cursor:pointer;">
+                <input type="radio" name="learningMode" value="understand" style="margin-top:2px;">
+                <div><div style="font-size:14px;font-weight:500;color:#111827">Understand</div><div style="font-size:12px;color:#6b7280">Deep insights and analysis</div></div>
+              </label>
+            </div>
+            <div style="padding:12px 16px;">
+              <button class="btn-primary" data-screen="3" style="width:100%;background:#3b82f6;color:#fff;border:none;border-radius:8px;padding:10px 14px;cursor:pointer;">Continue</button>
+            </div>
           </div>
-          
-          <!-- Feature Toggles -->
-          <div class="toggle-group grid grid-cols-2 gap-3">
-            <label class="flex items-center space-x-2 cursor-pointer">
-              <input type="checkbox" id="includeEmojis" checked class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500">
-              <span class="text-sm text-gray-700">😊 Include Emojis</span>
-            </label>
-            <label class="flex items-center space-x-2 cursor-pointer">
-              <input type="checkbox" id="includeQuiz" checked class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500">
-              <span class="text-sm text-gray-700">❓ Quiz Questions</span>
-            </label>
-            <label class="flex items-center space-x-2 cursor-pointer">
-              <input type="checkbox" id="includeTimestamps" checked class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500">
-              <span class="text-sm text-gray-700">⏱️ Timestamps</span>
-            </label>
-            <label class="flex items-center space-x-2 cursor-pointer">
-              <input type="checkbox" id="includeActionItems" checked class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500">
-              <span class="text-sm text-gray-700">🎯 Action Items</span>
-            </label>
+
+          <!-- Screen 3 Summary Depth -->
+          <div id="screen-3" class="screen" style="display:none;flex-direction:column;">
+            <div class="header" style="padding:12px 16px;border-bottom:1px solid #f3f4f6;display:flex;align-items:center;justify-content:space-between;">
+              <button class="back-btn" data-screen="2">←</button>
+              <h1 style="font-size:16px;font-weight:600;color:#111827;margin:0">Summary Depth</h1>
+              <div style="width:24px"></div>
+            </div>
+            <div class="content" style="padding:16px;">
+              <label style="display:flex;gap:12px;align-items:flex-start;border:1px solid #e5e7eb;border-radius:8px;padding:12px;margin-bottom:8px;cursor:pointer;">
+                <input type="radio" name="summaryDepth" value="quick" style="margin-top:2px;">
+                <div><div style="font-size:14px;font-weight:500;color:#111827">Quick</div><div style="font-size:12px;color:#6b7280">2-3 min read</div></div>
+              </label>
+              <label style="display:flex;gap:12px;align-items:flex-start;border:1px solid #e5e7eb;border-radius:8px;padding:12px;margin-bottom:8px;cursor:pointer;">
+                <input type="radio" name="summaryDepth" value="standard" checked style="margin-top:2px;">
+                <div><div style="font-size:14px;font-weight:500;color:#111827">Standard</div><div style="font-size:12px;color:#6b7280">5-7 min read</div></div>
+              </label>
+              <label style="display:flex;gap:12px;align-items:flex-start;border:1px solid #e5e7eb;border-radius:8px;padding:12px;cursor:pointer;">
+                <input type="radio" name="summaryDepth" value="deep" style="margin-top:2px;">
+                <div><div style="font-size:14px;font-weight:500;color:#111827">Deep</div><div style="font-size:12px;color:#6b7280">10+ min read</div></div>
+              </label>
+            </div>
+            <div style="padding:12px 16px;">
+              <button class="btn-primary" data-screen="4" style="width:100%;background:#3b82f6;color:#fff;border:none;border-radius:8px;padding:10px 14px;cursor:pointer;">Continue</button>
+            </div>
+          </div>
+
+          <!-- Screen 4 Project -->
+          <div id="screen-4" class="screen" style="display:none;flex-direction:column;">
+            <div class="header" style="padding:12px 16px;border-bottom:1px solid #f3f4f6;display:flex;align-items:center;justify-content:space-between;">
+              <button class="back-btn" data-screen="3">←</button>
+              <h1 style="font-size:16px;font-weight:600;color:#111827;margin:0">Default Project</h1>
+              <div style="width:24px"></div>
+            </div>
+            <div class="content" style="padding:16px;">
+              <label style="display:flex;gap:12px;align-items:center;border:1px solid #e5e7eb;border-radius:8px;padding:12px;margin-bottom:8px;cursor:pointer;">
+                <input type="radio" name="project" value="general" checked>
+                <span style="font-size:14px;color:#111827">General Learning</span>
+              </label>
+              <label style="display:flex;gap:12px;align-items:center;border:1px solid #e5e7eb;border-radius:8px;padding:12px;margin-bottom:8px;cursor:pointer;">
+                <input type="radio" name="project" value="work">
+                <span style="font-size:14px;color:#111827">Work & Career</span>
+              </label>
+              <label style="display:flex;gap:12px;align-items:center;border:1px solid #e5e7eb;border-radius:8px;padding:12px;cursor:pointer;">
+                <input type="radio" name="project" value="tech">
+                <span style="font-size:14px;color:#111827">Technology</span>
+              </label>
+            </div>
+            <div style="padding:12px 16px;">
+              <button class="btn-primary" data-screen="5" style="width:100%;background:#3b82f6;color:#fff;border:none;border-radius:8px;padding:10px 14px;cursor:pointer;">Continue</button>
+            </div>
+          </div>
+
+          <!-- Screen 5 Preferences -->
+          <div id="screen-5" class="screen" style="display:none;flex-direction:column;">
+            <div class="header" style="padding:12px 16px;border-bottom:1px solid #f3f4f6;display:flex;align-items:center;justify-content:space-between;">
+              <button class="back-btn" data-screen="4">←</button>
+              <h1 style="font-size:16px;font-weight:600;color:#111827;margin:0">Preferences</h1>
+              <div style="width:24px"></div>
+            </div>
+            <div class="content" style="padding:16px;">
+              <label style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f3f4f6;">
+                <div style="display:flex;align-items:center;gap:12px;">
+                  <span>⏱️</span><div><div style="font-size:14px;color:#111827">Include Timestamps</div><div style="font-size:12px;color:#6b7280">Link to specific video moments</div></div>
+                </div>
+                <input type="checkbox" id="includeTimestamps" checked>
+              </label>
+              <label style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f3f4f6;">
+                <div style="display:flex;align-items:center;gap:12px;">
+                  <span>🎯</span><div><div style="font-size:14px;color:#111827">Action Items</div><div style="font-size:12px;color:#6b7280">Extract actionable tasks</div></div>
+                </div>
+                <input type="checkbox" id="includeActionItems" checked>
+              </label>
+              <label style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f3f4f6;">
+                <div style="display:flex;align-items:center;gap:12px;">
+                  <span>😊</span><div><div style="font-size:14px;color:#111827">Use Emojis</div><div style="font-size:12px;color:#6b7280">Add visual cues to summaries</div></div>
+                </div>
+                <input type="checkbox" id="includeEmojis" checked>
+              </label>
+              <label style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f3f4f6;">
+                <div style="display:flex;align-items:center;gap:12px;">
+                  <span>❓</span><div><div style="font-size:14px;color:#111827">Quiz Questions</div><div style="font-size:12px;color:#6b7280">Generate questions for review</div></div>
+                </div>
+                <input type="checkbox" id="includeQuiz">
+              </label>
+            </div>
+            <div style="padding:12px 16px;">
+              <button class="btn-primary" data-screen="6" style="width:100%;background:#3b82f6;color:#fff;border:none;border-radius:8px;padding:10px 14px;cursor:pointer;">Finish Setup</button>
+            </div>
+          </div>
+
+          <!-- Screen 6 Complete -->
+          <div id="screen-6" class="screen" style="display:none;flex-direction:column;">
+            <div class="header" style="padding:16px;text-align:center;">
+              <h1 style="font-size:18px;font-weight:600;color:#111827;margin:0 0 8px;">All Set!</h1>
+              <p style="font-size:13px;color:#6b7280;margin:0">Ready to generate your summary</p>
+            </div>
+            <div class="content" style="padding:16px;">
+              <button id="generateSummaryBtn" class="btn-gradient" style="width:100%;background:linear-gradient(135deg,#3b82f6,#8b5cf6);color:#fff;border:none;border-radius:8px;padding:12px 14px;cursor:pointer;">🚀 Generate Summary Now</button>
+            </div>
           </div>
         </div>
-        
-        <!-- Generate Button -->
-        <button id="summarizeBtn" class="rvised-button w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-3 px-4 rounded-lg hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-          </svg>
-          Generate Summary
-        </button>
-        
-        <!-- Loading State -->
-        <div id="loadingState" class="loading-state hidden">
-          <div class="flex flex-col items-center py-8">
-            <div class="spinner w-12 h-12 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin"></div>
-            <p class="mt-4 text-gray-600">Analyzing video and generating summary...</p>
-            <p class="text-sm text-gray-500 mt-2">This may take 10-15 seconds</p>
-          </div>
+
+        <div id="loadingState" class="loading-state hidden" style="display:none;text-align:center;padding:16px;">
+          <div class="spinner" style="width:48px;height:48px;border:4px solid #e5e7eb;border-top-color:#2563eb;border-radius:9999px;margin:0 auto;animation:spin 1s linear infinite"></div>
+          <p style="color:#6b7280;margin-top:8px;">Generating summary...</p>
         </div>
-        
-        <!-- Summary Result -->
-        <div id="summaryResult" class="summary-result hidden">
-          <!-- Summary will be inserted here -->
-        </div>
+        <div id="summaryResult" class="summary-result hidden" style="display:none;"></div>
       </div>
     </div>
   `;
@@ -477,7 +590,45 @@ function createRvisedOverlay() {
   document.body.appendChild(rvisedOverlay);
   
   // Add event listeners
-  document.getElementById('summarizeBtn').addEventListener('click', handleSummarize);
+  // Wizard navigation & actions
+  function goToScreenOverlay(n){
+    const screens = rvisedOverlay.querySelectorAll('.screen');
+    screens.forEach(s=> s.style.display = 'none');
+    const t = rvisedOverlay.querySelector(`#screen-${n}`);
+    if (t) t.style.display = 'flex';
+  }
+
+  function getOverlaySettings(){
+    const getChecked = (name)=>{
+      const el = rvisedOverlay.querySelector(`input[name="${name}"]:checked`);
+      return el ? el.value : undefined;
+    };
+    return {
+      learningMode: getChecked('learningMode') || 'student',
+      summaryDepth: getChecked('summaryDepth') || 'standard',
+      project: (rvisedOverlay.querySelector('input[name="project"]:checked')||{}).value || 'general',
+      includeEmojis: !!rvisedOverlay.querySelector('#includeEmojis')?.checked,
+      includeQuiz: !!rvisedOverlay.querySelector('#includeQuiz')?.checked,
+      includeTimestamps: !!rvisedOverlay.querySelector('#includeTimestamps')?.checked,
+      includeActionItems: !!rvisedOverlay.querySelector('#includeActionItems')?.checked
+    };
+  }
+
+  rvisedOverlay.addEventListener('click', (e)=>{
+    const nav = e.target.closest('[data-screen]');
+    if (nav){
+      const n = nav.getAttribute('data-screen');
+      goToScreenOverlay(n);
+      return;
+    }
+    if (e.target.id === 'generateSummaryBtn'){
+      window.rvisedSettings = getOverlaySettings();
+      handleSummarize();
+    }
+    if (e.target.closest('.rvised-close')){
+      rvisedOverlay.style.display = 'none';
+    }
+  });
   
   // Add close button functionality
   const closeBtn = rvisedOverlay.querySelector('.rvised-close');

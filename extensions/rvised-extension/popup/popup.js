@@ -172,24 +172,17 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Target hasAttribute data-screen:', e.target.hasAttribute('data-screen'));
         console.log('Target data-screen value:', e.target.getAttribute('data-screen'));
         
-        // Handle screen navigation buttons
-        if (e.target.hasAttribute('data-screen')) {
-            const screenNumber = e.target.getAttribute('data-screen');
+        // Handle screen navigation buttons (support clicking inner elements)
+        const navEl = e.target.closest('[data-screen]');
+        if (navEl) {
+            const screenNumber = navEl.getAttribute('data-screen');
             console.log('Navigating to screen:', screenNumber);
             goToScreen(screenNumber);
             return;
         }
         
         // Handle setup item clicks
-        if (e.target.closest('.setup-item')) {
-            const setupItem = e.target.closest('.setup-item');
-            if (setupItem.hasAttribute('data-screen')) {
-                const screenNumber = setupItem.getAttribute('data-screen');
-                console.log('Setup item clicked, navigating to screen:', screenNumber);
-                goToScreen(screenNumber);
-                return;
-            }
-        }
+        // Setup items use same [data-screen] handling above
         
         // Handle back button clicks
         if (e.target.classList.contains('back-btn')) {

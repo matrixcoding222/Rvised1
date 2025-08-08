@@ -223,18 +223,15 @@
             background: linear-gradient(135deg, #2563eb, #7c3aed);
         }
         
-        .back-btn {
-            background: none;
-            border: none;
-            padding: 4px;
-            border-radius: 6px;
-            cursor: pointer;
-            color: #6b7280;
-        }
-        
-        .back-btn:hover {
-            background: #f3f4f6;
-        }
+        .back-btn { background: none; border: none; padding: 4px; border-radius: 6px; cursor: pointer; color: #6b7280; }
+        .back-btn:hover { background: #f3f4f6; }
+
+        /* Utility icon circles */
+        .icon-circle { width: 28px; height: 28px; border-radius: 8px; display:flex; align-items:center; justify-content:center; }
+        .icon-blue { background:#dbeafe; color:#2563eb }
+        .icon-green { background:#dcfce7; color:#16a34a }
+        .icon-purple { background:#ede9fe; color:#7c3aed }
+        .icon-orange { background:#ffedd5; color:#ea580c }
         
         .success-icon {
             width: 64px;
@@ -265,23 +262,67 @@
             
             <div class="content">
                 <div class="setup-item" data-screen="2">
-                    <div class="title">Learning Mode</div>
-                    <div class="subtitle">Student</div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;">
+                        <div style="display:flex;align-items:center;gap:12px;">
+                            <div class="icon-circle icon-blue"> 
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                  <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+                                  <path d="M5 8a7 7 0 0 1 14 0v4"/>
+                                  <path d="M8 21h8"/>
+                                </svg>
+                            </div>
+                            <div>
+                              <div class="title">Learning Mode</div>
+                              <div class="subtitle">Student</div>
+                            </div>
+                        </div>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                    </div>
                 </div>
                 
                 <div class="setup-item" data-screen="3">
-                    <div class="title">Summary Depth</div>
-                    <div class="subtitle">Standard</div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;">
+                        <div style="display:flex;align-items:center;gap:12px;">
+                            <div class="icon-circle icon-green">
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            </div>
+                            <div>
+                              <div class="title">Summary Depth</div>
+                              <div class="subtitle">Standard</div>
+                            </div>
+                        </div>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                    </div>
                 </div>
                 
                 <div class="setup-item" data-screen="4">
-                    <div class="title">Default Project</div>
-                    <div class="subtitle">General Learning</div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;">
+                        <div style="display:flex;align-items:center;gap:12px;">
+                            <div class="icon-circle icon-purple">
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16l6-3 6 3V6a4 4 0 0 0-4-4z"/></svg>
+                            </div>
+                            <div>
+                              <div class="title">Default Project</div>
+                              <div class="subtitle">General Learning</div>
+                            </div>
+                        </div>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                    </div>
                 </div>
                 
                 <div class="setup-item" data-screen="5">
-                    <div class="title">Preferences</div>
-                    <div class="subtitle">Format options</div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;">
+                        <div style="display:flex;align-items:center;gap:12px;">
+                            <div class="icon-circle icon-orange">
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="12" y1="21" x2="12" y2="8"/><line x1="20" y1="21" x2="20" y2="3"/></svg>
+                            </div>
+                            <div>
+                              <div class="title">Preferences</div>
+                              <div class="subtitle">Format options</div>
+                            </div>
+                        </div>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                    </div>
                 </div>
             </div>
             

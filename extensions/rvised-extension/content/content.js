@@ -838,8 +838,14 @@ function initializeRvised() {
   // Only run on YouTube watch pages
   if (window.location.pathname === '/watch') {
     console.log('🎬 YouTube video page detected, initializing Rvised...');
-    // Do not auto-render the overlay. We will create it only when the user triggers summarization
-    // via popup or explicit message. This prevents the overlay card appearing alongside the popup.
+    // Auto-create the overlay so users don't need to click the extension icon
+    if (!rvisedOverlay) {
+      setTimeout(() => {
+        if (!rvisedOverlay) {
+          createRvisedOverlay();
+        }
+      }, 1500);
+    }
   }
 }
 

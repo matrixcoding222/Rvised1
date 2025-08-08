@@ -378,9 +378,10 @@ function extractTranscriptFromPage() {
 
 // Create and inject the Rvised overlay
 function createRvisedOverlay() {
-  if (rvisedOverlay) {
-    rvisedOverlay.remove();
-  }
+  // Remove any previous overlays (even from older versions) to avoid multiple cards
+  const existingEl = document.getElementById('rvised-overlay');
+  if (existingEl) existingEl.remove();
+  if (rvisedOverlay) rvisedOverlay.remove();
   
   // Create overlay container
   rvisedOverlay = document.createElement('div');
@@ -599,6 +600,9 @@ function createRvisedOverlay() {
     const t = rvisedOverlay.querySelector(`#screen-${n}`);
     if (t) t.style.display = 'flex';
   }
+
+  // Start at screen 1 on initial inject
+  goToScreenOverlay(1);
 
   function getOverlaySettings(){
     const getChecked = (name)=>{

@@ -136,14 +136,7 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
       tab.url && 
       tab.url.includes('youtube.com/watch')) {
     
-    console.log('📺 YouTube video page loaded, ensuring content script is active');
-    
-    // Try to ping the content script
-    chrome.tabs.sendMessage(tabId, {action: 'ping'}, function(response) {
-      if (chrome.runtime.lastError) {
-        console.log('🔄 Content script not responding, might need manual refresh');
-      }
-    });
+    console.log('📺 YouTube video page loaded');
   }
 });
 

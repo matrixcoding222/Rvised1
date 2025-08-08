@@ -200,7 +200,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         // Handle finish setup button (text or data-screen=6)
-        if (e.target.textContent === 'Finish Setup' || (e.target.matches('button[data-screen="6"]') && e.target.closest('#screen-5'))) {
+        const isElement = e.target && typeof e.target.matches === 'function';
+        if (e.target.textContent === 'Finish Setup' || (isElement && e.target.matches('button[data-screen="6"]') && e.target.closest('#screen-5'))) {
             console.log('Finish Setup clicked');
             saveSettings();
             return;
@@ -242,7 +243,9 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('Setup items:', document.querySelectorAll('.setup-item').length);
     console.log('Buttons with data-screen:', document.querySelectorAll('[data-screen]').length);
     console.log('Back buttons:', document.querySelectorAll('.back-btn').length);
-    console.log('Finish Setup button:', document.querySelector('button:contains("Finish Setup")'));
+    // Debug presence checks without unsupported :contains selector
+    const finishBtn = Array.from(document.querySelectorAll('button')).find(btn => btn.textContent && btn.textContent.trim() === 'Finish Setup');
+    console.log('Finish Setup button present:', !!finishBtn);
     console.log('Generate Summary button:', document.getElementById('generateSummaryBtn'));
     console.log('Start Using button:', document.getElementById('startUsingBtn'));
 });

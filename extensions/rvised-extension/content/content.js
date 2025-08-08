@@ -415,14 +415,6 @@ function createRvisedOverlay() {
   rvisedOverlay.id = 'rvised-overlay';
   rvisedOverlay.className = 'rvised-overlay-container';
   
-  // Inject Tailwind CSS if not already present
-  if (!document.querySelector('#rvised-tailwind')) {
-    const tailwindScript = document.createElement('script');
-    tailwindScript.id = 'rvised-tailwind';
-    tailwindScript.src = 'https://cdn.tailwindcss.com';
-    document.head.appendChild(tailwindScript);
-  }
-  
   // Create overlay HTML with Tailwind classes
   rvisedOverlay.innerHTML = `
     <div class="rvised-container bg-white rounded-xl shadow-2xl">

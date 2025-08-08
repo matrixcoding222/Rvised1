@@ -1,0 +1,20 @@
+[33m445aa2c[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m Replace wizard with single-screen composer: popup + overlay share same composer.html/js; stop auto overlay; hydrate composer in overlay; CSP-safe
+[33m64f46ae[m Unify UI: add shared wizard.html/js; popup hydrates shared template; overlay loads shared template and listens for generate event; single source of truth
+[33m0117859[m Ensure single overlay: remove any prior #rvised-overlay before creating; set starting screen explicitly; stop background pings to avoid re-injection quirks
+[33m4349bfc[m UI parity: add 'Skip for now' to popup and overlay; wire popup->background showOverlay action; ensure overlay/popup use identical wizard design; keep one consistent card
+[33m2b0e4b8[m Overlay: replace old compact panel with full wizard-based UI (inline SVGs, utility CSS); remove previous mini settings form; hook buttons to goToScreen + generate
+[33mba6b049[m UX: auto-create overlay on YouTube; popup navigation uses closest([data-screen]); inline SVG icons + utility CSS in popup; keep CSP safe
+[33m37aa0da[m Popup: fix invalid :contains selector and guard matches(); map buttons to generated design flow; no behavior change to storage or messaging
+[33m722e911[m Popup: route Continue to screen 2; keep Finish Setup to 6; prevent auto overlay creation on load; only create overlay on startSummarization; fix popup double-card by not auto-injecting overlay
+[33m5522802[m Extension fixes: remove inline onclick; clean chapter extractor duplication; fix background duplicate context menu creation and wrong variable; harden popup Finish Setup handler; add minimal sandbox section; resolve duplicate context menu id error
+[33m3b1d66d[m Extension: remove Tailwind CDN injection to satisfy CSP; add minimal utility styles; keep overlay UI working without external scripts
+[33m2a2d681[m Add comprehensive debugging to popup buttons
+[33md4c5495[m 🔧 FIX POPUP BUTTON FUNCTIONALITY: Add proper event handling and debugging
+[33mfe8f00a[m 🔧 FIX TYPESCRIPT ERROR: Remove null assignments to optional arrays
+[33me5b7a4d[m 🔧 FIX SYNTAX ERROR: Correct indentation in route.ts
+[33md122c36[m 🔧 FIX VERCEL DEPLOYMENT: Remove invalid rootDirectory property
+[33m2e00308[m 🔧 FIX CHROME EXTENSION CSP ERRORS: Complete popup overhaul
+[33m148dc64[m 🔧 FIX POPUP TO CONTENT SCRIPT INTEGRATION: Complete flow
+[33mac35600[m 🔧 VERCEL MONOREPO FIX: Add vercel.json configuration
+[33m2fd63f0[m 🔗 INTEGRATE POPUP WITH CONTENT SCRIPT: Complete UI flow
+[33m4dbbd87[m 🔧 FINAL BUILD FIXES: Resolve remaining TypeScript errors

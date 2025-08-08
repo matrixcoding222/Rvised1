@@ -388,7 +388,7 @@ function createRvisedOverlay() {
   rvisedOverlay.id = 'rvised-overlay';
   rvisedOverlay.className = 'rvised-overlay-container';
   
-  // Minimal shell; content will be hydrated from shared composer
+  // Original compact overlay card with settings and single generate button
   rvisedOverlay.innerHTML = `
     <div class="rvised-container bg-white rounded-xl shadow-2xl">
       <div class="rvised-header" style="background:linear-gradient(90deg,#2563eb,#7c3aed);color:#fff;padding:12px 16px;border-top-left-radius:12px;border-top-right-radius:12px;display:flex;align-items:center;justify-content:space-between;">
@@ -400,8 +400,32 @@ function createRvisedOverlay() {
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </button>
       </div>
+      
       <div class="rvised-content" style="padding:16px;">
-        <div id="overlay-root"></div>
+        <div class="setting-group" style="margin-bottom:12px;">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Learning Mode</label>
+          <select id="learningMode" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+            <option value="student">🎓 Student - Clear explanations</option>
+            <option value="build" selected>🔧 Build - Practical steps</option>
+            <option value="understand">🧠 Understand - Deep insights</option>
+          </select>
+        </div>
+        <div class="setting-group" style="margin-bottom:12px;">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Summary Depth</label>
+          <select id="summaryDepth" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+            <option value="quick">⚡ Quick (2-3 min read)</option>
+            <option value="standard" selected>📋 Standard (5-7 min read)</option>
+            <option value="deep">🔍 Deep (10+ min read)</option>
+          </select>
+        </div>
+        <div class="toggle-group" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:12px;">
+          <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="includeEmojis" checked> <span>😊 Emojis</span></label>
+          <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="includeQuiz"> <span>❓ Quiz Questions</span></label>
+          <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="includeTimestamps" checked> <span>⏱️ Timestamps</span></label>
+          <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="includeActionItems" checked> <span>🎯 Action Items</span></label>
+        </div>
+        <button id="summarizeBtn" class="rvised-button" style="width:100%;background:linear-gradient(90deg,#2563eb,#7c3aed);color:#fff;font-weight:600;padding:10px 12px;border:none;border-radius:8px;cursor:pointer;">Generate Summary</button>
+        
         <div id="loadingState" class="loading-state hidden" style="display:none;text-align:center;padding:16px;">
           <div class="spinner" style="width:48px;height:48px;border:4px solid #e5e7eb;border-top-color:#2563eb;border-radius:9999px;margin:0 auto;animation:spin 1s linear infinite"></div>
           <p style="color:#6b7280;margin-top:8px;">Generating summary...</p>
@@ -413,21 +437,20 @@ function createRvisedOverlay() {
   
   document.body.appendChild(rvisedOverlay);
   
-  // Hydrate shared composer into overlay
-  (async () => {
-    try {
-      const url = chrome.runtime.getURL('shared/composer.html');
-      const html = await (await fetch(url)).text();
-      rvisedOverlay.querySelector('#overlay-root').innerHTML = html;
-      const modUrl = chrome.runtime.getURL('shared/composer.js');
-      const mod = await import(modUrl);
-      mod.initComposer(rvisedOverlay.querySelector('#overlay-root'), { mode: 'overlay' });
-    } catch (e) { console.error('Overlay composer load failed', e); }
-  })();
-
-  // Listen for generate event from composer controller
-  window.addEventListener('rvised-generate', (evt) => {
-    window.rvisedSettings = evt.detail?.settings;
+  // Bind close and generate
+  const closeBtn = rvisedOverlay.querySelector('.rvised-close');
+  if (closeBtn) closeBtn.addEventListener('click', () => { rvisedOverlay.remove(); });
+  const genBtn = rvisedOverlay.querySelector('#summarizeBtn');
+  if (genBtn) genBtn.addEventListener('click', () => {
+    window.rvisedSettings = {
+      learningMode: document.getElementById('learningMode')?.value || 'student',
+      summaryDepth: document.getElementById('summaryDepth')?.value || 'standard',
+      includeEmojis: document.getElementById('includeEmojis')?.checked || false,
+      includeQuiz: document.getElementById('includeQuiz')?.checked || false,
+      includeTimestamps: document.getElementById('includeTimestamps')?.checked || false,
+      includeActionItems: document.getElementById('includeActionItems')?.checked || false,
+      quizCount: '5'
+    };
     handleSummarize();
   });
   

@@ -410,7 +410,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<Summarize
           
           if (transcriptText.length > 50) {
             contentToSummarize = transcriptText
-            contentSource = 'transcript'
+        contentSource = 'transcript'
             console.log(`🎉 SUCCESS: Using transcript for AI summarization`)
           } else {
             throw new Error(`Transcript exists but too short: ${transcriptText.length} characters`)

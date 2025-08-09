@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rvised - Complete Flow Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #1f2937;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #6b7280;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .test-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .test-number {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-weight: bold;
+        }
+        .test-title {
+            flex: 1;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        .status {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .status.pending { background: #fef3c7; color: #92400e; }
+        .status.testing { background: #dbeafe; color: #1e40af; }
+        .status.success { background: #d1fae5; color: #065f46; }
+        .status.error { background: #fee2e2; color: #991b1b; }
+        .test-content {
+            margin-left: 42px;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #374151;
+            font-size: 14px;
+        }
+        .input-group input, .input-group textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        .input-group textarea {
+            min-height: 100px;
+            font-family: 'Courier New', monospace;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        button:hover:not(:disabled) {
+            transform: translateY(-1px);
+        }
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .result-box {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 12px;
+            margin-top: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .result-box pre {
+            margin: 0;
+            white-space: pre-wrap;
+            font-size: 12px;
+        }
+        .success-message {
+            color: #059669;
+            background: #d1fae5;
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin-top: 10px;
+        }
+        .error-message {
+            color: #dc2626;
+            background: #fee2e2;
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin-top: 10px;
+        }
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #f3f4f6;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 8px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .instructions {
+            background: #f0f9ff;
+            border-left: 4px solid #0ea5e9;
+            padding: 16px;
+            margin-bottom: 20px;
+            border-radius: 0 6px 6px 0;
+        }
+        .instructions h3 {
+            margin: 0 0 8px 0;
+            color: #0c4a6e;
+        }
+        .instructions ol {
+            margin: 8px 0 0 0;
+            padding-left: 20px;
+        }
+        .instructions li {
+            margin-bottom: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>=� Rvised Complete Flow Test</h1>
+        <p class="subtitle">Test the entire YouTube summarization pipeline</p>
+
+        <div class="instructions">
+            <h3>=� Before Testing</h3>
+            <ol>
+                <li>Make sure you've disabled Vercel Authentication</li>
+                <li>Added OPENAI_API_KEY to Vercel environment variables</li>
+                <li>Redeployed after making changes</li>
+                <li>Have a YouTube video URL ready to test</li>
+            </ol>
+        </div>
+
+        <!-- Test 1: Health Check -->
+        <div class="test-section">
+            <div class="test-header">
+                <span class="test-number">1</span>
+                <span class="test-title">Health Check</span>
+                <span class="status pending" id="status-1">Pending</span>
+            </div>
+            <div class="test-content">
+                <p>Testing if the API is accessible</p>
+                <button onclick="testHealth()">Run Health Check</button>
+                <div id="result-1"></div>
+            </div>
+        </div>
+
+        <!-- Test 2: CORS Check -->
+        <div class="test-section">
+            <div class="test-header">
+                <span class="test-number">2</span>
+                <span class="test-title">CORS Configuration</span>
+                <span class="status pending" id="status-2">Pending</span>
+            </div>
+            <div class="test-content">
+                <p>Testing if CORS is properly configured for extension</p>
+                <button onclick="testCORS()">Test CORS</button>
+                <div id="result-2"></div>
+            </div>
+        </div>
+
+        <!-- Test 3: Transcript Extraction -->
+        <div class="test-section">
+            <div class="test-header">
+                <span class="test-number">3</span>
+                <span class="test-title">Transcript Extraction Simulation</span>
+                <span class="status pending" id="status-3">Pending</span>
+            </div>
+            <div class="test-content">
+                <div class="input-group">
+                    <label>Sample Transcript (paste a real transcript):</label>
+                    <textarea id="sample-transcript" placeholder="Paste a YouTube transcript here...">
+Welcome to this video about building successful apps.
+Today we'll discuss the 1-minute rule for monetization.
+Apps that solve problems in under 1 minute can charge $100/year.
+We'll use React, Next.js, and Tailwind CSS for development.
+Key metrics: 20% conversion rate, $5 CAC, 80% retention.
+Tools mentioned: Vercel for deployment, Stripe for payments.
+                    </textarea>
+                </div>
+                <button onclick="testTranscript()">Test Transcript Processing</button>
+                <div id="result-3"></div>
+            </div>
+        </div>
+
+        <!-- Test 4: Full Summarization -->
+        <div class="test-section">
+            <div class="test-header">
+                <span class="test-number">4</span>
+                <span class="test-title">Full Summarization Flow</span>
+                <span class="status pending" id="status-4">Pending</span>
+            </div>
+            <div class="test-content">
+                <div class="input-group">
+                    <label>YouTube URL:</label>
+                    <input type="text" id="youtube-url" placeholder="https://www.youtube.com/watch?v=..." value="https://www.youtube.com/watch?v=6Fj1AxKXjiM">
+                </div>
+                <div class="input-group">
+                    <label>Test Transcript:</label>
+                    <textarea id="full-transcript" placeholder="Enter transcript for this video...">
+This video covers building production-ready applications.
+We discuss monetization strategies including the 1-minute rule.
+Key insight: Apps solving problems quickly can charge premium prices.
+Specific metric: $100/year subscription for productivity apps.
+Tools used: React 18.2, Next.js 14, Vercel hosting, Stripe payments.
+Database options: PostgreSQL with Prisma ORM or Supabase.
+Performance tip: Use React.memo() for expensive components.
+Code splitting with dynamic imports reduces bundle size by 40%.
+Testing strategy: Jest for unit tests, Playwright for E2E.
+Deployment workflow: GitHub Actions CI/CD to Vercel.
+                    </textarea>
+                </div>
+                <button onclick="testFullFlow()">Test Full Summarization</button>
+                <div id="result-4"></div>
+            </div>
+        </div>
+
+        <!-- Test 5: OpenAI API -->
+        <div class="test-section">
+            <div class="test-header">
+                <span class="test-number">5</span>
+                <span class="test-title">OpenAI API Integration</span>
+                <span class="status pending" id="status-5">Pending</span>
+            </div>
+            <div class="test-content">
+                <p>Testing if OpenAI API key is configured and working</p>
+                <button onclick="testOpenAI()">Test OpenAI Integration</button>
+                <div id="result-5"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Use local or Vercel URL based on query parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const useLocal = urlParams.get('local') === 'true';
+        const API_URL = useLocal 
+            ? 'http://localhost:3000'
+            : 'https://rvised-pj1pqwanw-tysonso1122-2100s-projects.vercel.app';
+        
+        console.log('Using API URL:', API_URL);
+
+        function updateStatus(testNum, status, message = '') {
+            const statusEl = document.getElementById(`status-${testNum}`);
+            statusEl.className = `status ${status}`;
+            statusEl.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+            
+            const resultEl = document.getElementById(`result-${testNum}`);
+            if (message) {
+                const msgClass = status === 'success' ? 'success-message' : 
+                               status === 'error' ? 'error-message' : '';
+                resultEl.innerHTML = `<div class="${msgClass}">${message}</div>`;
+            }
+        }
+
+        async function testHealth() {
+            updateStatus(1, 'testing');
+            try {
+                const response = await fetch(`${API_URL}/api/health`);
+                const text = await response.text();
+                
+                if (response.ok) {
+                    updateStatus(1, 'success', ` API is accessible! Response: ${text}`);
+                } else {
+                    updateStatus(1, 'error', `L API returned ${response.status}: ${text}`);
+                }
+            } catch (error) {
+                updateStatus(1, 'error', `L Failed to connect: ${error.message}`);
+            }
+        }
+
+        async function testCORS() {
+            updateStatus(2, 'testing');
+            try {
+                const response = await fetch(`${API_URL}/api/summarize`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Origin': 'chrome-extension://test'
+                    },
+                    body: JSON.stringify({ test: true })
+                });
+                
+                const corsHeader = response.headers.get('access-control-allow-origin');
+                if (corsHeader) {
+                    updateStatus(2, 'success', ` CORS configured! Allow-Origin: ${corsHeader}`);
+                } else {
+                    updateStatus(2, 'error', 'L CORS headers not present');
+                }
+            } catch (error) {
+                updateStatus(2, 'error', `L CORS test failed: ${error.message}`);
+            }
+        }
+
+        async function testTranscript() {
+            updateStatus(3, 'testing');
+            const transcript = document.getElementById('sample-transcript').value;
+            
+            if (!transcript.trim()) {
+                updateStatus(3, 'error', 'L Please enter a transcript');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_URL}/api/summarize`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Origin': 'chrome-extension://test'
+                    },
+                    body: JSON.stringify({
+                        videoUrl: 'https://www.youtube.com/watch?v=test',
+                        extensionTranscript: transcript,
+                        settings: {
+                            summaryDepth: 'standard',
+                            includeEmojis: true,
+                            includeKeyInsights: true
+                        }
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    const resultEl = document.getElementById('result-3');
+                    resultEl.innerHTML = `
+                        <div class="success-message"> Transcript processed successfully!</div>
+                        <div class="result-box">
+                            <pre>${JSON.stringify(data.data, null, 2)}</pre>
+                        </div>
+                    `;
+                    updateStatus(3, 'success');
+                } else {
+                    updateStatus(3, 'error', `L ${data.error}`);
+                }
+            } catch (error) {
+                updateStatus(3, 'error', `L Processing failed: ${error.message}`);
+            }
+        }
+
+        async function testFullFlow() {
+            updateStatus(4, 'testing');
+            const url = document.getElementById('youtube-url').value;
+            const transcript = document.getElementById('full-transcript').value;
+            
+            if (!url || !transcript) {
+                updateStatus(4, 'error', 'L Please enter both URL and transcript');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_URL}/api/summarize`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Origin': 'chrome-extension://test'
+                    },
+                    body: JSON.stringify({
+                        videoUrl: url,
+                        extensionTranscript: transcript,
+                        settings: {
+                            summaryDepth: 'detailed',
+                            includeEmojis: true,
+                            includeKeyInsights: true,
+                            includeActionItems: true,
+                            includeTechStack: true,
+                            includeTimestamps: true
+                        }
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    const resultEl = document.getElementById('result-4');
+                    resultEl.innerHTML = `
+                        <div class="success-message"> Full summarization successful!</div>
+                        <div class="result-box">
+                            <h4>Summary Preview:</h4>
+                            <p>${data.data.summary.substring(0, 200)}...</p>
+                            <h4>Key Insights:</h4>
+                            <ul>${data.data.keyInsights?.map(i => `<li>${i}</li>`).join('') || '<li>No insights</li>'}</ul>
+                            <h4>Full Response:</h4>
+                            <pre>${JSON.stringify(data.data, null, 2)}</pre>
+                        </div>
+                    `;
+                    updateStatus(4, 'success');
+                } else {
+                    updateStatus(4, 'error', `L ${data.error}`);
+                }
+            } catch (error) {
+                updateStatus(4, 'error', `L Summarization failed: ${error.message}`);
+            }
+        }
+
+        async function testOpenAI() {
+            updateStatus(5, 'testing');
+            try {
+                const response = await fetch(`${API_URL}/api/summarize`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Origin': 'chrome-extension://test'
+                    },
+                    body: JSON.stringify({
+                        videoUrl: 'https://www.youtube.com/watch?v=test',
+                        extensionTranscript: 'Test OpenAI integration.',
+                        settings: { summaryDepth: 'brief' }
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    updateStatus(5, 'success', ' OpenAI API is working!');
+                } else if (data.error?.includes('API key')) {
+                    updateStatus(5, 'error', 'L OpenAI API key not configured in Vercel');
+                } else {
+                    updateStatus(5, 'error', `L OpenAI error: ${data.error}`);
+                }
+            } catch (error) {
+                updateStatus(5, 'error', `L Test failed: ${error.message}`);
+            }
+        }
+
+        // Auto-run health check on load
+        window.addEventListener('load', () => {
+            setTimeout(testHealth, 500);
+        });
+    </script>
+</body>
+</html>

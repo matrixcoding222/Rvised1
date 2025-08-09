@@ -11,17 +11,22 @@
   ],
   
   "host_permissions": [
-    "https://www.youtube.com/*",
+    "*://*.youtube.com/*",
     "https://rvised.vercel.app/*",
-    "https://localhost:3000/*"
+    "https://localhost:3000/*",
+    "http://localhost:3000/*",
+    "https://127.0.0.1:3000/*",
+    "http://127.0.0.1:3000/*",
+    "https://video.google.com/*"
   ],
   
   "content_scripts": [
     {
-      "matches": ["https://www.youtube.com/watch*"],
+      "matches": ["*://*.youtube.com/watch*", "*://*.youtube.com/embed/*", "*://*.youtube.com/shorts/*"],
       "js": ["content/content.js"],
       "css": ["content/overlay.css"],
-      "run_at": "document_end"
+      "run_at": "document_end",
+      "all_frames": true
     }
   ],
   

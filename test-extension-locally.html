@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Transcript Extraction</title>
+</head>
+<body>
+    <h1>YouTube Transcript Extraction Test</h1>
+    <p>Open this file, then:</p>
+    <ol>
+        <li>Open YouTube video in another tab</li>
+        <li>Open browser console (F12)</li>
+        <li>Run this code in the YouTube tab console:</li>
+    </ol>
+    <pre style="background: #f0f0f0; padding: 10px;">
+// TEST CODE - Run this in YouTube console
+(function() {
+    // Find ytInitialPlayerResponse
+    const scripts = document.querySelectorAll('script');
+    for (const script of scripts) {
+        const content = script.textContent || '';
+        if (content.includes('ytInitialPlayerResponse')) {
+            const match = content.match(/ytInitialPlayerResponse\s*=\s*({.+?});/);
+            if (match) {
+                try {
+                    const playerResponse = JSON.parse(match[1]);
+                    const tracks = playerResponse?.captions?.playerCaptionsTracklistRenderer?.captionTracks;
+                    
+                    if (tracks && tracks.length > 0) {
+                        console.log('✅ FOUND CAPTION TRACKS:', tracks);
+                        
+                        const track = tracks[0];
+                        if (track?.baseUrl) {
+                            console.log('📡 Caption URL:', track.baseUrl);
+                            
+                            // Fetch the captions
+                            fetch(track.baseUrl.replace(/\\u0026/g, '&'))
+                                .then(r => r.text())
+                                .then(text => {
+                                    console.log('📄 RAW RESPONSE:', text.substring(0, 500));
+                                    
+                                    // Parse XML
+                                    const parser = new DOMParser();
+                                    const doc = parser.parseFromString(text, 'text/xml');
+                                    const textNodes = doc.querySelectorAll('text');
+                                    
+                                    if (textNodes.length > 0) {
+                                        console.log('✅ SUCCESS! Found', textNodes.length, 'text segments');
+                                        const sample = Array.from(textNodes).slice(0, 5).map(n => n.textContent);
+                                        console.log('Sample text:', sample);
+                                    } else {
+                                        console.log('❌ No text nodes found in XML');
+                                    }
+                                })
+                                .catch(e => console.error('Fetch failed:', e));
+                        }
+                    } else {
+                        console.log('❌ NO CAPTION TRACKS FOUND');
+                    }
+                } catch (e) {
+                    console.error('Parse error:', e);
+                }
+                break;
+            }
+        }
+    }
+    
+    // Also check window object
+    if (window.ytInitialPlayerResponse) {
+        console.log('Also found on window:', window.ytInitialPlayerResponse?.captions);
+    }
+})();
+    </pre>
+</body>
+</html>

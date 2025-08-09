@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node:*)",
+      "Bash(npm run dev:*)",
+      "Bash(start \"C:\\Users\\User\\RVISED3\\test-complete-flow.html\")",
+      "Bash(powershell:*)"
+    ],
+    "deny": []
+  }
+}

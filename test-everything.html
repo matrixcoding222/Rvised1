@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Complete Rvised Test Suite</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; max-width: 1200px; margin: 0 auto; }
+        .test-section { margin: 20px 0; padding: 20px; border: 2px solid #ddd; border-radius: 8px; }
+        .success { background: #d4edda; color: #155724; padding: 10px; border-radius: 4px; }
+        .error { background: #f8d7da; color: #721c24; padding: 10px; border-radius: 4px; }
+        .warning { background: #fff3cd; color: #856404; padding: 10px; border-radius: 4px; }
+        button { padding: 10px 20px; font-size: 16px; cursor: pointer; margin: 5px; }
+        pre { background: #f0f0f0; padding: 10px; overflow-x: auto; }
+        .result { margin: 10px 0; padding: 10px; border-left: 4px solid #007bff; }
+    </style>
+</head>
+<body>
+    <h1>🎯 Complete Rvised Test Suite</h1>
+    <p>Test EVERYTHING to ensure it works 100% before deployment</p>
+
+    <!-- Test 1: Check if video has captions -->
+    <div class="test-section">
+        <h2>Test 1: Check Video for Captions</h2>
+        <p>Paste this in YouTube console to check if video has captions:</p>
+        <pre id="test1"></pre>
+        <div id="result1"></div>
+    </div>
+
+    <!-- Test 2: Extract transcript -->
+    <div class="test-section">
+        <h2>Test 2: Extract Transcript (if available)</h2>
+        <p>Paste this in YouTube console to extract transcript:</p>
+        <pre id="test2"></pre>
+        <div id="result2"></div>
+    </div>
+
+    <!-- Test 3: Test API with transcript -->
+    <div class="test-section">
+        <h2>Test 3: Test API Summary Generation</h2>
+        <textarea id="transcript" rows="5" cols="80" placeholder="Paste extracted transcript here"></textarea>
+        <br>
+        <label><input type="checkbox" id="includeChapters" checked> Include Chapters</label>
+        <label><input type="checkbox" id="includeKeyInsights" checked> Include Key Insights</label>
+        <label><input type="checkbox" id="includeEmojis" checked> Include Emojis</label>
+        <label><input type="checkbox" id="includeQuiz" checked> Include Quiz</label>
+        <label><input type="checkbox" id="includeTimestamps" checked> Include Timestamps</label>
+        <br><br>
+        <button onclick="testAPI()">Test API with Transcript</button>
+        <button onclick="testAPIWithoutTranscript()">Test API without Transcript (Description fallback)</button>
+        <div id="apiResult"></div>
+    </div>
+
+    <!-- Test 4: Verify all features -->
+    <div class="test-section">
+        <h2>Test 4: Feature Verification Checklist</h2>
+        <div id="checklist"></div>
+    </div>
+
+    <script>
+        // Test 1: Check for captions
+        document.getElementById('test1').textContent = `
+// CHECK IF VIDEO HAS CAPTIONS
+function checkCaptions() {
+  const videoId = new URLSearchParams(window.location.search).get('v');
+  console.log('Checking video:', videoId);
+  
+  let playerResponse = window.ytInitialPlayerResponse;
+  if (!playerResponse) {
+    const scripts = document.querySelectorAll('script');
+    for (const script of scripts) {
+      if (script.textContent?.includes('ytInitialPlayerResponse')) {
+        const match = script.textContent.match(/ytInitialPlayerResponse\\s*=\\s*({[\\s\\S]*?});/);
+        if (match) {
+          try { playerResponse = JSON.parse(match[1]); break; } catch {}
+        }
+      }
+    }
+  }
+  
+  const tracks = playerResponse?.captions?.playerCaptionsTracklistRenderer?.captionTracks;
+  
+  if (!tracks || tracks.length === 0) {
+    console.log('❌ NO CAPTIONS AVAILABLE');
+    return false;
+  }
+  
+  console.log('✅ CAPTIONS FOUND:', tracks.length, 'track(s)');
+  tracks.forEach(t => console.log('-', t.name?.simpleText, '(' + t.languageCode + ')'));
+  return true;
+}
+checkCaptions();`;
+
+        // Test 2: Extract transcript
+        document.getElementById('test2').textContent = `
+// EXTRACT TRANSCRIPT (ONE METHOD THAT WORKS)
+async function extractTranscript() {
+  console.log('🎯 EXTRACTING TRANSCRIPT...');
+  
+  let playerResponse = window.ytInitialPlayerResponse;
+  if (!playerResponse) {
+    const scripts = document.querySelectorAll('script');
+    for (const script of scripts) {
+      if (script.textContent?.includes('ytInitialPlayerResponse')) {
+        const match = script.textContent.match(/ytInitialPlayerResponse\\s*=\\s*({[\\s\\S]*?});/);
+        if (match) {
+          try { playerResponse = JSON.parse(match[1]); break; } catch {}
+        }
+      }
+    }
+  }
+  
+  const tracks = playerResponse?.captions?.playerCaptionsTracklistRenderer?.captionTracks;
+  if (!tracks || tracks.length === 0) {
+    console.log('❌ No captions available');
+    return null;
+  }
+  
+  const track = tracks.find(t => t.languageCode?.startsWith('en')) || tracks[0];
+  const url = track.baseUrl.replace(/\\\\u0026/g, '&');
+  
+  console.log('📥 Fetching from:', url.substring(0, 80) + '...');
+  
+  try {
+    const response = await fetch(url);
+    if (response.status === 429) {
+      console.log('⚠️ Rate limited - YouTube is blocking requests');
+      console.log('Try: 1) Different video, 2) Wait a bit, 3) Use VPN');
+      return null;
+    }
+    
+    if (!response.ok) {
+      console.log('❌ Fetch failed:', response.status);
+      return null;
+    }
+    
+    const xml = await response.text();
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(xml, 'text/xml');
+    const textNodes = doc.getElementsByTagName('text');
+    
+    const transcript = Array.from(textNodes)
+      .map(node => (node.textContent || '').replace(/&amp;/g, '&').replace(/&#39;/g, "'").trim())
+      .filter(t => t.length > 0)
+      .join(' ');
+    
+    console.log('✅ SUCCESS! Extracted', transcript.length, 'characters');
+    console.log('📋 Copied to clipboard');
+    navigator.clipboard.writeText(transcript);
+    
+    return transcript;
+  } catch (e) {
+    console.log('❌ Error:', e.message);
+    return null;
+  }
+}
+extractTranscript();`;
+
+        // Test API
+        async function testAPI() {
+            const transcript = document.getElementById('transcript').value;
+            const resultDiv = document.getElementById('apiResult');
+            
+            if (!transcript) {
+                resultDiv.innerHTML = '<div class="warning">Please paste a transcript first</div>';
+                return;
+            }
+            
+            resultDiv.innerHTML = '<div>Testing API with transcript...</div>';
+            
+            const settings = {
+                includeChapters: document.getElementById('includeChapters').checked,
+                includeKeyInsights: document.getElementById('includeKeyInsights').checked,
+                includeEmojis: document.getElementById('includeEmojis').checked,
+                includeQuiz: document.getElementById('includeQuiz').checked,
+                includeTimestamps: document.getElementById('includeTimestamps').checked,
+                summaryDepth: 'comprehensive'
+            };
+            
+            try {
+                const response = await fetch('http://localhost:3000/api/summarize', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        videoUrl: 'https://www.youtube.com/watch?v=jNQXAC9IVRw',
+                        extensionTranscript: transcript,
+                        settings: settings
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            <h3>✅ API WORKS WITH TRANSCRIPT!</h3>
+                            <div class="result">
+                                <strong>Content Source:</strong> ${data.data?.contentSource}<br>
+                                <strong>Video Title:</strong> ${data.data?.videoTitle}<br>
+                                <strong>Summary Length:</strong> ${data.data?.summary?.length || 0} chars<br>
+                                <strong>Key Insights:</strong> ${data.data?.keyInsights?.length || 0} items<br>
+                                <strong>Chapters:</strong> ${data.data?.chapters?.length || 0} items<br>
+                                <strong>Quiz Questions:</strong> ${data.data?.quiz?.length || 0} items<br>
+                                <strong>Timestamps:</strong> ${data.data?.timestampedSections?.length || 0} items
+                            </div>
+                            <details>
+                                <summary>View Summary Preview</summary>
+                                <pre>${data.data?.summary?.substring(0, 500)}...</pre>
+                            </details>
+                        </div>
+                    `;
+                    updateChecklist(data.data);
+                } else {
+                    resultDiv.innerHTML = `<div class="error">API Error: ${data.error}</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">Request failed: ${error.message}</div>`;
+            }
+        }
+
+        async function testAPIWithoutTranscript() {
+            const resultDiv = document.getElementById('apiResult');
+            resultDiv.innerHTML = '<div>Testing API without transcript (should use description)...</div>';
+            
+            try {
+                const response = await fetch('http://localhost:3000/api/summarize', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        videoUrl: 'https://www.youtube.com/watch?v=jNQXAC9IVRw',
+                        settings: {
+                            includeChapters: true,
+                            includeKeyInsights: true,
+                            includeEmojis: true,
+                            includeQuiz: true,
+                            includeTimestamps: true
+                        }
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    const isUsingFallback = data.data?.contentSource === 'title-description';
+                    resultDiv.innerHTML = `
+                        <div class="${isUsingFallback ? 'warning' : 'error'}">
+                            <h3>${isUsingFallback ? '⚠️' : '❌'} API Using Fallback</h3>
+                            <div class="result">
+                                <strong>Content Source:</strong> ${data.data?.contentSource}<br>
+                                <strong>This means:</strong> ${
+                                    isUsingFallback 
+                                    ? 'No transcript available, using video title & description' 
+                                    : 'Something went wrong'
+                                }
+                            </div>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">Request failed: ${error.message}</div>`;
+            }
+        }
+
+        function updateChecklist(data) {
+            const checklist = document.getElementById('checklist');
+            const checks = [
+                { name: 'Transcript Extraction', pass: data?.contentSource === 'extension-transcript' },
+                { name: 'AI Summary Generation', pass: data?.summary && data.summary.length > 100 },
+                { name: 'Key Insights', pass: data?.keyInsights && data.keyInsights.length > 0 },
+                { name: 'Chapters', pass: data?.chapters && data.chapters.length > 0 },
+                { name: 'Quiz Questions', pass: data?.quiz && data.quiz.length > 0 },
+                { name: 'Timestamps', pass: data?.timestampedSections && data.timestampedSections.length > 0 },
+                { name: 'Emojis', pass: data?.summary && data.summary.includes('🎯') }
+            ];
+            
+            checklist.innerHTML = '<h3>Feature Status:</h3>' + 
+                checks.map(c => `
+                    <div class="${c.pass ? 'success' : 'warning'}" style="margin: 5px 0;">
+                        ${c.pass ? '✅' : '⚠️'} ${c.name}
+                    </div>
+                `).join('');
+            
+            const allPass = checks.every(c => c.pass);
+            checklist.innerHTML += `
+                <div class="${allPass ? 'success' : 'warning'}" style="margin-top: 20px; font-size: 18px;">
+                    ${allPass ? '🎉 ALL FEATURES WORKING!' : '⚠️ Some features need attention'}
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>

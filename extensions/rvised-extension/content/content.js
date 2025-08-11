@@ -4,8 +4,17 @@ console.log('🎥 Rvised content script loaded on YouTube');
 let rvisedOverlay = null;
 let isProcessing = false;
 
-// Production API endpoint (our deployed Vercel app)
-const API_BASE_URL = 'https://rvised.vercel.app';
+// Resolve API base (local → https local → prod)
+async function resolveApiBaseUrl() {
+  const candidates = ['http://localhost:3000', 'https://localhost:3000', 'https://rvised.vercel.app'];
+  for (const base of candidates) {
+    try {
+      const r = await fetch(`${base}/api/health`, { method: 'GET' });
+      if (r.ok) return base;
+    } catch (_) {}
+  }
+  return 'https://rvised.vercel.app';
+}
 
 // Extract video ID from current YouTube URL
 function getVideoId() {
@@ -387,6 +396,7 @@ function createRvisedOverlay() {
   rvisedOverlay = document.createElement('div');
   rvisedOverlay.id = 'rvised-overlay';
   rvisedOverlay.className = 'rvised-overlay-container';
+  rvisedOverlay.style.pointerEvents = 'auto';
   
   // Original compact overlay card with settings and single generate button
   rvisedOverlay.innerHTML = `
@@ -455,11 +465,9 @@ function createRvisedOverlay() {
   });
   
   // Add close button functionality
-  const closeBtn = rvisedOverlay.querySelector('.rvised-close');
-  if (closeBtn) {
-    closeBtn.addEventListener('click', () => {
-      rvisedOverlay.style.display = 'none';
-    });
+  const closeBtn2 = rvisedOverlay.querySelector('.rvised-close');
+  if (closeBtn2) {
+    closeBtn2.addEventListener('click', () => { rvisedOverlay.style.display = 'none'; });
   }
 }
 
@@ -512,29 +520,55 @@ async function handleSummarize() {
     
     console.log('📖 Extracted chapters:', localChapters);
     
-    // Send to our API
-    const response = await fetch(`${API_BASE_URL}/api/summarize`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        videoUrl: window.location.href,
-        settings: settings,
-        extensionTranscript: localTranscript, // Send locally extracted transcript
-        extensionChapters: localChapters // Send locally extracted chapters
-      })
-    });
+    // Prefer background messaging to avoid mixed-content/CORS; fallback to direct fetch
+    let summaryData = null;
+    try {
+      const bgResp = await new Promise((resolve, reject) => {
+        try {
+          chrome.runtime.sendMessage({
+            action: 'summarizeVideo',
+            data: {
+              url: window.location.href,
+              settings,
+              transcript: localTranscript,
+              chapters: localChapters
+            }
+          }, (response) => {
+            if (chrome.runtime.lastError) return reject(new Error(chrome.runtime.lastError.message));
+            resolve(response);
+          });
+        } catch (e) { reject(e); }
+      });
+      if (bgResp && bgResp.success && bgResp.data) {
+        summaryData = bgResp.data;
+      } else if (bgResp && bgResp.error) {
+        throw new Error(bgResp.error);
+      }
+    } catch (_) {}
+
+    if (!summaryData) {
+      const BASE = await resolveApiBaseUrl();
+      const response = await fetch(`${BASE}/api/summarize`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          videoUrl: window.location.href,
+          settings,
+          extensionTranscript: localTranscript,
+          extensionChapters: localChapters
+        })
+      });
+      if (!response.ok) throw new Error(`API request failed: ${response.status}`);
+      const apiResp = await response.json();
+      if (apiResp.error) throw new Error(apiResp.error);
+      summaryData = apiResp.data || apiResp;
+    }
     
     if (!response.ok) {
       throw new Error(`API request failed: ${response.status}`);
     }
     
-    const apiResp = await response.json();
-    if (apiResp.error) {
-      throw new Error(apiResp.error);
-    }
-    const summaryData = apiResp.data || apiResp; // use nested data if present
+    // use nested data if present
     
     // REAL DATA ONLY: Use only actual extracted chapters, no fallbacks
     const timestampsEnabled = settings.includeTimestamps;
@@ -697,13 +731,27 @@ function displaySummary(data) {
   html += `
       <div class="summary-actions">
         <button onclick="copyToClipboard()" class="action-btn">📋 Copy Summary</button>
-        <a href="${API_BASE_URL}" target="_blank" class="action-btn">🎯 Open Dashboard</a>
+        <a href="#" id="openDashboardLink" class="action-btn">🎯 Open Dashboard</a>
       </div>
     </div>
   `;
   
   summaryResult.innerHTML = html;
   summaryResult.classList.remove('hidden');
+
+  // Bind dashboard link to resolve base at click time
+  const dash = document.getElementById('openDashboardLink');
+  if (dash) {
+    dash.addEventListener('click', async (e) => {
+      e.preventDefault();
+      try {
+        const base = await resolveApiBaseUrl();
+        window.open(`${base}/dashboard`, '_blank');
+      } catch (_) {
+        window.open('https://rvised.vercel.app/dashboard', '_blank');
+      }
+    });
+  }
 }
 
 // Copy summary to clipboard
@@ -810,9 +858,12 @@ function updateSettingsFromPopup(settings) {
 
 // Initialize when page loads
 function initializeRvised() {
-  // Only run on YouTube watch pages (no auto overlay now; user triggers from popup)
+  // Auto-create overlay on YouTube watch pages
   if (window.location.pathname === '/watch') {
-    console.log('🎬 YouTube video page detected');
+    console.log('🎬 YouTube video page detected, injecting overlay');
+    setTimeout(() => {
+      try { createRvisedOverlay(); } catch (_) {}
+    }, 1500);
   }
 }
 

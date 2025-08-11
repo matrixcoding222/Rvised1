@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { SignInButton, SignUpButton, SignedIn, SignedOut } from '@clerk/nextjs'
 
 export default function Home() {
   return (
@@ -13,10 +14,27 @@ export default function Home() {
               <span className="text-xl font-semibold tracking-tight">Rvised</span>
             </div>
             <div className="hidden md:flex items-center space-x-6">
-              <Link href="/dashboard" className="text-gray-700 hover:text-gray-900 text-sm">Dashboard</Link>
-              <a href="/extension.zip" download className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2.5 rounded-xl font-medium text-sm shadow-lg shadow-blue-500/25 transition-all">Download Extension</a>
+              <SignedOut>
+                <SignInButton mode="modal">
+                  <button className="text-gray-700 hover:text-gray-900 text-sm">Sign In</button>
+                </SignInButton>
+                <SignUpButton mode="modal">
+                  <button className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2.5 rounded-xl font-medium text-sm shadow-lg shadow-blue-500/25 transition-all">Get Started</button>
+                </SignUpButton>
+              </SignedOut>
+              <SignedIn>
+                <Link href="/dashboard" className="text-gray-700 hover:text-gray-900 text-sm">Dashboard</Link>
+                <a href="/extension.zip" download className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2.5 rounded-xl font-medium text-sm shadow-lg shadow-blue-500/25 transition-all">Download Extension</a>
+              </SignedIn>
             </div>
-            <Link href="/dashboard" className="md:hidden text-sm text-gray-700">Dashboard</Link>
+            <SignedOut>
+              <SignUpButton mode="modal">
+                <button className="md:hidden text-sm text-gray-700">Get Started</button>
+              </SignUpButton>
+            </SignedOut>
+            <SignedIn>
+              <Link href="/dashboard" className="md:hidden text-sm text-gray-700">Dashboard</Link>
+            </SignedIn>
           </div>
         </div>
       </nav>
@@ -41,12 +59,24 @@ export default function Home() {
                 </svg>
                 <span>Download Chrome Extension</span>
               </a>
-              <Link href="/dashboard" className="group flex items-center space-x-3 text-gray-600 hover:text-gray-900 transition-all font-medium px-6 py-4">
-                <div className="w-12 h-12 border border-gray-200 rounded-xl flex items-center justify-center group-hover:border-blue-300 group-hover:bg-blue-50 transition-all">
-                  <span className="text-blue-600">▶</span>
-                </div>
-                <span>Open Dashboard</span>
-              </Link>
+              <SignedOut>
+                <SignUpButton mode="modal">
+                  <button className="group flex items-center space-x-3 text-gray-600 hover:text-gray-900 transition-all font-medium px-6 py-4">
+                    <div className="w-12 h-12 border border-gray-200 rounded-xl flex items-center justify-center group-hover:border-blue-300 group-hover:bg-blue-50 transition-all">
+                      <span className="text-blue-600">▶</span>
+                    </div>
+                    <span>Sign Up Free</span>
+                  </button>
+                </SignUpButton>
+              </SignedOut>
+              <SignedIn>
+                <Link href="/dashboard" className="group flex items-center space-x-3 text-gray-600 hover:text-gray-900 transition-all font-medium px-6 py-4">
+                  <div className="w-12 h-12 border border-gray-200 rounded-xl flex items-center justify-center group-hover:border-blue-300 group-hover:bg-blue-50 transition-all">
+                    <span className="text-blue-600">▶</span>
+                  </div>
+                  <span>Open Dashboard</span>
+                </Link>
+              </SignedIn>
             </div>
             <div className="flex items-center justify-center space-x-2 text-sm text-gray-500">
               <div className="flex text-yellow-400">⭐⭐⭐⭐⭐</div>
@@ -87,7 +117,7 @@ export default function Home() {
                 <div className="flex items-start space-x-3"><div className="w-2 h-2 bg-blue-500 rounded-full mt-2" /><p>Important timestamps and moments</p></div>
                 <div className="flex items-start space-x-3"><div className="w-2 h-2 bg-blue-500 rounded-full mt-2" /><p>Actionable takeaways and next steps</p></div>
               </div>
-              <Link href="/dashboard" className="w-full inline-block text-center bg-blue-600 text-white py-3 rounded-xl text-sm font-medium mt-6 hover:bg-blue-700 transition">Save Summary</Link>
+              <Link href="/sign-up" className="w-full inline-block text-center bg-blue-600 text-white py-3 rounded-xl text-sm font-medium mt-6 hover:bg-blue-700 transition">Sign Up to Save</Link>
             </div>
           </div>
         </div>
@@ -184,7 +214,7 @@ export default function Home() {
                   <div key={x} className="flex items-center space-x-4"><span>✔</span><span className="text-lg">{x}</span></div>
                 ))}
               </div>
-              <Link href="/dashboard" className="w-full inline-block text-center bg-white text-blue-600 py-4 rounded-xl font-semibold text-lg hover:bg-gray-50 transition">Start Free Trial</Link>
+              <Link href="/sign-up" className="w-full inline-block text-center bg-white text-blue-600 py-4 rounded-xl font-semibold text-lg hover:bg-gray-50 transition">Start Free Trial</Link>
             </div>
           </div>
         </div>

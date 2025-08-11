@@ -1,0 +1,62 @@
+name: Playwright CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        working-directory: rvised
+        run: |
+          npm ci
+
+      - name: Install Playwright browsers
+        working-directory: rvised
+        run: npx playwright install --with-deps chromium
+
+      - name: Build app
+        working-directory: rvised
+        run: npm run build
+
+      - name: Start app
+        working-directory: rvised
+        run: nohup npm run start &
+
+      - name: Wait for server
+        run: |
+          for i in {1..30}; do
+            if curl -sSf http://localhost:3000/api/health >/dev/null; then
+              echo "Server is up"; exit 0; fi; echo "Waiting..."; sleep 2; done; exit 1
+
+      - name: Run Playwright tests
+        working-directory: rvised
+        run: npx playwright test -c ./playwright.config.ts
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: rvised/playwright-report
+
+      - name: Upload Playwright traces
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-traces
+          path: rvised/test-results
+
+

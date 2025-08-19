@@ -1,0 +1,7 @@
+# Stripe Configuration
+# Get these from your Stripe dashboard: https://dashboard.stripe.com/apikeys
+STRIPE_SECRET_KEY=sk_test_... # Your Stripe secret key (starts with sk_test_ for testing)
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_... # Your Stripe publishable key (starts with pk_test_ for testing)
+
+# Optional: Webhook endpoint secret for handling payment events
+STRIPE_WEBHOOK_SECRET=whsec_... # Webhook endpoint secret from Stripe dashboard

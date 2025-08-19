@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stripe Setup Helper - Rvised</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        .section h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+        .step {
+            margin: 15px 0;
+            padding: 15px;
+            background: white;
+            border-radius: 6px;
+            border-left: 4px solid #667eea;
+        }
+        .code-block {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
+        .warning {
+            background: #fff3cd;
+            color: #856404;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-top: 10px;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin: 5px 0;
+            font-family: 'Courier New', monospace;
+        }
+        .price-input {
+            margin: 10px 0;
+        }
+        .price-input label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+        #status {
+            margin-top: 20px;
+        }
+        .link {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Stripe Setup Helper</h1>
+        <p class="subtitle">Complete your Rvised payment integration</p>
+
+        <div class="section">
+            <h2>✅ Step 1: Your API Keys (Already Set)</h2>
+            <div class="success">
+                <strong>Great!</strong> Your Stripe API keys are already configured in .env.local
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>📦 Step 2: Create Products in Stripe Dashboard</h2>
+            <div class="step">
+                <p><strong>1. Go to your Stripe Dashboard</strong></p>
+                <a href="https://dashboard.stripe.com/test/products" target="_blank" class="link">
+                    Open Stripe Products (Test Mode) →
+                </a>
+            </div>
+            
+            <div class="step">
+                <p><strong>2. Create these two products:</strong></p>
+                
+                <div style="margin-top: 15px;">
+                    <h4>Product 1: Monthly Subscription</h4>
+                    <div class="code-block">
+Name: Rvised Pro Monthly
+Price: $7.99
+Billing: Recurring / Monthly
+                    </div>
+                </div>
+
+                <div style="margin-top: 15px;">
+                    <h4>Product 2: Annual Subscription</h4>
+                    <div class="code-block">
+Name: Rvised Pro Annual
+Price: $47.88
+Billing: Recurring / Yearly
+Description: Save 50% with annual billing
+                    </div>
+                </div>
+            </div>
+
+            <div class="step">
+                <p><strong>3. After creating each product, copy the Price ID</strong></p>
+                <p style="margin-top: 10px; color: #666;">
+                    The Price ID looks like: <code style="background: #f0f0f0; padding: 2px 6px; border-radius: 3px;">price_1AbCdEfGhIjKlMnOp</code>
+                </p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🔑 Step 3: Enter Your Price IDs</h2>
+            <div class="price-input">
+                <label for="monthly-price">Monthly Price ID:</label>
+                <input type="text" id="monthly-price" placeholder="price_..." />
+            </div>
+            <div class="price-input">
+                <label for="annual-price">Annual Price ID:</label>
+                <input type="text" id="annual-price" placeholder="price_..." />
+            </div>
+            <button onclick="updateEnvFile()">Update .env.local File</button>
+        </div>
+
+        <div class="section">
+            <h2>🔄 Step 4: Set Up Webhook (For Local Testing)</h2>
+            <div class="step">
+                <p><strong>1. Download Stripe CLI</strong></p>
+                <a href="https://github.com/stripe/stripe-cli/releases" target="_blank" class="link">
+                    Download Stripe CLI for Windows →
+                </a>
+            </div>
+            <div class="step">
+                <p><strong>2. Open Terminal/Command Prompt and run:</strong></p>
+                <div class="code-block">
+stripe login
+stripe listen --forward-to localhost:3000/api/webhooks/stripe
+                </div>
+                <p style="margin-top: 10px; color: #666;">
+                    This will give you a webhook secret starting with <code>whsec_</code>
+                </p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🧪 Step 5: Test Your Integration</h2>
+            <button onclick="testCheckout()">Test Checkout (Monthly)</button>
+            <button onclick="testCheckout('annual')">Test Checkout (Annual)</button>
+            
+            <div class="warning" style="margin-top: 20px;">
+                <strong>Test Card:</strong> Use <code>4242 4242 4242 4242</code> with any future expiry date
+            </div>
+        </div>
+
+        <div id="status"></div>
+    </div>
+
+    <script>
+        function updateEnvFile() {
+            const monthlyPrice = document.getElementById('monthly-price').value;
+            const annualPrice = document.getElementById('annual-price').value;
+            
+            if (!monthlyPrice || !annualPrice) {
+                showStatus('Please enter both Price IDs', 'error');
+                return;
+            }
+
+            const envContent = `
+# Update these lines in your .env.local file:
+STRIPE_PRICE_ID_MONTHLY=${monthlyPrice}
+STRIPE_PRICE_ID_ANNUAL=${annualPrice}
+`;
+
+            showStatus(`
+                <strong>Copy these to your .env.local file:</strong>
+                <div class="code-block">${envContent}</div>
+                <p style="margin-top: 10px;">Then restart your Next.js dev server with: <code>npm run dev</code></p>
+            `, 'success');
+
+            // Also save to localStorage for testing
+            localStorage.setItem('stripe_price_monthly', monthlyPrice);
+            localStorage.setItem('stripe_price_annual', annualPrice);
+        }
+
+        async function testCheckout(plan = 'monthly') {
+            showStatus('Starting checkout...', 'warning');
+            
+            try {
+                const response = await fetch('http://localhost:3000/api/stripe/checkout', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        billingInterval: plan,
+                        userEmail: 'test@rvised.app'
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.error) {
+                    showStatus(`Error: ${data.error}`, 'error');
+                    if (data.error.includes('price IDs')) {
+                        showStatus(`
+                            <strong>Setup Required:</strong>
+                            <ol style="margin-top: 10px;">
+                                <li>Create products in Stripe Dashboard</li>
+                                <li>Copy the Price IDs</li>
+                                <li>Update your .env.local file</li>
+                                <li>Restart your dev server</li>
+                            </ol>
+                        `, 'warning');
+                    }
+                } else if (data.checkoutUrl) {
+                    showStatus('Redirecting to Stripe Checkout...', 'success');
+                    window.open(data.checkoutUrl, '_blank');
+                } else {
+                    showStatus('Unexpected response from server', 'error');
+                }
+            } catch (error) {
+                showStatus(`Connection error: ${error.message}`, 'error');
+                showStatus(`
+                    <strong>Make sure:</strong>
+                    <ul style="margin-top: 10px;">
+                        <li>Your Next.js server is running on port 3000</li>
+                        <li>You've installed the Stripe packages (npm install stripe @stripe/stripe-js)</li>
+                        <li>The API endpoints are created correctly</li>
+                    </ul>
+                `, 'warning');
+            }
+        }
+
+        function showStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerHTML = `<div class="${type}">${message}</div>`;
+        }
+
+        // Check if server is running
+        fetch('http://localhost:3000/api/health')
+            .then(() => showStatus('✅ Server is running on localhost:3000', 'success'))
+            .catch(() => showStatus('⚠️ Server not detected on localhost:3000. Make sure to run: npm run dev', 'warning'));
+    </script>
+</body>
+</html>

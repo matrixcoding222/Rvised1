@@ -1,37 +1,43 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import { ClerkProvider, SignInButton, SignUpButton, SignedIn, SignedOut, UserButton } from '@clerk/nextjs'
-import "./globals.css";
+import type React from "react"
+import type { Metadata } from "next"
+import { Inter, Space_Grotesk } from "next/font/google"
+import { ClerkProvider } from "@clerk/nextjs"
+import "./globals.css"
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
   subsets: ["latin"],
-});
+  display: "swap",
+  variable: "--font-inter",
+})
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
-});
+  display: "swap",
+  variable: "--font-space-grotesk",
+})
 
 export const metadata: Metadata = {
-  title: "Rvised - YouTube Summaries",
-  description: "Get instant AI summaries of YouTube videos",
-};
+  title: "Rvised - Transform YouTube into Your Personal Learning System",
+  description:
+    "Generate intelligent summaries of educational videos and retain 80% of content while saving hours of time.",
+  generator: "v0.app",
+  icons: {
+    icon: "/glasses.svg",
+    shortcut: "/glasses.svg",
+    apple: "/glasses.svg",
+  },
+}
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: React.ReactNode
 }>) {
   return (
     <ClerkProvider>
-      <html lang="en">
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        >
-          {children}
-        </body>
+      <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable} antialiased`}>
+        <body className="font-sans">{children}</body>
       </html>
     </ClerkProvider>
-  );
+  )
 }

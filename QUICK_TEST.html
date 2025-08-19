@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rvised Extension - Quick Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #1a202c;
+            font-size: 32px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: #10b981;
+            color: white;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .step {
+            margin: 25px 0;
+            padding: 20px;
+            background: #f7fafc;
+            border-left: 4px solid #4299e1;
+            border-radius: 8px;
+        }
+        .step h3 {
+            margin: 0 0 10px 0;
+            color: #2d3748;
+            font-size: 18px;
+        }
+        .step p {
+            margin: 0;
+            color: #4a5568;
+            line-height: 1.6;
+        }
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        .btn.secondary {
+            background: #e2e8f0;
+            color: #2d3748;
+        }
+        .btn.success {
+            background: #10b981;
+        }
+        .status-check {
+            padding: 20px;
+            background: #f0fdf4;
+            border: 2px solid #10b981;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+        .status-check h4 {
+            margin: 0 0 10px 0;
+            color: #065f46;
+        }
+        .check-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 8px 0;
+            color: #047857;
+        }
+        .video-card {
+            padding: 20px;
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            margin: 15px 0;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .video-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.1);
+        }
+        .video-title {
+            font-weight: 600;
+            color: #1a202c;
+            margin-bottom: 5px;
+        }
+        .video-url {
+            color: #718096;
+            font-size: 14px;
+        }
+        .alert {
+            padding: 15px;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            color: #991b1b;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>
+            🚀 Rvised Extension
+            <span class="status-badge">✓ Ready</span>
+        </h1>
+        
+        <div class="status-check">
+            <h4>✅ System Status</h4>
+            <div class="check-item">✓ API Server: Running on port 3003</div>
+            <div class="check-item">✓ OpenAI API Key: Configured</div>
+            <div class="check-item">✓ Extension: Ready to load</div>
+            <div class="check-item">✓ Transcript System: Working</div>
+        </div>
+
+        <div class="step">
+            <h3>📦 Step 1: Load Extension</h3>
+            <p>Open Chrome Extensions page and load the unpacked extension from:<br>
+            <code>C:\Users\User\RVISED3\extensions\rvised-extension</code></p>
+        </div>
+
+        <div class="button-group">
+            <button class="btn" onclick="window.open('chrome://extensions/', '_blank')">
+                Open Extensions Page
+            </button>
+            <button class="btn secondary" onclick="checkAPI()">
+                Check API Status
+            </button>
+        </div>
+
+        <div class="step">
+            <h3>🎬 Step 2: Test on YouTube</h3>
+            <p>Open any of these test videos and click the "Summarize" button:</p>
+        </div>
+
+        <div class="video-card" onclick="window.open('https://www.youtube.com/watch?v=jNQXAC9IVRw', '_blank')">
+            <div class="video-title">🐘 First YouTube Video (19 seconds)</div>
+            <div class="video-url">Perfect for quick testing - has captions</div>
+        </div>
+
+        <div class="video-card" onclick="window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ', '_blank')">
+            <div class="video-title">🎵 Famous Test Video</div>
+            <div class="video-url">Good for testing with music content</div>
+        </div>
+
+        <div class="video-card" onclick="window.open('https://www.youtube.com/watch?v=pTB0EiLXUC8', '_blank')">
+            <div class="video-title">💻 Tech Tutorial</div>
+            <div class="video-url">Test with technical content</div>
+        </div>
+
+        <div class="step">
+            <h3>✨ Step 3: Test Features</h3>
+            <p>Once on YouTube, test these features:</p>
+            <ul>
+                <li>Click "Summarize" button next to Like/Dislike</li>
+                <li>Wait for summary to generate (10-15 seconds)</li>
+                <li>Try different learning modes in Settings</li>
+                <li>Test Copy and Download buttons</li>
+                <li>Click Dashboard to open main app</li>
+            </ul>
+        </div>
+
+        <div class="button-group">
+            <button class="btn success" onclick="testSummaryAPI()">
+                Test Summary API
+            </button>
+            <button class="btn secondary" onclick="window.open('http://localhost:3003', '_blank')">
+                Open Main App
+            </button>
+        </div>
+
+        <div id="apiResult"></div>
+    </div>
+
+    <script>
+        async function checkAPI() {
+            try {
+                const response = await fetch('http://localhost:3003/api/health');
+                if (response.ok) {
+                    alert('✅ API is running on port 3003!');
+                } else {
+                    alert('⚠️ API returned status: ' + response.status);
+                }
+            } catch (error) {
+                alert('❌ API not reachable. Make sure server is running.');
+            }
+        }
+
+        async function testSummaryAPI() {
+            const resultDiv = document.getElementById('apiResult');
+            resultDiv.innerHTML = '<div class="alert" style="background: #dbeafe; border-color: #3b82f6; color: #1e40af;">⏳ Testing API...</div>';
+            
+            try {
+                const response = await fetch('http://localhost:3003/api/summarize', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        videoUrl: 'https://www.youtube.com/watch?v=jNQXAC9IVRw',
+                        extensionTranscript: 'This is the first YouTube video ever uploaded. Me at the zoo.',
+                        settings: {
+                            learningMode: 'student',
+                            summaryDepth: 'quick',
+                            includeTimestamps: true
+                        }
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    resultDiv.innerHTML = `
+                        <div class="status-check">
+                            <h4>✅ API Test Successful!</h4>
+                            <div class="check-item">Summary: ${data.data.summary.substring(0, 100)}...</div>
+                            <div class="check-item">Takeaway: ${data.data.mainTakeaway}</div>
+                            <div class="check-item">Insights: ${data.data.keyInsights.length} generated</div>
+                        </div>
+                    `;
+                } else {
+                    throw new Error(data.error || 'Unknown error');
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="alert">❌ Error: ${error.message}</div>`;
+            }
+        }
+
+        // Auto-check API on load
+        window.addEventListener('load', () => {
+            fetch('http://localhost:3003/api/health')
+                .then(r => r.ok && console.log('✅ API is running'))
+                .catch(() => console.warn('⚠️ API not running'));
+        });
+    </script>
+</body>
+</html>

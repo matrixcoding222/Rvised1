@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Pro Feature Overlay - Rvised</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      padding: 40px;
+      background: #1a1a1a;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+    
+    .youtube-container {
+      max-width: 1200px;
+      width: 100%;
+      background: #0f0f0f;
+      border-radius: 12px;
+      padding: 20px;
+    }
+    
+    .video-area {
+      background: #000;
+      aspect-ratio: 16/9;
+      border-radius: 8px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #666;
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+    
+    .extension-trigger {
+      position: fixed;
+      bottom: 40px;
+      right: 40px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 16px 24px;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+      transition: all 0.3s;
+      z-index: 1000;
+    }
+    
+    .extension-trigger:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 40px rgba(102, 126, 234, 0.5);
+    }
+    
+    /* Simulated Extension Card */
+    #rvised-extension {
+      position: fixed;
+      bottom: 100px;
+      right: 20px;
+      width: 440px;
+      height: 600px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+      display: none;
+      z-index: 9999;
+    }
+    
+    #rvised-extension.active {
+      display: block;
+      animation: slideIn 0.3s ease-out;
+    }
+    
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+    
+    .extension-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .extension-content {
+      padding: 20px;
+      height: calc(100% - 60px);
+      overflow-y: auto;
+      position: relative;
+    }
+    
+    .tab-buttons {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    
+    .tab-btn {
+      padding: 8px 16px;
+      background: #f3f4f6;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    
+    .tab-btn:hover {
+      background: #e5e7eb;
+    }
+    
+    .info-box {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+    
+    .test-controls {
+      position: fixed;
+      top: 40px;
+      left: 40px;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+    }
+    
+    .test-controls h3 {
+      margin: 0 0 15px 0;
+      font-size: 16px;
+      color: #333;
+    }
+    
+    .test-controls button {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    
+    .test-controls button:hover {
+      background: #5a67d8;
+    }
+    
+    .test-controls .secondary {
+      background: #48bb78;
+    }
+    
+    .test-controls .secondary:hover {
+      background: #38a169;
+    }
+  </style>
+</head>
+<body>
+  <!-- Test Controls -->
+  <div class="test-controls">
+    <h3>Test Controls</h3>
+    <button onclick="showExtension()">Show Extension</button>
+    <button onclick="triggerProOverlay('Dashboard')">Test Dashboard Pro</button>
+    <button onclick="triggerProOverlay('Analytics')">Test Analytics Pro</button>
+    <button onclick="setUserTier('free')" class="secondary">Set as Free User</button>
+    <button onclick="setUserTier('pro')" class="secondary">Set as Pro User</button>
+  </div>
+
+  <!-- YouTube-like Container -->
+  <div class="youtube-container">
+    <div class="video-area">
+      YouTube Video Player Area
+    </div>
+    <div style="color: white;">
+      <h1 style="font-size: 20px; margin: 0 0 8px 0;">Sample Video Title</h1>
+      <p style="color: #aaa; font-size: 14px;">1.2M views • 2 days ago</p>
+    </div>
+  </div>
+
+  <!-- Extension Trigger Button -->
+  <button class="extension-trigger" onclick="showExtension()">
+    Open Rvised Extension
+  </button>
+
+  <!-- Simulated Extension Card -->
+  <div id="rvised-extension">
+    <div class="extension-header">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <div style="width: 32px; height: 32px; background: rgba(255,255,255,0.2); border-radius: 8px;"></div>
+        <span style="font-weight: 600;">Rvised</span>
+      </div>
+      <button onclick="hideExtension()" style="
+        background: none;
+        border: none;
+        color: white;
+        font-size: 24px;
+        cursor: pointer;
+        padding: 0;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      ">×</button>
+    </div>
+    <div class="extension-content" id="extension-content">
+      <div class="tab-buttons">
+        <button class="tab-btn">Summary</button>
+        <button class="tab-btn">Transcript</button>
+        <button class="tab-btn" onclick="triggerProOverlay('Dashboard')">Dashboard</button>
+      </div>
+      
+      <div class="info-box">
+        <h3 style="margin: 0 0 10px 0; font-size: 16px;">Test Pro Feature Overlay</h3>
+        <p style="margin: 0; color: #666; font-size: 14px;">
+          Click the Dashboard tab or use the test controls to see the new Pro feature overlay.
+          The overlay covers the entire extension card with a beautiful gradient design.
+        </p>
+      </div>
+      
+      <div style="margin-top: 20px;">
+        <p style="color: #666; font-size: 14px;">
+          <strong>Features of the new overlay:</strong>
+        </p>
+        <ul style="color: #666; font-size: 14px; line-height: 1.8;">
+          <li>Full-screen coverage within extension card</li>
+          <li>Beautiful gradient background</li>
+          <li>Smooth fade-in animation</li>
+          <li>Clear feature presentation</li>
+          <li>Prominent CTA buttons</li>
+          <li>Easy close options</li>
+          <li>Matches extension UI style</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentTier = 'free';
+    
+    function showExtension() {
+      document.getElementById('rvised-extension').classList.add('active');
+    }
+    
+    function hideExtension() {
+      document.getElementById('rvised-extension').classList.remove('active');
+    }
+    
+    function setUserTier(tier) {
+      currentTier = tier;
+      localStorage.setItem('rvised_userTier', tier);
+      alert(`User tier set to: ${tier.toUpperCase()}`);
+    }
+    
+    function triggerProOverlay(feature) {
+      if (currentTier === 'pro') {
+        alert(`${feature} is accessible - you're a Pro user!`);
+        return;
+      }
+      
+      showExtension();
+      
+      const container = document.getElementById('extension-content');
+      
+      // Remove existing overlay if present
+      const existing = container.querySelector('#pro-overlay');
+      if (existing) existing.remove();
+      
+      // Create the Pro overlay
+      const overlay = document.createElement('div');
+      overlay.id = 'pro-overlay';
+      overlay.innerHTML = `
+        <div style="
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: linear-gradient(135deg, rgba(124, 58, 237, 0.98) 0%, rgba(139, 92, 246, 0.98) 100%);
+          z-index: 10000;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          animation: fadeIn 0.3s ease-out;
+          border-radius: 12px;
+          overflow: hidden;
+        ">
+          <style>
+            @keyframes fadeIn {
+              from { opacity: 0; transform: scale(0.95); }
+              to { opacity: 1; transform: scale(1); }
+            }
+            @keyframes pulse {
+              0%, 100% { transform: scale(1); }
+              50% { transform: scale(1.05); }
+            }
+          </style>
+          
+          <!-- Close button -->
+          <button onclick="this.parentElement.parentElement.remove()" style="
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+          ">×</button>
+          
+          <!-- Content -->
+          <div style="padding: 40px 32px; max-width: 380px; width: 100%; text-align: center;">
+            <!-- Lock Icon -->
+            <div style="
+              width: 80px;
+              height: 80px;
+              margin: 0 auto 24px;
+              background: rgba(255, 255, 255, 0.2);
+              border-radius: 50%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              animation: pulse 2s infinite;
+            ">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                <rect x="5" y="11" width="14" height="10" rx="2" ry="2"/>
+                <path d="M7 11V7a5 5 0 0110 0v4"/>
+              </svg>
+            </div>
+            
+            <!-- Title -->
+            <h2 style="color: white; font-size: 24px; font-weight: 700; margin: 0 0 12px 0;">
+              ${feature} is Pro Only
+            </h2>
+            
+            <!-- Subtitle -->
+            <p style="color: rgba(255, 255, 255, 0.9); font-size: 14px; margin: 0 0 28px 0;">
+              Unlock the full power of Rvised with Pro
+            </p>
+            
+            <!-- Features List -->
+            <div style="text-align: left; margin: 0 0 28px 0;">
+              <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: rgba(255, 255, 255, 0.1); border-radius: 8px; margin-bottom: 8px;">
+                <div style="width: 32px; height: 32px; background: rgba(255, 255, 255, 0.2); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px;">📊</div>
+                <div>
+                  <div style="color: white; font-weight: 600; font-size: 14px;">Advanced Analytics</div>
+                  <div style="color: rgba(255, 255, 255, 0.7); font-size: 12px;">Track your learning progress</div>
+                </div>
+              </div>
+              <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: rgba(255, 255, 255, 0.1); border-radius: 8px; margin-bottom: 8px;">
+                <div style="width: 32px; height: 32px; background: rgba(255, 255, 255, 0.2); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px;">🚀</div>
+                <div>
+                  <div style="color: white; font-weight: 600; font-size: 14px;">Unlimited Summaries</div>
+                  <div style="color: rgba(255, 255, 255, 0.7); font-size: 12px;">No daily limits</div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- CTA Buttons -->
+            <div style="display: flex; gap: 12px;">
+              <button onclick="alert('Opening upgrade page...')" style="
+                flex: 1;
+                background: white;
+                color: #7c3aed;
+                border: none;
+                padding: 14px 24px;
+                border-radius: 10px;
+                font-size: 15px;
+                font-weight: 600;
+                cursor: pointer;
+              ">Upgrade to Pro</button>
+              <button onclick="this.closest('#pro-overlay').remove()" style="
+                padding: 14px 24px;
+                background: rgba(255, 255, 255, 0.2);
+                color: white;
+                border: 1px solid rgba(255, 255, 255, 0.3);
+                border-radius: 10px;
+                font-size: 15px;
+                font-weight: 500;
+                cursor: pointer;
+              ">Not Now</button>
+            </div>
+            
+            <!-- Price -->
+            <p style="color: rgba(255, 255, 255, 0.8); font-size: 12px; margin: 16px 0 0 0;">
+              Starting at just $9.99/month
+            </p>
+          </div>
+        </div>
+      `;
+      
+      container.appendChild(overlay);
+    }
+    
+    // Initialize
+    setUserTier('free');
+  </script>
+</body>
+</html>

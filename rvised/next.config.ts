@@ -7,6 +7,20 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'i.ytimg.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'img.youtube.com',
+        pathname: '/**',
+      },
+    ],
+  },
   async headers() {
     return [
       {
@@ -15,7 +29,7 @@ const nextConfig: NextConfig = {
         headers: [
           { key: 'Access-Control-Allow-Origin', value: '*' },
           { key: 'Access-Control-Allow-Methods', value: 'GET, POST, PUT, DELETE, OPTIONS' },
-          { key: 'Access-Control-Allow-Headers', value: 'Content-Type, Authorization, X-Requested-With, Origin' },
+          { key: 'Access-Control-Allow-Headers', value: 'Content-Type, Authorization, X-Requested-With, Origin, x-user-tier, x-user-email' },
           { key: 'Access-Control-Allow-Credentials', value: 'false' },
           { key: 'Access-Control-Max-Age', value: '86400' },
         ],

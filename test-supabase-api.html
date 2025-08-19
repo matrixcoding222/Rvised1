@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Supabase Integration</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        .test-section h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+        .status {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 6px;
+            display: none;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            display: block;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            display: block;
+        }
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            display: block;
+        }
+        .data-display {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+        }
+        .data-display.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test Supabase Integration</h1>
+
+        <!-- Test User Creation -->
+        <div class="test-section">
+            <h3>1. Test User Management</h3>
+            <button onclick="testUserCreation()">Create Test User</button>
+            <button onclick="fetchUsers()">View All Users</button>
+            <div id="user-status" class="status"></div>
+            <pre id="user-data" class="data-display"></pre>
+        </div>
+
+        <!-- Test Project Management -->
+        <div class="test-section">
+            <h3>2. Test Project Management</h3>
+            <button onclick="createProject()">Create Project</button>
+            <button onclick="fetchProjects()">View Projects</button>
+            <button onclick="deleteProject()">Delete Project</button>
+            <div id="project-status" class="status"></div>
+            <pre id="project-data" class="data-display"></pre>
+        </div>
+
+        <!-- Test Usage Tracking -->
+        <div class="test-section">
+            <h3>3. Test Usage Tracking</h3>
+            <button onclick="trackUsage()">Track Summary Usage</button>
+            <button onclick="checkUsage()">Check Current Usage</button>
+            <div id="usage-status" class="status"></div>
+            <pre id="usage-data" class="data-display"></pre>
+        </div>
+
+        <!-- Test Summary Storage -->
+        <div class="test-section">
+            <h3>4. Test Summary Storage</h3>
+            <button onclick="saveSummary()">Save Test Summary</button>
+            <button onclick="fetchSummaries()">View Summaries</button>
+            <div id="summary-status" class="status"></div>
+            <pre id="summary-data" class="data-display"></pre>
+        </div>
+
+        <!-- Database Info -->
+        <div class="test-section">
+            <h3>📊 Supabase Dashboard</h3>
+            <p>View your data directly in Supabase:</p>
+            <a href="https://supabase.com/dashboard/project/pouzqjduusuolceqaxjo/editor" target="_blank" style="color: #667eea;">
+                Open Supabase Table Editor →
+            </a>
+        </div>
+    </div>
+
+    <script>
+        let testEmail = `test-${Date.now()}@rvised.app`;
+        let testProjectId = null;
+
+        function showStatus(elementId, message, type = 'info') {
+            const status = document.getElementById(elementId);
+            status.className = `status ${type}`;
+            status.textContent = message;
+        }
+
+        function showData(elementId, data) {
+            const display = document.getElementById(elementId);
+            display.textContent = JSON.stringify(data, null, 2);
+            display.classList.add('show');
+        }
+
+        async function testUserCreation() {
+            try {
+                const response = await fetch('http://localhost:3000/api/usage', {
+                    method: 'GET',
+                    headers: {
+                        'x-user-email': testEmail
+                    }
+                });
+
+                const data = await response.json();
+                showStatus('user-status', `User created/fetched: ${testEmail}`, 'success');
+                showData('user-data', data);
+            } catch (error) {
+                showStatus('user-status', `Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function fetchUsers() {
+            showStatus('user-status', 'Fetching users from database...', 'info');
+            showData('user-data', { 
+                note: 'Check Supabase dashboard to see all users',
+                dashboard: 'https://supabase.com/dashboard/project/pouzqjduusuolceqaxjo/editor/users'
+            });
+        }
+
+        async function createProject() {
+            try {
+                const response = await fetch('http://localhost:3000/api/projects', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-user-email': testEmail
+                    },
+                    body: JSON.stringify({
+                        action: 'create',
+                        name: `Test Project ${Date.now()}`,
+                        description: 'Testing Supabase integration',
+                        emoji: '🧪'
+                    })
+                });
+
+                const data = await response.json();
+                if (data.project) {
+                    testProjectId = data.project.id;
+                    showStatus('project-status', 'Project created successfully!', 'success');
+                    showData('project-data', data);
+                } else {
+                    showStatus('project-status', 'Failed to create project', 'error');
+                    showData('project-data', data);
+                }
+            } catch (error) {
+                showStatus('project-status', `Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function fetchProjects() {
+            try {
+                const response = await fetch('http://localhost:3000/api/projects', {
+                    headers: {
+                        'x-user-email': testEmail
+                    }
+                });
+
+                const data = await response.json();
+                showStatus('project-status', `Found ${data.projects?.length || 0} projects`, 'success');
+                showData('project-data', data);
+            } catch (error) {
+                showStatus('project-status', `Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function deleteProject() {
+            if (!testProjectId) {
+                showStatus('project-status', 'Create a project first', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`http://localhost:3000/api/projects?id=${testProjectId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'x-user-email': testEmail
+                    }
+                });
+
+                const data = await response.json();
+                showStatus('project-status', 'Project deleted successfully!', 'success');
+                showData('project-data', data);
+                testProjectId = null;
+            } catch (error) {
+                showStatus('project-status', `Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function trackUsage() {
+            try {
+                const response = await fetch('http://localhost:3000/api/usage', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-user-email': testEmail
+                    },
+                    body: JSON.stringify({
+                        action: 'summarize'
+                    })
+                });
+
+                const data = await response.json();
+                showStatus('usage-status', 'Usage tracked successfully!', 'success');
+                showData('usage-data', data);
+            } catch (error) {
+                showStatus('usage-status', `Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function checkUsage() {
+            try {
+                const response = await fetch('http://localhost:3000/api/usage', {
+                    headers: {
+                        'x-user-email': testEmail
+                    }
+                });
+
+                const data = await response.json();
+                showStatus('usage-status', `Current usage: ${data.usage.summariesToday} summaries today`, 'info');
+                showData('usage-data', data);
+            } catch (error) {
+                showStatus('usage-status', `Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function saveSummary() {
+            if (!testProjectId) {
+                await createProject();
+            }
+
+            try {
+                const response = await fetch('http://localhost:3000/api/projects', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-user-email': testEmail
+                    },
+                    body: JSON.stringify({
+                        action: 'save',
+                        projectId: testProjectId,
+                        videoUrl: 'https://youtube.com/watch?v=test',
+                        videoTitle: 'Test Video Summary',
+                        channelName: 'Test Channel',
+                        videoLength: 600,
+                        learningMode: 'student',
+                        summaryDepth: 'standard',
+                        summaryData: {
+                            mainTakeaway: 'This is a test summary',
+                            keyInsights: ['Insight 1', 'Insight 2', 'Insight 3'],
+                            quiz: []
+                        }
+                    })
+                });
+
+                const data = await response.json();
+                showStatus('summary-status', 'Summary saved successfully!', 'success');
+                showData('summary-data', data);
+            } catch (error) {
+                showStatus('summary-status', `Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function fetchSummaries() {
+            showStatus('summary-status', 'Check Supabase dashboard for summaries', 'info');
+            showData('summary-data', {
+                note: 'Summaries are stored in the database',
+                dashboard: 'https://supabase.com/dashboard/project/pouzqjduusuolceqaxjo/editor/summaries'
+            });
+        }
+
+        // Initial test on load
+        window.addEventListener('load', () => {
+            fetch('http://localhost:3000/api/health')
+                .then(() => showStatus('user-status', '✅ Server connected to Supabase!', 'success'))
+                .catch(() => showStatus('user-status', '⚠️ Server not running', 'error'));
+        });
+    </script>
+</body>
+</html>

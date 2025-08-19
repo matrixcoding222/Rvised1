@@ -1,0 +1,4 @@
+
+# Stripe Price IDs (Generated)
+STRIPE_PRICE_ID_MONTHLY=price_1RwwStD1nlcujrqEToU41vx2
+STRIPE_PRICE_ID_ANNUAL=price_1RwwStD1nlcujrqEo8993b0U

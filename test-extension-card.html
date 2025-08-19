@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Rvised Extension Card</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f3f4f6;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 6px;
+        }
+        .success { background: #dcfce7; color: #16a34a; }
+        .error { background: #fee2e2; color: #dc2626; }
+        .info { background: #eff6ff; color: #2563eb; }
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #2563eb; }
+        #test-area {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            min-height: 400px;
+            position: relative;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test Rvised Extension Card</h1>
+    
+    <div id="status"></div>
+    
+    <div>
+        <button onclick="loadScripts()">1. Load Scripts</button>
+        <button onclick="createCard()">2. Create Card</button>
+        <button onclick="toggleCard()">3. Toggle Card</button>
+        <button onclick="checkVisibility()">4. Check Visibility</button>
+    </div>
+    
+    <div id="test-area">
+        <p>The extension card should appear here:</p>
+    </div>
+
+    <script>
+        // Mock chrome API
+        window.chrome = {
+            runtime: {
+                getURL: (path) => `extensions/rvised-extension/${path}`
+            },
+            storage: {
+                local: {
+                    get: (keys, callback) => callback({})
+                }
+            }
+        };
+
+        let isCollapsed = true;
+        let isSummarized = false;
+
+        function addStatus(msg, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `status ${type}`;
+            div.textContent = msg;
+            document.getElementById('status').appendChild(div);
+        }
+
+        function loadScripts() {
+            const script = document.createElement('script');
+            script.src = 'extensions/rvised-extension/content/v0-exact-ui.js';
+            script.onload = () => addStatus('✅ Scripts loaded', 'success');
+            script.onerror = () => addStatus('❌ Failed to load scripts', 'error');
+            document.head.appendChild(script);
+        }
+
+        function createCard() {
+            if (!window.getExactV0UI) {
+                addStatus('❌ UI script not loaded', 'error');
+                return;
+            }
+
+            // Remove existing
+            const existing = document.querySelector('#rvised-overlay-container');
+            if (existing) existing.remove();
+
+            // Get HTML
+            const html = window.getExactV0UI({
+                isCollapsed,
+                isSummarized,
+                activeMode: 'student',
+                readingDepth: 'standard'
+            });
+
+            // Parse and insert
+            const temp = document.createElement('div');
+            temp.innerHTML = html;
+            const container = temp.querySelector('#rvised-overlay-container');
+            
+            if (container) {
+                // Make it visible
+                container.style.position = 'relative';
+                container.style.top = 'auto';
+                container.style.right = 'auto';
+                container.style.display = 'block';
+                container.style.visibility = 'visible';
+                container.style.opacity = '1';
+                
+                document.getElementById('test-area').appendChild(container);
+                addStatus('✅ Card created', 'success');
+                
+                // Add event listeners
+                const collapseBtn = container.querySelector('#rvised-collapse-btn');
+                if (collapseBtn) {
+                    collapseBtn.onclick = toggleCard;
+                }
+            } else {
+                addStatus('❌ Failed to create card', 'error');
+            }
+        }
+
+        function toggleCard() {
+            isCollapsed = !isCollapsed;
+            createCard();
+            addStatus(`Card ${isCollapsed ? 'collapsed' : 'expanded'}`, 'info');
+        }
+
+        function checkVisibility() {
+            const container = document.querySelector('#rvised-overlay-container');
+            if (container) {
+                const style = window.getComputedStyle(container);
+                const card = container.querySelector('#rvised-main-card');
+                const cardStyle = card ? window.getComputedStyle(card) : null;
+                
+                addStatus(`Container: display=${style.display}, visibility=${style.visibility}, opacity=${style.opacity}`, 'info');
+                if (cardStyle) {
+                    addStatus(`Card: display=${cardStyle.display}, visibility=${cardStyle.visibility}, opacity=${cardStyle.opacity}`, 'info');
+                }
+                
+                const isVisible = style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0';
+                addStatus(isVisible ? '✅ Card is visible' : '⚠️ Card is hidden', isVisible ? 'success' : 'error');
+            } else {
+                addStatus('❌ No card found', 'error');
+            }
+        }
+
+        // Auto-load
+        window.onload = () => {
+            setTimeout(loadScripts, 500);
+        };
+    </script>
+</body>
+</html>

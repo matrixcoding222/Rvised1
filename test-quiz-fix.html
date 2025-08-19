@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Quiz Generation Fix</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .quiz-container {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 4px;
+        }
+        .question {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .question h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .option {
+            padding: 10px;
+            margin: 5px 0;
+            background: #f0f0f0;
+            border: 2px solid transparent;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .option:hover {
+            background: #e0e0e0;
+        }
+        .option.correct {
+            background: #c8e6c9;
+            border-color: #4CAF50;
+            font-weight: bold;
+        }
+        .option.wrong {
+            background: #ffcdd2;
+            border-color: #f44336;
+        }
+        .status {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .status.loading {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .debug {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f0f0f0;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test Quiz Generation Fix</h1>
+        <p>This page tests the fixed quiz generation logic to ensure correct answers are properly randomized.</p>
+        
+        <div>
+            <label for="videoUrl">YouTube Video URL:</label><br>
+            <input type="text" id="videoUrl" value="https://www.youtube.com/watch?v=8BtHk-oNlN0" style="width: 100%; padding: 8px; margin: 10px 0;">
+        </div>
+        
+        <button id="testQuiz" onclick="testQuizGeneration()">Test Quiz Generation</button>
+        
+        <div id="status" class="status" style="display: none;"></div>
+        <div id="quizContainer" class="quiz-container" style="display: none;"></div>
+    </div>
+
+    <script>
+        async function testQuizGeneration() {
+            const button = document.getElementById('testQuiz');
+            const status = document.getElementById('status');
+            const quizContainer = document.getElementById('quizContainer');
+            const videoUrl = document.getElementById('videoUrl').value;
+            
+            // Reset UI
+            button.disabled = true;
+            status.className = 'status loading';
+            status.textContent = 'Generating quiz questions...';
+            status.style.display = 'block';
+            quizContainer.style.display = 'none';
+            quizContainer.innerHTML = '';
+            
+            try {
+                // Call the API to generate quiz
+                const response = await fetch('http://localhost:3003/api/summarize', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        videoUrl: videoUrl,
+                        settings: {
+                            learningMode: 'student',
+                            summaryDepth: 'quick',
+                            includeQuiz: true,
+                            includeEmojis: false,
+                            includeTimestamps: false,
+                            quizOnly: true
+                        }
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to generate quiz');
+                }
+                
+                if (!data.success || !data.data?.quiz) {
+                    throw new Error('No quiz data received');
+                }
+                
+                const quiz = data.data.quiz;
+                
+                // Display success status
+                status.className = 'status success';
+                status.textContent = `✅ Generated ${quiz.length} quiz questions successfully!`;
+                
+                // Display quiz questions
+                quizContainer.style.display = 'block';
+                quizContainer.innerHTML = '<h2>Generated Quiz Questions:</h2>';
+                
+                quiz.forEach((q, qIdx) => {
+                    const questionDiv = document.createElement('div');
+                    questionDiv.className = 'question';
+                    
+                    // Add question title
+                    const title = document.createElement('h3');
+                    title.textContent = `Question ${qIdx + 1}: ${q.question}`;
+                    questionDiv.appendChild(title);
+                    
+                    // Add debug info
+                    const debug = document.createElement('div');
+                    debug.className = 'debug';
+                    debug.textContent = `Debug Info:
+- Correct Index: ${q.correct}
+- Correct Answer: "${q.answer || q.options[q.correct]}"
+- All Options: ${JSON.stringify(q.options, null, 2)}`;
+                    questionDiv.appendChild(debug);
+                    
+                    // Add options
+                    q.options.forEach((option, optIdx) => {
+                        const optionDiv = document.createElement('div');
+                        optionDiv.className = 'option';
+                        
+                        // Mark correct answer
+                        if (optIdx === q.correct) {
+                            optionDiv.className += ' correct';
+                            optionDiv.innerHTML = `✓ Option ${optIdx}: ${option} <strong>(CORRECT)</strong>`;
+                        } else {
+                            optionDiv.innerHTML = `Option ${optIdx}: ${option}`;
+                        }
+                        
+                        questionDiv.appendChild(optionDiv);
+                    });
+                    
+                    // Verification check
+                    const verification = document.createElement('div');
+                    verification.style.marginTop = '10px';
+                    verification.style.padding = '10px';
+                    verification.style.borderRadius = '4px';
+                    
+                    // Check if correct index is valid
+                    const isValidIndex = q.correct >= 0 && q.correct < 4;
+                    const correctPositions = new Set();
+                    quiz.forEach(question => correctPositions.add(question.correct));
+                    const hasVariedPositions = correctPositions.size > 1;
+                    
+                    if (isValidIndex && hasVariedPositions) {
+                        verification.style.background = '#c8e6c9';
+                        verification.innerHTML = `✅ <strong>PASS:</strong> Correct answer is at index ${q.correct} (not always 0!)`;
+                    } else if (!isValidIndex) {
+                        verification.style.background = '#ffcdd2';
+                        verification.innerHTML = `❌ <strong>FAIL:</strong> Invalid correct index: ${q.correct}`;
+                    } else if (!hasVariedPositions) {
+                        verification.style.background = '#fff3cd';
+                        verification.innerHTML = `⚠️ <strong>WARNING:</strong> All questions have same correct index (${q.correct})`;
+                    }
+                    
+                    questionDiv.appendChild(verification);
+                    quizContainer.appendChild(questionDiv);
+                });
+                
+                // Overall verification
+                const overallDiv = document.createElement('div');
+                overallDiv.style.marginTop = '20px';
+                overallDiv.style.padding = '15px';
+                overallDiv.style.background = 'white';
+                overallDiv.style.borderRadius = '4px';
+                
+                const correctPositions = new Set();
+                quiz.forEach(q => correctPositions.add(q.correct));
+                
+                if (correctPositions.size > 1) {
+                    overallDiv.innerHTML = `
+                        <h3 style="color: #4CAF50;">✅ Quiz Generation FIXED!</h3>
+                        <p>Correct answers appear at different positions: ${Array.from(correctPositions).sort().join(', ')}</p>
+                        <p>This proves the bug is fixed - answers are properly randomized!</p>
+                    `;
+                } else {
+                    overallDiv.innerHTML = `
+                        <h3 style="color: #f44336;">❌ Bug Still Present</h3>
+                        <p>All correct answers are at position ${Array.from(correctPositions)[0]}</p>
+                        <p>The fix hasn't worked - all answers are still at the same index.</p>
+                    `;
+                }
+                
+                quizContainer.appendChild(overallDiv);
+                
+            } catch (error) {
+                status.className = 'status error';
+                status.textContent = `❌ Error: ${error.message}`;
+                console.error('Quiz generation error:', error);
+            } finally {
+                button.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rvised Extension - Flow Demo</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .demo-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 32px;
+        }
+        .flow-steps {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+        .step {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f9fafb;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        .step.active {
+            background: #eff6ff;
+            border: 2px solid #3b82f6;
+            transform: scale(1.02);
+        }
+        .step-number {
+            width: 32px;
+            height: 32px;
+            background: #e5e7eb;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 15px;
+            transition: all 0.3s;
+        }
+        .step.active .step-number {
+            background: #3b82f6;
+            color: white;
+        }
+        .step-text {
+            flex: 1;
+            font-size: 14px;
+            color: #374151;
+        }
+        .step.active .step-text {
+            color: #1e40af;
+            font-weight: 500;
+        }
+        .demo-button {
+            width: 100%;
+            padding: 14px 24px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 20px;
+        }
+        .demo-button:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+        }
+        .demo-button:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+        }
+        #extension-container {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 1000;
+        }
+        .status-message {
+            text-align: center;
+            padding: 12px;
+            background: #fef3c7;
+            border-radius: 8px;
+            color: #92400e;
+            font-size: 14px;
+            font-weight: 500;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <h1>🎬 Rvised Extension Flow Demo</h1>
+        
+        <div class="flow-steps">
+            <h2 style="margin-top: 0; margin-bottom: 25px; color: #111827;">Summary Generation Flow</h2>
+            
+            <div class="step" id="step-1">
+                <div class="step-number">1</div>
+                <div class="step-text">Extension starts in collapsed state (320px × 180px)</div>
+            </div>
+            
+            <div class="step" id="step-2">
+                <div class="step-number">2</div>
+                <div class="step-text">User clicks "Summarize video" button</div>
+            </div>
+            
+            <div class="step" id="step-3">
+                <div class="step-number">3</div>
+                <div class="step-text">Card expands & shows loading animation</div>
+            </div>
+            
+            <div class="step" id="step-4">
+                <div class="step-number">4</div>
+                <div class="step-text">Summary generated - auto-expands to 600px height</div>
+            </div>
+            
+            <div class="step" id="step-5">
+                <div class="step-number">5</div>
+                <div class="step-text">User can collapse/expand as needed</div>
+            </div>
+            
+            <button class="demo-button" id="start-demo" onclick="startDemo()">
+                Start Demo
+            </button>
+            
+            <button class="demo-button" id="reset-demo" onclick="resetDemo()" style="display: none;">
+                Reset Demo
+            </button>
+            
+            <div id="status" class="status-message" style="display: none;"></div>
+        </div>
+    </div>
+    
+    <div id="extension-container"></div>
+    
+    <script src="extensions/rvised-extension/content/v0-exact-ui.js"></script>
+    <script>
+        let currentStep = 0;
+        let demoRunning = false;
+        
+        // Initial state
+        let state = {
+            isMinimized: false,
+            isCollapsed: true,
+            isSummarized: false,
+            isLoading: false,
+            activeMode: 'student',
+            readingDepth: 'standard',
+            includeTimestamps: true,
+            showActionItems: true,
+            generateQuiz: false,
+            includeTranscript: false,
+            videoTitle: 'How to Build Better Learning Habits',
+            channelName: 'Andrew Huberman'
+        };
+        
+        function renderExtension() {
+            const container = document.getElementById('extension-container');
+            if (typeof getExactV0UI === 'function') {
+                container.innerHTML = getExactV0UI(state);
+                setupListeners();
+            }
+        }
+        
+        function setupListeners() {
+            const container = document.getElementById('extension-container');
+            
+            // Summarize button
+            const summarizeBtn = container.querySelector('#rvised-summarize-btn');
+            if (summarizeBtn && !demoRunning) {
+                summarizeBtn.addEventListener('click', () => {
+                    if (currentStep === 1) {
+                        continueDemo();
+                    }
+                });
+            }
+            
+            // Collapse button
+            const collapseBtn = container.querySelector('#rvised-collapse-btn');
+            if (collapseBtn) {
+                collapseBtn.addEventListener('click', () => {
+                    state.isCollapsed = !state.isCollapsed;
+                    renderExtension();
+                    if (currentStep === 4) {
+                        showStatus('You can collapse and expand the summary anytime!');
+                    }
+                });
+            }
+        }
+        
+        function highlightStep(stepNum) {
+            // Clear all active states
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+            // Highlight current step
+            if (stepNum > 0) {
+                document.getElementById(`step-${stepNum}`).classList.add('active');
+            }
+        }
+        
+        function showStatus(message) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.style.display = 'block';
+        }
+        
+        function hideStatus() {
+            document.getElementById('status').style.display = 'none';
+        }
+        
+        async function startDemo() {
+            demoRunning = true;
+            currentStep = 1;
+            document.getElementById('start-demo').disabled = true;
+            hideStatus();
+            
+            // Step 1: Show collapsed state
+            highlightStep(1);
+            state = { ...state, isCollapsed: true, isSummarized: false, isLoading: false };
+            renderExtension();
+            showStatus('Extension starts in collapsed, compact state');
+            
+            await sleep(2000);
+            
+            // Step 2: User clicks summarize
+            currentStep = 2;
+            highlightStep(2);
+            showStatus('Click the "Summarize video" button in the extension');
+            demoRunning = false;
+            setupListeners(); // Re-enable button
+        }
+        
+        async function continueDemo() {
+            demoRunning = true;
+            
+            // Step 3: Show loading
+            currentStep = 3;
+            highlightStep(3);
+            state = { ...state, isLoading: true, isCollapsed: false };
+            renderExtension();
+            showStatus('Loading and analyzing video content...');
+            
+            await sleep(2500);
+            
+            // Step 4: Show summary (auto-expanded)
+            currentStep = 4;
+            highlightStep(4);
+            state = { ...state, isLoading: false, isSummarized: true, isCollapsed: false };
+            renderExtension();
+            showStatus('Summary complete! Card auto-expands to 600px height');
+            
+            await sleep(3000);
+            
+            // Step 5: User can interact
+            currentStep = 5;
+            highlightStep(5);
+            showStatus('Try the collapse/expand button to toggle the view');
+            
+            // Show reset button
+            document.getElementById('start-demo').style.display = 'none';
+            document.getElementById('reset-demo').style.display = 'block';
+            demoRunning = false;
+        }
+        
+        function resetDemo() {
+            currentStep = 0;
+            demoRunning = false;
+            highlightStep(0);
+            hideStatus();
+            
+            // Reset state
+            state = {
+                isMinimized: false,
+                isCollapsed: true,
+                isSummarized: false,
+                isLoading: false,
+                activeMode: 'student',
+                readingDepth: 'standard',
+                includeTimestamps: true,
+                showActionItems: true,
+                generateQuiz: false,
+                includeTranscript: false,
+                videoTitle: 'How to Build Better Learning Habits',
+                channelName: 'Andrew Huberman'
+            };
+            
+            renderExtension();
+            
+            // Reset buttons
+            document.getElementById('start-demo').style.display = 'block';
+            document.getElementById('start-demo').disabled = false;
+            document.getElementById('reset-demo').style.display = 'none';
+        }
+        
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+        
+        // Initialize
+        window.addEventListener('DOMContentLoaded', () => {
+            renderExtension();
+        });
+    </script>
+</body>
+</html>

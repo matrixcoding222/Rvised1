@@ -57,10 +57,20 @@ function sendSettingsToContentScript() {
 // Listen for messages from content script
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     if (request.action === 'openDashboard') {
-        // Open the web app dashboard
-        chrome.tabs.create({
-            url: 'https://rvised-1u5gahd9g-tysonso1122-2100s-projects.vercel.app/'
-        });
+        // Open the web app Library
+        // Open local dev or deployed app library
+        (async () => {
+            try {
+                const bases = ['http://localhost:3000','http://127.0.0.1:3000','https://rvised.vercel.app']
+                let base = bases[0]
+                for (const b of bases) {
+                    try { const r = await fetch(b + '/api/health'); if (r.ok) { base = b; break; } } catch(_) {}
+                }
+                chrome.tabs.create({ url: base + '/library' })
+            } catch(_) {
+                chrome.tabs.create({ url: 'https://rvised.vercel.app/library' })
+            }
+        })();
     }
 });
 
@@ -248,6 +258,27 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('Finish Setup button present:', !!finishBtn);
     console.log('Generate Summary button:', document.getElementById('generateSummaryBtn'));
     console.log('Start Using button:', document.getElementById('startUsingBtn'));
+
+    // Health check
+    try {
+        const el = document.getElementById('apiHealthStatus');
+        if (el) {
+            (async () => {
+                try {
+                    const bases = ['http://localhost:3000','http://127.0.0.1:3000','https://rvised.vercel.app']
+                    let ok = false
+                    for (const b of bases) {
+                        try { const r = await fetch(b + '/api/health'); if (r.ok) { ok = true; break; } } catch(_) {}
+                    }
+                    el.textContent = 'API: ' + (ok ? 'OK' : 'Unavailable')
+                    el.classList.add(ok ? 'health-ok' : 'health-bad')
+                } catch(_) {
+                    el.textContent = 'API: Unavailable'
+                    el.classList.add('health-bad')
+                }
+            })();
+        }
+    } catch(ex) { console.warn('Health check error', ex); }
 });
 
 function updateDisplayValues() {

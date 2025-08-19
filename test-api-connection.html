@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test API Connection</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        button {
+            background: #ff0000;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #cc0000;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 8px;
+            white-space: pre-wrap;
+        }
+        .error {
+            background: #ffebee;
+            color: #c62828;
+        }
+        .success {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test API Connection</h1>
+    
+    <div>
+        <h2>Test Video URL:</h2>
+        <input type="text" id="videoUrl" value="https://www.youtube.com/watch?v=b4n6B005IdM" style="width: 100%; padding: 8px;">
+    </div>
+
+    <div style="margin-top: 20px;">
+        <button onclick="testTranscript()">Test Transcript API</button>
+        <button onclick="testSummarize()">Test Summarize API</button>
+        <button onclick="testHealth()">Test Health Check</button>
+    </div>
+
+    <div id="result" class="result"></div>
+
+    <script>
+        const API_BASE = 'http://localhost:3000';
+        const resultDiv = document.getElementById('result');
+
+        async function testHealth() {
+            resultDiv.textContent = 'Testing health endpoint...';
+            resultDiv.className = 'result';
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/health`);
+                const data = await response.text();
+                
+                resultDiv.textContent = `Health Check Response:\nStatus: ${response.status}\nResponse: ${data}`;
+                resultDiv.className = response.ok ? 'result success' : 'result error';
+            } catch (error) {
+                resultDiv.textContent = `Health Check Error:\n${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        }
+
+        async function testTranscript() {
+            const videoUrl = document.getElementById('videoUrl').value;
+            resultDiv.textContent = 'Fetching transcript...';
+            resultDiv.className = 'result';
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/transcript`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ videoUrl })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    const transcriptPreview = data.transcript ? 
+                        data.transcript.substring(0, 500) + '...' : 
+                        'No transcript found';
+                    
+                    resultDiv.textContent = `Transcript API Response:\nStatus: ${response.status}\nSuccess: ${data.success}\n\nTranscript Preview:\n${transcriptPreview}`;
+                    resultDiv.className = 'result success';
+                } else {
+                    resultDiv.textContent = `Transcript API Error:\nStatus: ${response.status}\nError: ${data.error || 'Unknown error'}`;
+                    resultDiv.className = 'result error';
+                }
+            } catch (error) {
+                resultDiv.textContent = `Transcript Fetch Error:\n${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        }
+
+        async function testSummarize() {
+            const videoUrl = document.getElementById('videoUrl').value;
+            resultDiv.textContent = 'Generating summary (this may take 30-60 seconds)...';
+            resultDiv.className = 'result';
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/summarize`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-user-tier': 'free'
+                    },
+                    body: JSON.stringify({
+                        videoUrl,
+                        settings: {
+                            learningMode: 'balanced',
+                            summaryDepth: 'moderate',
+                            includeTimestamps: true,
+                            includeActionItems: true,
+                            includeQuiz: false,
+                            includeTranscript: false,
+                            includeEmojis: false
+                        }
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    const summaryPreview = data.data?.summary ? 
+                        data.data.summary.substring(0, 500) + '...' : 
+                        'No summary generated';
+                    
+                    resultDiv.textContent = `Summarize API Response:\nStatus: ${response.status}\nSuccess: ${data.success}\n\nMain Takeaway:\n${data.data?.mainTakeaway || 'N/A'}\n\nSummary Preview:\n${summaryPreview}`;
+                    resultDiv.className = 'result success';
+                } else {
+                    resultDiv.textContent = `Summarize API Error:\nStatus: ${response.status}\nError: ${data.error || 'Unknown error'}`;
+                    resultDiv.className = 'result error';
+                }
+            } catch (error) {
+                resultDiv.textContent = `Summarize Fetch Error:\n${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        }
+
+        // Test health on load
+        window.onload = () => {
+            testHealth();
+        };
+    </script>
+</body>
+</html>

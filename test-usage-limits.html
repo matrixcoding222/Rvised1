@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Usage Limits - Rvised</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      padding: 40px;
+      max-width: 900px;
+      margin: 0 auto;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+    }
+    .container {
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #333;
+      margin-bottom: 10px;
+    }
+    h2 {
+      color: #666;
+      font-size: 18px;
+      margin-top: 30px;
+      margin-bottom: 15px;
+      border-bottom: 2px solid #f0f0f0;
+      padding-bottom: 5px;
+    }
+    .test-section {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+    .tier-buttons {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    button {
+      background: #667eea;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin: 5px;
+      font-size: 14px;
+      transition: all 0.3s;
+    }
+    button:hover {
+      background: #5a67d8;
+      transform: translateY(-1px);
+    }
+    button.secondary {
+      background: #48bb78;
+    }
+    button.secondary:hover {
+      background: #38a169;
+    }
+    button.danger {
+      background: #f56565;
+    }
+    button.danger:hover {
+      background: #e53e3e;
+    }
+    .status {
+      padding: 10px;
+      border-radius: 6px;
+      margin: 10px 0;
+      font-size: 14px;
+    }
+    .success {
+      background: #c6f6d5;
+      color: #22543d;
+      border: 1px solid #9ae6b4;
+    }
+    .error {
+      background: #fed7d7;
+      color: #742a2a;
+      border: 1px solid #fc8181;
+    }
+    .info {
+      background: #bee3f8;
+      color: #2c5282;
+      border: 1px solid #90cdf4;
+    }
+    .warning {
+      background: #fef5e7;
+      color: #7c4e07;
+      border: 1px solid #f6d55f;
+    }
+    .usage-display {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin: 20px 0;
+    }
+    .usage-card {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 15px;
+      text-align: center;
+    }
+    .usage-card h3 {
+      font-size: 14px;
+      color: #64748b;
+      margin: 0 0 8px 0;
+    }
+    .usage-card .value {
+      font-size: 24px;
+      font-weight: bold;
+      color: #1e293b;
+    }
+    .usage-card .label {
+      font-size: 12px;
+      color: #94a3b8;
+      margin-top: 4px;
+    }
+    pre {
+      background: #1a202c;
+      color: #e2e8f0;
+      padding: 15px;
+      border-radius: 6px;
+      overflow-x: auto;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .pro-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-left: 10px;
+    }
+    .free-badge {
+      display: inline-block;
+      background: #e2e8f0;
+      color: #475569;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-left: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔬 Usage Limits Test</h1>
+    <p>Test the 3 per day limit for free users and unlimited for Pro users.</p>
+
+    <div class="test-section">
+      <h2>Current User Configuration</h2>
+      <div class="tier-buttons">
+        <button onclick="setUserTier('free')">Set as Free User</button>
+        <button onclick="setUserTier('pro')" class="secondary">Set as Pro User</button>
+        <button onclick="resetDailyUsage()" class="danger">Reset Daily Usage</button>
+      </div>
+      <div id="current-user" class="status info">
+        Loading user info...
+      </div>
+    </div>
+
+    <div class="test-section">
+      <h2>Usage Statistics</h2>
+      <div class="usage-display">
+        <div class="usage-card">
+          <h3>User Tier</h3>
+          <div class="value" id="tier-display">-</div>
+        </div>
+        <div class="usage-card">
+          <h3>Summaries Today</h3>
+          <div class="value" id="summaries-today">0</div>
+          <div class="label" id="summaries-limit">of 3</div>
+        </div>
+        <div class="usage-card">
+          <h3>Can Summarize</h3>
+          <div class="value" id="can-summarize">✅</div>
+        </div>
+        <div class="usage-card">
+          <h3>Max Video Length</h3>
+          <div class="value" id="max-video-length">20</div>
+          <div class="label">minutes</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="test-section">
+      <h2>Test Summary Generation</h2>
+      <p>Simulate creating summaries to test limits:</p>
+      <div style="margin-top: 15px;">
+        <button onclick="testSummary(10)">Test 10-min Video</button>
+        <button onclick="testSummary(25)">Test 25-min Video (Over Limit)</button>
+        <button onclick="testSummary(5)">Test 5-min Video</button>
+      </div>
+      <div id="test-results" style="margin-top: 20px;"></div>
+    </div>
+
+    <div class="test-section">
+      <h2>Expected Behavior</h2>
+      <div class="status info">
+        <strong>Free Users (3/day limit):</strong>
+        <ul style="margin: 10px 0; padding-left: 20px;">
+          <li>Can create 3 summaries per day</li>
+          <li>4th attempt shows "Daily limit reached" message</li>
+          <li>Videos over 20 minutes show "Video too long" message</li>
+          <li>Dashboard shows crown icon and Pro popup</li>
+          <li>Limit resets at midnight</li>
+        </ul>
+      </div>
+      <div class="status success">
+        <strong>Pro Users (Unlimited):</strong>
+        <ul style="margin: 10px 0; padding-left: 20px;">
+          <li>Unlimited summaries per day</li>
+          <li>No video length restrictions</li>
+          <li>Full dashboard access</li>
+          <li>Priority processing</li>
+          <li>No upgrade prompts</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="test-section">
+      <h2>API Response</h2>
+      <pre id="api-response">No API calls made yet</pre>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = 'http://localhost:3000';
+    let currentEmail = 'test-free@rvised.app';
+    let currentTier = 'free';
+    let summaryCount = 0;
+    
+    // Initialize
+    checkCurrentUsage();
+
+    async function setUserTier(tier) {
+      currentTier = tier;
+      currentEmail = tier === 'pro' ? 'pro@rvised.app' : 'test-free@rvised.app';
+      
+      // Update localStorage (simulating extension storage)
+      localStorage.setItem('rvised_userTier', tier);
+      localStorage.setItem('rvised_userEmail', currentEmail);
+      
+      updateDisplay();
+      await checkCurrentUsage();
+      
+      document.getElementById('current-user').innerHTML = `
+        User: <strong>${currentEmail}</strong>
+        ${tier === 'pro' ? '<span class="pro-badge">PRO</span>' : '<span class="free-badge">FREE</span>'}
+      `;
+    }
+
+    async function checkCurrentUsage() {
+      try {
+        const response = await fetch(`${API_BASE}/api/usage`, {
+          headers: {
+            'x-user-email': currentEmail,
+          }
+        });
+        
+        const data = await response.json();
+        document.getElementById('api-response').textContent = JSON.stringify(data, null, 2);
+        
+        // Update display
+        summaryCount = data.usage?.summariesToday || 0;
+        const canSummarize = data.canSummarize;
+        const tier = data.usage?.tier || 'free';
+        const dailyLimit = data.limits?.dailySummaries || 3;
+        const maxMinutes = data.limits?.maxVideoMinutes || 20;
+        
+        document.getElementById('tier-display').innerHTML = 
+          tier === 'pro' ? 'Pro' : 'Free';
+        document.getElementById('summaries-today').textContent = 
+          tier === 'pro' ? '∞' : summaryCount;
+        document.getElementById('summaries-limit').textContent = 
+          tier === 'pro' ? 'unlimited' : `of ${dailyLimit}`;
+        document.getElementById('can-summarize').innerHTML = 
+          canSummarize ? '✅' : '❌';
+        document.getElementById('max-video-length').textContent = 
+          tier === 'pro' ? '∞' : maxMinutes;
+        
+      } catch (error) {
+        console.error('Error checking usage:', error);
+        document.getElementById('api-response').textContent = `Error: ${error.message}`;
+      }
+    }
+
+    async function testSummary(videoMinutes) {
+      const results = document.getElementById('test-results');
+      results.innerHTML = '<div class="status info">Testing summary creation...</div>';
+      
+      try {
+        // First check if we can summarize
+        const checkResponse = await fetch(`${API_BASE}/api/usage`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-user-email': currentEmail,
+          },
+          body: JSON.stringify({
+            action: 'check',
+            videoLength: videoMinutes * 60, // Convert to seconds
+          })
+        });
+        
+        const checkData = await checkResponse.json();
+        
+        if (!checkResponse.ok) {
+          // Hit a limit
+          if (checkData.limitType === 'daily') {
+            results.innerHTML = `
+              <div class="status error">
+                <strong>Daily Limit Reached!</strong><br>
+                ${checkData.message}
+              </div>
+            `;
+          } else if (checkData.limitType === 'videoLength') {
+            results.innerHTML = `
+              <div class="status warning">
+                <strong>Video Too Long!</strong><br>
+                ${checkData.message}
+              </div>
+            `;
+          }
+          document.getElementById('api-response').textContent = JSON.stringify(checkData, null, 2);
+          return;
+        }
+        
+        // Can summarize - track the usage
+        const trackResponse = await fetch(`${API_BASE}/api/usage`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-user-email': currentEmail,
+          },
+          body: JSON.stringify({
+            action: 'summarize',
+          })
+        });
+        
+        const trackData = await trackResponse.json();
+        
+        if (trackResponse.ok) {
+          results.innerHTML = `
+            <div class="status success">
+              <strong>✅ Summary Created Successfully!</strong><br>
+              Video: ${videoMinutes} minutes<br>
+              Summaries today: ${trackData.usage?.summariesToday || summaryCount + 1}<br>
+              Remaining: ${trackData.usage?.remaining === -1 ? 'Unlimited' : trackData.usage?.remaining}
+            </div>
+          `;
+          
+          // Refresh usage display
+          await checkCurrentUsage();
+        } else {
+          results.innerHTML = `
+            <div class="status error">
+              <strong>Error:</strong> ${trackData.error || 'Failed to create summary'}
+            </div>
+          `;
+        }
+        
+        document.getElementById('api-response').textContent = JSON.stringify(trackData, null, 2);
+        
+      } catch (error) {
+        results.innerHTML = `
+          <div class="status error">
+            <strong>Error:</strong> ${error.message}
+          </div>
+        `;
+      }
+    }
+
+    async function resetDailyUsage() {
+      // This simulates a new day by clearing local tracking
+      // In production, this would be handled by the date-based tracking
+      if (confirm('Reset daily usage counter? (This simulates a new day)')) {
+        // Clear any local storage
+        localStorage.removeItem('rvised_usage_' + new Date().toDateString());
+        
+        summaryCount = 0;
+        updateDisplay();
+        
+        document.getElementById('test-results').innerHTML = `
+          <div class="status success">
+            Daily usage reset. You can now test the limits again.
+          </div>
+        `;
+        
+        await checkCurrentUsage();
+      }
+    }
+
+    function updateDisplay() {
+      document.getElementById('tier-display').innerHTML = 
+        currentTier === 'pro' ? 'Pro' : 'Free';
+    }
+  </script>
+</body>
+</html>

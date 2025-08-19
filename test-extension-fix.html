@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Extension Fix</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f3f4f6;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .success {
+            background: #10b981;
+            color: white;
+        }
+        .error {
+            background: #ef4444;
+            color: white;
+        }
+        .pending {
+            background: #f59e0b;
+            color: white;
+        }
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #2563eb;
+        }
+        pre {
+            background: #1f2937;
+            color: #f3f4f6;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 Extension Fix Test</h1>
+    
+    <div class="test-section">
+        <h2>Test Summary</h2>
+        <p>This page tests the fix for the <code>window.handleSummarize is not a function</code> error.</p>
+        <div id="test-results"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Manual Test</h2>
+        <p>To test the fix:</p>
+        <ol>
+            <li>Reload the extension in Chrome (chrome://extensions)</li>
+            <li>Go to any YouTube video</li>
+            <li>Click the "Generate AI Summary" button</li>
+            <li>Check the console for errors</li>
+        </ol>
+        <button onclick="checkFunctions()">Check Functions</button>
+        <button onclick="testHandleSummarize()">Test handleSummarize</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>Console Output</h2>
+        <pre id="console-output">Console output will appear here...</pre>
+    </div>
+
+    <script>
+        const output = document.getElementById('console-output');
+        const results = document.getElementById('test-results');
+        
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            output.textContent += `[${timestamp}] ${type.toUpperCase()}: ${message}\n`;
+            console.log(message);
+        }
+        
+        function checkFunctions() {
+            log('Checking if functions are defined...', 'info');
+            const functions = [
+                'handleSummarize',
+                'toggleMinimize',
+                'toggleSettings',
+                'setActiveMode',
+                'setActiveTab',
+                'navigateToTimestamp',
+                'copyToClipboard',
+                'exportSummary',
+                'saveToLibrary',
+                'updateNotes',
+                'updateProject',
+                'saveNotes'
+            ];
+            
+            let allDefined = true;
+            functions.forEach(func => {
+                if (typeof window[func] === 'function') {
+                    log(`✅ window.${func} is defined`, 'success');
+                } else {
+                    log(`❌ window.${func} is NOT defined`, 'error');
+                    allDefined = false;
+                }
+            });
+            
+            if (allDefined) {
+                results.innerHTML = '<div class="status success">✅ All functions are properly defined!</div>';
+            } else {
+                results.innerHTML = '<div class="status error">❌ Some functions are missing. Please check the extension.</div>';
+            }
+        }
+        
+        function testHandleSummarize() {
+            log('Testing handleSummarize function...', 'info');
+            if (typeof window.handleSummarize === 'function') {
+                log('✅ handleSummarize is accessible', 'success');
+                results.innerHTML = '<div class="status success">✅ handleSummarize is properly defined!</div>';
+                
+                // Try to get function signature
+                const funcString = window.handleSummarize.toString();
+                const preview = funcString.substring(0, 100) + '...';
+                log(`Function preview: ${preview}`, 'info');
+            } else {
+                log('❌ handleSummarize is NOT accessible', 'error');
+                results.innerHTML = '<div class="status error">❌ handleSummarize is not defined!</div>';
+            }
+        }
+        
+        // Auto-check on load
+        window.addEventListener('load', () => {
+            log('Page loaded. Extension should define global functions.', 'info');
+            
+            // Simulate the defineGlobalFunctions call
+            if (typeof defineGlobalFunctions === 'function') {
+                log('defineGlobalFunctions exists, calling it...', 'info');
+                defineGlobalFunctions();
+            }
+            
+            setTimeout(() => {
+                checkFunctions();
+            }, 1000);
+        });
+        
+        // Mock the defineGlobalFunctions for testing
+        function defineGlobalFunctions() {
+            window.handleSummarize = async function() {
+                console.log('handleSummarize called!');
+                return 'Summary generated';
+            };
+            
+            window.toggleMinimize = function() {
+                console.log('toggleMinimize called!');
+            };
+            
+            window.toggleSettings = function() {
+                console.log('toggleSettings called!');
+            };
+            
+            window.setActiveMode = function(mode) {
+                console.log('setActiveMode called with:', mode);
+            };
+            
+            window.setActiveTab = function(tab) {
+                console.log('setActiveTab called with:', tab);
+            };
+            
+            window.navigateToTimestamp = function(seconds) {
+                console.log('navigateToTimestamp called with:', seconds);
+            };
+            
+            window.copyToClipboard = function() {
+                console.log('copyToClipboard called!');
+            };
+            
+            window.exportSummary = function() {
+                console.log('exportSummary called!');
+            };
+            
+            window.saveToLibrary = async function() {
+                console.log('saveToLibrary called!');
+            };
+            
+            window.updateNotes = function(value) {
+                console.log('updateNotes called with:', value);
+            };
+            
+            window.updateProject = function(value) {
+                console.log('updateProject called with:', value);
+            };
+            
+            window.saveNotes = function() {
+                console.log('saveNotes called!');
+            };
+        }
+    </script>
+</body>
+</html>

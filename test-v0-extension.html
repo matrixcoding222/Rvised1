@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test v0 Extension UI - Collapsible</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: system-ui, -apple-system, sans-serif;
+            background: #f3f4f6;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #111827;
+            margin-bottom: 20px;
+        }
+        .test-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 8px 12px;
+            border-radius: 4px;
+            display: inline-block;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .status.success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .status.error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        #extension-preview {
+            position: relative;
+            height: 700px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            overflow: visible;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .test-btn {
+            padding: 8px 16px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.15s;
+        }
+        .test-btn:hover {
+            background: #1d4ed8;
+            transform: translateY(-1px);
+        }
+        .test-btn.secondary {
+            background: white;
+            color: #374151;
+            border: 1px solid #e5e7eb;
+        }
+        .test-btn.secondary:hover {
+            background: #f9fafb;
+        }
+        .state-info {
+            display: flex;
+            gap: 20px;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        .state-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .state-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #dc2626;
+        }
+        .state-indicator.active {
+            background: #16a34a;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎬 Rvised Extension v0 UI Test - Collapsible States</h1>
+        
+        <div class="test-section">
+            <h2>Extension UI Preview</h2>
+            <p>Test the collapsible card functionality with different states.</p>
+            <div id="extension-preview"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>State Controls</h2>
+            <div class="button-group">
+                <button class="test-btn" onclick="testCollapsedInitial()">Collapsed (Initial)</button>
+                <button class="test-btn" onclick="testExpandedInitial()">Expanded (Initial)</button>
+                <button class="test-btn" onclick="testLoadingState()">Loading State</button>
+                <button class="test-btn" onclick="testCollapsedSummary()">Collapsed (Summary)</button>
+                <button class="test-btn" onclick="testExpandedSummary()">Expanded (Summary)</button>
+            </div>
+            
+            <div class="state-info">
+                <div class="state-item">
+                    <div class="state-indicator" id="collapsed-indicator"></div>
+                    <span>Collapsed: <span id="collapsed-state">true</span></span>
+                </div>
+                <div class="state-item">
+                    <div class="state-indicator" id="summarized-indicator"></div>
+                    <span>Summarized: <span id="summarized-state">false</span></span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2>Functionality Tests</h2>
+            <div class="button-group">
+                <button class="test-btn secondary" onclick="testSummarizeFlow()">Test Full Summarize Flow</button>
+                <button class="test-btn secondary" onclick="testOptionsToggle()">Test Options Toggle</button>
+                <button class="test-btn secondary" onclick="testModeSelection()">Test Mode Selection</button>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2>Status</h2>
+            <div id="status"></div>
+        </div>
+    </div>
+    
+    <script src="extensions/rvised-extension/content/v0-exact-ui.js" onerror="console.error('Failed to load v0-exact-ui.js')"></script>
+    <script>
+        // Wait for script to load with timeout
+        let scriptLoadTimeout = null;
+        
+        function waitForV0UI() {
+            return new Promise((resolve, reject) => {
+                // Check if already loaded
+                if (typeof getExactV0UI === 'function') {
+                    resolve();
+                    return;
+                }
+                
+                // Set up timeout
+                scriptLoadTimeout = setTimeout(() => {
+                    console.error('❌ v0 UI failed to load after timeout');
+                    reject(new Error('v0 UI loading timeout'));
+                }, 5000);
+                
+                // Poll for function
+                const checkInterval = setInterval(() => {
+                    if (typeof getExactV0UI === 'function') {
+                        clearInterval(checkInterval);
+                        clearTimeout(scriptLoadTimeout);
+                        resolve();
+                    }
+                }, 100);
+            });
+        }
+        
+        // Initialize after ensuring script is loaded
+        async function initializeApp() {
+            try {
+                await waitForV0UI();
+                console.log('✅ v0 UI loaded successfully');
+                // Continue with initialization
+                initializeUI();
+            } catch (error) {
+                console.error('Failed to initialize:', error);
+                updateStatus('Failed to load v0 UI script', true);
+            }
+        }
+        // Current state
+        let currentState = {
+            isMinimized: false,
+            isCollapsed: true,
+            isSummarized: false,
+            isLoading: false,
+            activeMode: 'student',
+            readingDepth: 'standard',
+            includeTimestamps: true,
+            showActionItems: true,
+            generateQuiz: false,
+            includeTranscript: false,
+            videoTitle: 'How to Build Better Learning Habits',
+            channelName: 'Andrew Huberman'
+        };
+        
+        function updateStatus(message, isError = false) {
+            const statusEl = document.getElementById('status');
+            statusEl.innerHTML = `<span class="status ${isError ? 'error' : 'success'}">${message}</span>`;
+        }
+        
+        function updateStateIndicators() {
+            // Update indicators
+            document.getElementById('collapsed-indicator').className = 
+                'state-indicator' + (currentState.isCollapsed ? ' active' : '');
+            document.getElementById('summarized-indicator').className = 
+                'state-indicator' + (currentState.isSummarized ? ' active' : '');
+            
+            // Update text
+            document.getElementById('collapsed-state').textContent = currentState.isCollapsed;
+            document.getElementById('summarized-state').textContent = currentState.isSummarized;
+        }
+        
+        function renderUI(state = currentState) {
+            currentState = { ...currentState, ...state };
+            const preview = document.getElementById('extension-preview');
+            
+            if (typeof getExactV0UI === 'function') {
+                preview.innerHTML = getExactV0UI(currentState);
+                updateStatus('UI rendered successfully');
+                updateStateIndicators();
+                
+                // Set up event listeners
+                setupEventListeners();
+            } else {
+                updateStatus('getExactV0UI function not found', true);
+            }
+        }
+        
+        function setupEventListeners() {
+            const preview = document.getElementById('extension-preview');
+            
+            // Summarize button
+            const summarizeBtn = preview.querySelector('#rvised-summarize-btn');
+            if (summarizeBtn) {
+                summarizeBtn.addEventListener('click', () => {
+                    updateStatus('Summarize clicked - simulating loading...');
+                    renderUI({ isLoading: true, isCollapsed: false });
+                    setTimeout(() => {
+                        // Auto-expand when summary is ready
+                        renderUI({ 
+                            isLoading: false, 
+                            isSummarized: true, 
+                            isCollapsed: false // Always expand to show summary
+                        });
+                        updateStatus('Summary generated and expanded!');
+                    }, 2000);
+                });
+            }
+            
+            // Collapse/Expand button
+            const collapseBtn = preview.querySelector('#rvised-collapse-btn');
+            if (collapseBtn) {
+                collapseBtn.addEventListener('click', () => {
+                    renderUI({ isCollapsed: !currentState.isCollapsed });
+                    updateStatus(`Card ${currentState.isCollapsed ? 'collapsed' : 'expanded'}`);
+                });
+            }
+            
+            // Account button
+            const accountBtn = preview.querySelector('#rvised-account-btn');
+            if (accountBtn) {
+                accountBtn.addEventListener('click', () => {
+                    updateStatus('Account/Dashboard clicked - would navigate to dashboard');
+                    // In real extension, this would open dashboard
+                    console.log('Navigate to dashboard');
+                });
+            }
+            
+            // Expand summary button (in collapsed state)
+            const expandSummaryBtn = preview.querySelector('#rvised-expand-summary-btn');
+            if (expandSummaryBtn) {
+                expandSummaryBtn.addEventListener('click', () => {
+                    renderUI({ isCollapsed: false });
+                    updateStatus('Summary expanded');
+                });
+            }
+            
+            // Mode buttons
+            const modeButtons = preview.querySelectorAll('.rvised-v0-mode-btn[data-mode]');
+            modeButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const mode = btn.dataset.mode;
+                    renderUI({ activeMode: mode });
+                    updateStatus(`Mode changed to: ${mode}`);
+                });
+            });
+            
+            // Options dropdown
+            const optionsBtn = preview.querySelector('#rvised-options-btn');
+            const optionsDropdown = preview.querySelector('#rvised-options-dropdown');
+            if (optionsBtn && optionsDropdown) {
+                optionsBtn.addEventListener('click', () => {
+                    optionsDropdown.classList.toggle('show');
+                    updateStatus('Options dropdown toggled');
+                });
+            }
+            
+            // Copy button
+            const copyBtn = preview.querySelector('#rvised-copy-btn');
+            if (copyBtn) {
+                copyBtn.addEventListener('click', () => {
+                    updateStatus('Copy clicked');
+                });
+            }
+            
+            // Download button
+            const downloadBtn = preview.querySelector('#rvised-download-btn');
+            if (downloadBtn) {
+                downloadBtn.addEventListener('click', () => {
+                    updateStatus('Download clicked');
+                });
+            }
+            
+            // Save buttons
+            const saveSummaryBtn = preview.querySelector('#rvised-save-summary-btn');
+            if (saveSummaryBtn) {
+                saveSummaryBtn.addEventListener('click', () => {
+                    updateStatus('Save Summary clicked');
+                });
+            }
+            
+            const dashboardBtn = preview.querySelector('#rvised-dashboard-btn');
+            if (dashboardBtn) {
+                dashboardBtn.addEventListener('click', () => {
+                    updateStatus('Go to Dashboard clicked');
+                    // In real extension, this would open dashboard
+                    console.log('Navigate to dashboard');
+                });
+            }
+        }
+        
+        // Test functions
+        function testCollapsedInitial() {
+            renderUI({
+                isMinimized: false,
+                isCollapsed: true,
+                isSummarized: false,
+                isLoading: false
+            });
+        }
+        
+        function testExpandedInitial() {
+            renderUI({
+                isMinimized: false,
+                isCollapsed: false,
+                isSummarized: false,
+                isLoading: false
+            });
+        }
+        
+        function testLoadingState() {
+            renderUI({
+                isMinimized: false,
+                isCollapsed: false,
+                isSummarized: false,
+                isLoading: true
+            });
+        }
+        
+        function testCollapsedSummary() {
+            renderUI({
+                isMinimized: false,
+                isCollapsed: true,
+                isSummarized: true,
+                isLoading: false
+            });
+        }
+        
+        function testExpandedSummary() {
+            renderUI({
+                isMinimized: false,
+                isCollapsed: false,
+                isSummarized: true,
+                isLoading: false
+            });
+        }
+        
+        
+        function testSummarizeFlow() {
+            updateStatus('Starting summarize flow...');
+            // Start collapsed
+            testCollapsedInitial();
+            setTimeout(() => {
+                updateStatus('User clicks summarize...');
+                const btn = document.querySelector('#rvised-summarize-btn');
+                if (btn) btn.click();
+                // This will:
+                // 1. Expand and show loading (2 seconds)
+                // 2. Auto-expand with summary displayed
+            }, 1500);
+        }
+        
+        function testOptionsToggle() {
+            const optionsBtn = document.querySelector('#rvised-options-btn');
+            if (optionsBtn) {
+                optionsBtn.click();
+                updateStatus('Options dropdown toggled');
+            }
+        }
+        
+        function testModeSelection() {
+            const modes = ['student', 'build', 'deep'];
+            let index = 0;
+            
+            const cycleMode = () => {
+                if (index < modes.length) {
+                    renderUI({ activeMode: modes[index] });
+                    updateStatus(`Testing mode: ${modes[index]}`);
+                    index++;
+                    setTimeout(cycleMode, 1000);
+                } else {
+                    updateStatus('Mode cycling complete');
+                }
+            };
+            
+            cycleMode();
+        }
+        
+        // Initialize UI after script loads
+        function initializeUI() {
+            testCollapsedInitial();
+        }
+        
+        // Initialize with collapsed state
+        window.addEventListener('DOMContentLoaded', () => {
+            initializeApp();
+        });
+    </script>
+</body>
+</html>

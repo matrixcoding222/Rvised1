@@ -4,8 +4,27 @@
       "Bash(node:*)",
       "Bash(npm run dev:*)",
       "Bash(start \"C:\\Users\\User\\RVISED3\\test-complete-flow.html\")",
-      "Bash(powershell:*)"
+      "Bash(powershell:*)",
+      "Bash(start \"C:\\Users\\User\\RVISED3\\test-quiz-fix.html\")",
+      "Bash(dir:*)",
+      "WebFetch(domain:www.youtube.com)",
+      "Bash(cp:*)",
+      "Bash(start \"C:\\Users\\User\\RVISED3\\test-youtube-summary.html\")",
+      "Bash(npm install:*)",
+      "Bash(start \"C:\\Users\\User\\RVISED3\\test-stripe-setup.html\")",
+      "Bash(start \"C:\\Users\\User\\RVISED3\\test-stripe-payment.html\")",
+      "Bash(npm uninstall:*)",
+      "Bash(mv:*)",
+      "Bash(rm:*)",
+      "Bash(cmd.exe:*)",
+      "Bash(npm run build:*)",
+      "Bash(start \"C:\\Users\\User\\RVISED3\\COMPREHENSIVE_TEST.html\")",
+      "Bash(curl:*)",
+      "Bash(start \"C:\\Users\\User\\RVISED3\\test-extension-api.html\")",
+      "Bash(vercel env ls:*)",
+      "Bash(taskkill:*)"
     ],
-    "deny": []
+    "deny": [],
+    "defaultMode": "acceptEdits"
   }
 }

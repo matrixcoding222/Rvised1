@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test All Settings Combinations - Rvised Extension</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #111827;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .subtitle {
+            color: #6b7280;
+            margin-bottom: 30px;
+        }
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .test-card {
+            background: #f9fafb;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+        .test-card:hover {
+            border-color: #3b82f6;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+        }
+        .test-card h3 {
+            margin: 0 0 15px 0;
+            color: #1f2937;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .setting-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .setting-row:last-child {
+            border-bottom: none;
+        }
+        .setting-label {
+            font-weight: 500;
+            color: #4b5563;
+        }
+        .setting-value {
+            padding: 4px 12px;
+            background: white;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .mode-student { color: #10b981; }
+        .mode-build { color: #f59e0b; }
+        .mode-understand { color: #8b5cf6; }
+        .depth-quick { color: #06b6d4; }
+        .depth-standard { color: #3b82f6; }
+        .depth-deep { color: #7c3aed; }
+        .test-button {
+            width: 100%;
+            margin-top: 15px;
+            padding: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .test-button:hover {
+            transform: translateY(-2px);
+        }
+        .test-button:active {
+            transform: translateY(0);
+        }
+        .status {
+            margin-top: 10px;
+            padding: 8px;
+            border-radius: 6px;
+            font-size: 13px;
+            text-align: center;
+        }
+        .status.testing {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        .status.success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .status.error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        .batch-controls {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+            border-radius: 12px;
+        }
+        .batch-controls h2 {
+            margin-top: 0;
+            color: #1f2937;
+        }
+        .control-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .control-button {
+            padding: 10px 20px;
+            background: white;
+            border: 2px solid #3b82f6;
+            color: #3b82f6;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .control-button:hover {
+            background: #3b82f6;
+            color: white;
+        }
+        .results-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f9fafb;
+            border-radius: 12px;
+        }
+        .results-section h2 {
+            margin-top: 0;
+            color: #1f2937;
+        }
+        #results {
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+        }
+        .toggle-yes { color: #10b981; }
+        .toggle-no { color: #ef4444; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test All Settings Combinations</h1>
+        <p class="subtitle">Test the Rvised extension with different learning modes, depths, and options</p>
+
+        <div class="batch-controls">
+            <h2>⚡ Batch Testing</h2>
+            <div class="control-buttons">
+                <button class="control-button" onclick="testAllModes()">Test All Modes</button>
+                <button class="control-button" onclick="testAllDepths()">Test All Depths</button>
+                <button class="control-button" onclick="testAllOptions()">Test All Options</button>
+                <button class="control-button" onclick="testEverything()">Test Everything</button>
+                <button class="control-button" onclick="clearResults()">Clear Results</button>
+            </div>
+        </div>
+
+        <div class="test-grid">
+            <!-- Learning Modes -->
+            <div class="test-card">
+                <h3>👨‍🎓 Student Mode</h3>
+                <div class="setting-row">
+                    <span class="setting-label">Mode:</span>
+                    <span class="setting-value mode-student">student</span>
+                </div>
+                <div class="setting-row">
+                    <span class="setting-label">Depth:</span>
+                    <span class="setting-value depth-standard">standard</span>
+                </div>
+                <div class="setting-row">
+                    <span class="setting-label">Timestamps:</span>
+                    <span class="setting-value toggle-yes">Yes</span>
+                </div>
+                <div class="setting-row">
+                    <span class="setting-label">Quiz:</span>
+                    <span class="setting-value toggle-no">No</span>
+                </div>
+                <button class="test-button" onclick="testConfig('student', 'standard', true, false, false)">
+                    Test Student Mode
+                </button>
+                <div id="status-student" class="status" style="display: none;"></div>
+            </div>
+
+            <div class="test-card">
+                <h3>🔨 Build Mode</h3>
+                <div class="setting-row">
+                    <span class="setting-label">Mode:</span>
+                    <span class="setting-value mode-build">build</span>
+                </div>
+                <div class="setting-row">
+                    <span class="setting-label">Depth:</span>
+                    <span class="setting-value depth-standard">standard</span>
+                </div>
+                <div class="setting-row">
+                    <span class="setting-label">Timestamps:</span>
+                    <span class="setting-value toggle-yes">Yes</span>
+                </div>
+                <div class="setting-row">
+                    <span class="setting-label">Quiz:</span>
+                    <span class="setting-value toggle-no">No</span>
+                </div>
+                <button class="test-button" onclick="testConfig('build', 'standard', true, false, false)">
+                    Test Build Mode
+                </button>
+                <div id="status-build" class="status" style="display: none;"></div>
+            </div>
+
+            <div class="test-card">
+                <h3>🧠 Understand Mode</h3>
+                <div class="setting-row">
+                    <span class="setting-label">Mode:</span>
+                    <span class="setting-value mode-understand">understand</span>
+                </div>
+                <div class="setting-row">
+                    <span class="setting-label">Depth:</span>
+                    <span class="setting-value depth-standard">standard</span>
+                </div>
+                <div class="setting-row">
+                    <span class="setting-label">Timestamps:</span>
+                    <span class="setting-value toggle-yes">Yes</span>
+                </div>
+                <div class="setting-row">
+                    <span class="setting-label">Quiz:</span>
+                    <span class="setting-value toggle-no">No</span>
+                </div>
+                <button class="test-button" onclick="testConfig('understand', 'standard', true, false, false)">
+                    Test Understand Mode
+                </button>
+                <div id="status-understand" class="status" style="display: none;"></div>
+            </div>
+
+            <!-- Summary Depths -->
+            <div class="test-card">
+                <h3>⚡ Quick Summary</h3>
+                <div class="setting-row">
+                    <span class="setting-label">Mode:</span>
+                    <span class="setting-value mode-student">student</span>
+                </div>
+                <div class="setting-row">
+                    <span class="setting-label">Depth:</span>
+                    <span class="setting-value depth-quick">quick</span>
+                </div>
+                <div class="setting-row">
+                    <span class="setting-label">Timestamps:</span>
+                    <span class="setting-value toggle-yes">Yes</span>
+                </div>
+                <div class="setting-row">
+                    <span class="setting-label">Quiz:</span>
+                    <span class="setting-value toggle-no">No</span>
+                </div>
+                <button class="test-button" onclick="testConfig('student', 'quick', true, false, false)">
+                    Test Quick Summary
+                </button>
+                <div id="status-quick" class="status" style="display: none;"></div>
+            </div>
+
+            <div class="test-card">
+                <h3>📘 Standard Summary</h3>
+                <div class="setting-row">
+                    <span class="setting-label">Mode:</span>
+                    <span class="setting-value mode-student">student</span>
+                </div>
+                <div class="setting-row">
+                    <span class="setting-label">Depth:</span>
+                    <span class="setting-value depth-standard">standard</span>
+                </div>
+                <div class="setting-row">
+                    <span class="setting-label">Timestamps:</span>
+                    <span class="setting-value toggle-yes">Yes</span>
+                </div>
+                <div class="setting-row">
+                    <span class="setting-label">Quiz:</span>
+                    <span class="setting-value toggle-no">No</span>
+                </div>
+                <button class="test-button" onclick="testConfig('student', 'standard', true, false, false)">
+                    Test Standard Summary
+                </button>
+                <div id="status-standard" class="status" style="display: none;"></div>
+            </div>
+
+            <div class="test-card">
+                <h3>📚 Deep Summary</h3>
+                <div class="setting-row">
+                    <span class="setting-label">Mode:</span>
+                    <span class="setting-value mode-student">student</span>
+                </div>
+                <div class="setting-row">
+                    <span class="setting-label">Depth:</span>
+                    <span class="setting-value depth-deep">deep</span>
+                </div>
+                <div class="setting-row">
+                    <span class="setting-label">Timestamps:</span>
+                    <span class="setting-value toggle-yes">Yes</span>
+                </div>
+                <div class="setting-row">
+                    <span class="setting-label">Quiz:</span>
+                    <span class="setting-value toggle-no">No</span>
+                </div>
+                <button class="test-button" onclick="testConfig('student', 'deep', true, false, false)">
+                    Test Deep Summary
+                </button>
+                <div id="status-deep" class="status" style="display: none;"></div>
+            </div>
+
+            <!-- Feature Options -->
+            <div class="test-card">
+                <h3>⏰ With Timestamps</h3>
+                <div class="setting-row">
+                    <span class="setting-label">Mode:</span>
+                    <span class="setting-value mode-student">student</span>
+                </div>
+                <div class="setting-row">
+                    <span class="setting-label">Depth:</span>
+                    <span class="setting-value depth-standard">standard</span>
+                </div>
+                <div class="setting-row">
+                    <span class="setting-label">Timestamps:</span>
+                    <span class="setting-value toggle-yes">Yes</span>
+                </div>
+                <div class="setting-row">
+                    <span class="setting-label">Quiz:</span>
+                    <span class="setting-value toggle-no">No</span>
+                </div>
+                <button class="test-button" onclick="testConfig('student', 'standard', true, false, false)">
+                    Test With Timestamps
+                </button>
+                <div id="status-timestamps" class="status" style="display: none;"></div>
+            </div>
+
+            <div class="test-card">
+                <h3>🧩 With Quiz</h3>
+                <div class="setting-row">
+                    <span class="setting-label">Mode:</span>
+                    <span class="setting-value mode-student">student</span>
+                </div>
+                <div class="setting-row">
+                    <span class="setting-label">Depth:</span>
+                    <span class="setting-value depth-standard">standard</span>
+                </div>
+                <div class="setting-row">
+                    <span class="setting-label">Timestamps:</span>
+                    <span class="setting-value toggle-no">No</span>
+                </div>
+                <div class="setting-row">
+                    <span class="setting-label">Quiz:</span>
+                    <span class="setting-value toggle-yes">Yes</span>
+                </div>
+                <button class="test-button" onclick="testConfig('student', 'standard', false, true, false)">
+                    Test With Quiz
+                </button>
+                <div id="status-quiz" class="status" style="display: none;"></div>
+            </div>
+
+            <div class="test-card">
+                <h3>🎯 Everything Enabled</h3>
+                <div class="setting-row">
+                    <span class="setting-label">Mode:</span>
+                    <span class="setting-value mode-build">build</span>
+                </div>
+                <div class="setting-row">
+                    <span class="setting-label">Depth:</span>
+                    <span class="setting-value depth-deep">deep</span>
+                </div>
+                <div class="setting-row">
+                    <span class="setting-label">Timestamps:</span>
+                    <span class="setting-value toggle-yes">Yes</span>
+                </div>
+                <div class="setting-row">
+                    <span class="setting-label">Quiz:</span>
+                    <span class="setting-value toggle-yes">Yes</span>
+                </div>
+                <button class="test-button" onclick="testConfig('build', 'deep', true, true, true)">
+                    Test Everything
+                </button>
+                <div id="status-everything" class="status" style="display: none;"></div>
+            </div>
+        </div>
+
+        <div class="results-section">
+            <h2>📊 Test Results</h2>
+            <div id="results"></div>
+        </div>
+    </div>
+
+    <script>
+        const testTranscript = `
+            Hello everyone, welcome to this comprehensive tutorial on building modern web applications.
+            Today we'll cover React, TypeScript, and Next.js to create scalable applications.
+            
+            First, let's understand the fundamentals of React components and hooks.
+            React uses a component-based architecture where everything is a component.
+            Hooks like useState and useEffect allow us to manage state and side effects.
+            
+            Next, we'll explore TypeScript integration for type safety.
+            TypeScript adds static typing to JavaScript, catching errors at compile time.
+            This makes our code more maintainable and easier to refactor.
+            
+            Then we'll dive into Next.js for server-side rendering and routing.
+            Next.js provides file-based routing and automatic code splitting.
+            It also supports both static generation and server-side rendering.
+            
+            Finally, we'll deploy our application to production using Vercel.
+            Vercel offers seamless deployment with automatic HTTPS and global CDN.
+            
+            This tutorial will help you build production-ready applications efficiently.
+        `;
+
+        async function testConfig(mode, depth, timestamps, quiz, transcript) {
+            const statusId = `status-${mode === 'build' ? 'build' : mode === 'understand' ? 'understand' : 
+                            depth === 'quick' ? 'quick' : depth === 'deep' ? 'deep' : 
+                            timestamps && quiz ? 'everything' : quiz ? 'quiz' : 
+                            timestamps ? 'timestamps' : mode}`;
+            
+            const statusEl = document.getElementById(statusId);
+            if (statusEl) {
+                statusEl.style.display = 'block';
+                statusEl.className = 'status testing';
+                statusEl.textContent = 'Testing...';
+            }
+            
+            const startTime = Date.now();
+            
+            try {
+                const response = await fetch('http://localhost:3000/api/summarize', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-user-tier': 'free'
+                    },
+                    body: JSON.stringify({
+                        videoUrl: 'https://www.youtube.com/watch?v=test123',
+                        extensionTranscript: testTranscript,
+                        settings: {
+                            learningMode: mode,
+                            summaryDepth: depth,
+                            includeTimestamps: timestamps,
+                            includeQuiz: quiz,
+                            includeTranscript: transcript,
+                            includeActionItems: true,
+                            includeEmojis: false
+                        }
+                    })
+                });
+                
+                const elapsed = Date.now() - startTime;
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    if (statusEl) {
+                        statusEl.className = 'status success';
+                        statusEl.textContent = `✅ Success (${elapsed}ms)`;
+                    }
+                    
+                    // Log results
+                    logResult({
+                        mode, depth, timestamps, quiz,
+                        success: true,
+                        elapsed,
+                        summary: data.data.summary ? data.data.summary.substring(0, 100) + '...' : 'No summary',
+                        insights: data.data.keyInsights ? data.data.keyInsights.length : 0,
+                        actions: data.data.actionItems ? data.data.actionItems.length : 0,
+                        hasTimestamps: !!data.data.timestampedSections,
+                        hasQuiz: !!data.data.quiz
+                    });
+                    
+                    return data;
+                } else {
+                    throw new Error(data.error || 'Unknown error');
+                }
+            } catch (error) {
+                if (statusEl) {
+                    statusEl.className = 'status error';
+                    statusEl.textContent = `❌ ${error.message}`;
+                }
+                
+                logResult({
+                    mode, depth, timestamps, quiz,
+                    success: false,
+                    error: error.message
+                });
+                
+                return null;
+            }
+        }
+        
+        function logResult(result) {
+            const resultsDiv = document.getElementById('results');
+            const timestamp = new Date().toLocaleTimeString();
+            
+            const resultText = `[${timestamp}] ${result.success ? '✅' : '❌'} Mode: ${result.mode}, Depth: ${result.depth}
+  Timestamps: ${result.timestamps ? 'Yes' : 'No'}, Quiz: ${result.quiz ? 'Yes' : 'No'}
+  ${result.success ? 
+    `Time: ${result.elapsed}ms, Insights: ${result.insights}, Actions: ${result.actions}
+  Has Timestamps: ${result.hasTimestamps}, Has Quiz: ${result.hasQuiz}` : 
+    `Error: ${result.error}`}
+${'─'.repeat(60)}
+`;
+            
+            resultsDiv.innerHTML = resultText + resultsDiv.innerHTML;
+        }
+        
+        async function testAllModes() {
+            await testConfig('student', 'standard', true, false, false);
+            await new Promise(r => setTimeout(r, 500));
+            await testConfig('build', 'standard', true, false, false);
+            await new Promise(r => setTimeout(r, 500));
+            await testConfig('understand', 'standard', true, false, false);
+        }
+        
+        async function testAllDepths() {
+            await testConfig('student', 'quick', true, false, false);
+            await new Promise(r => setTimeout(r, 500));
+            await testConfig('student', 'standard', true, false, false);
+            await new Promise(r => setTimeout(r, 500));
+            await testConfig('student', 'deep', true, false, false);
+        }
+        
+        async function testAllOptions() {
+            await testConfig('student', 'standard', true, false, false);
+            await new Promise(r => setTimeout(r, 500));
+            await testConfig('student', 'standard', false, true, false);
+            await new Promise(r => setTimeout(r, 500));
+            await testConfig('student', 'standard', true, true, false);
+        }
+        
+        async function testEverything() {
+            const modes = ['student', 'build', 'understand'];
+            const depths = ['quick', 'standard', 'deep'];
+            
+            for (const mode of modes) {
+                for (const depth of depths) {
+                    await testConfig(mode, depth, true, true, false);
+                    await new Promise(r => setTimeout(r, 1000));
+                }
+            }
+        }
+        
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+            document.querySelectorAll('.status').forEach(el => el.style.display = 'none');
+        }
+    </script>
+</body>
+</html>

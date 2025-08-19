@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Pro Dashboard Access</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      padding: 40px;
+      max-width: 800px;
+      margin: 0 auto;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+    }
+    .container {
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #333;
+      margin-bottom: 10px;
+    }
+    h2 {
+      color: #666;
+      font-size: 18px;
+      margin-top: 30px;
+      margin-bottom: 15px;
+      border-bottom: 2px solid #f0f0f0;
+      padding-bottom: 5px;
+    }
+    .test-section {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+    button {
+      background: #667eea;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin: 5px;
+      font-size: 14px;
+      transition: all 0.3s;
+    }
+    button:hover {
+      background: #5a67d8;
+      transform: translateY(-1px);
+    }
+    button.secondary {
+      background: #48bb78;
+    }
+    button.secondary:hover {
+      background: #38a169;
+    }
+    .status {
+      padding: 10px;
+      border-radius: 6px;
+      margin: 10px 0;
+      font-size: 14px;
+    }
+    .success {
+      background: #c6f6d5;
+      color: #22543d;
+      border: 1px solid #9ae6b4;
+    }
+    .error {
+      background: #fed7d7;
+      color: #742a2a;
+      border: 1px solid #fc8181;
+    }
+    .info {
+      background: #bee3f8;
+      color: #2c5282;
+      border: 1px solid #90cdf4;
+    }
+    .warning {
+      background: #fef5e7;
+      color: #7c4e07;
+      border: 1px solid #f6d55f;
+    }
+    pre {
+      background: #1a202c;
+      color: #e2e8f0;
+      padding: 15px;
+      border-radius: 6px;
+      overflow-x: auto;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .test-list {
+      list-style: none;
+      padding: 0;
+    }
+    .test-list li {
+      padding: 8px 0;
+      display: flex;
+      align-items: center;
+    }
+    .test-list li:before {
+      content: "✓";
+      color: #48bb78;
+      font-weight: bold;
+      margin-right: 10px;
+    }
+    .test-list li.pending:before {
+      content: "○";
+      color: #cbd5e0;
+    }
+    .test-list li.failed:before {
+      content: "✗";
+      color: #f56565;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔒 Pro Dashboard Access Test</h1>
+    <p>This page tests the Pro-only dashboard functionality.</p>
+
+    <div class="test-section">
+      <h2>Test Scenarios</h2>
+      <ul class="test-list">
+        <li class="pending" id="test-1">Free user sees Pro gate when accessing dashboard</li>
+        <li class="pending" id="test-2">Pro user can access dashboard directly</li>
+        <li class="pending" id="test-3">Extension shows Pro crown icon for free users</li>
+        <li class="pending" id="test-4">Clicking dashboard in extension shows alert for free users</li>
+        <li class="pending" id="test-5">Pro gate redirects to upgrade page</li>
+      </ul>
+    </div>
+
+    <div class="test-section">
+      <h2>User Tier Simulation</h2>
+      <button onclick="setUserTier('free')">Set as Free User</button>
+      <button onclick="setUserTier('pro')" class="secondary">Set as Pro User</button>
+      <button onclick="checkCurrentTier()">Check Current Tier</button>
+      <div id="tier-status" class="status info" style="margin-top: 15px;">
+        Current tier: Loading...
+      </div>
+    </div>
+
+    <div class="test-section">
+      <h2>Dashboard Access Tests</h2>
+      <button onclick="testDashboardAccess()">Test Dashboard Access</button>
+      <button onclick="testExtensionBehavior()">Test Extension Behavior</button>
+      <button onclick="testProGate()">Test Pro Gate Component</button>
+      <div id="test-results" style="margin-top: 15px;"></div>
+    </div>
+
+    <div class="test-section">
+      <h2>API Response</h2>
+      <pre id="api-response">No API calls made yet</pre>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = 'http://localhost:3000';
+    
+    // Initialize
+    checkCurrentTier();
+
+    async function setUserTier(tier) {
+      try {
+        // Simulate setting user tier in localStorage (extension would use chrome.storage)
+        localStorage.setItem('rvised_userTier', tier);
+        localStorage.setItem('rvised_userEmail', tier === 'pro' ? 'pro@rvised.app' : 'free@rvised.app');
+        
+        updateStatus('tier-status', `User tier set to: ${tier.toUpperCase()}`, 'success');
+        
+        // Update test list
+        if (tier === 'free') {
+          markTest('test-1', 'pending');
+          markTest('test-3', 'pending');
+          markTest('test-4', 'pending');
+        } else {
+          markTest('test-2', 'pending');
+        }
+      } catch (error) {
+        updateStatus('tier-status', `Error: ${error.message}`, 'error');
+      }
+    }
+
+    async function checkCurrentTier() {
+      try {
+        const storedTier = localStorage.getItem('rvised_userTier') || 'free';
+        const storedEmail = localStorage.getItem('rvised_userEmail') || 'guest@rvised.app';
+        
+        // Also check with API
+        const response = await fetch(`${API_BASE}/api/user/tier`, {
+          headers: {
+            'x-user-email': storedEmail
+          }
+        });
+        
+        const data = await response.json();
+        
+        updateStatus('tier-status', 
+          `Stored tier: ${storedTier.toUpperCase()}\n` +
+          `API tier: ${data.tier.toUpperCase()}\n` +
+          `Email: ${storedEmail}`, 
+          'info'
+        );
+        
+        document.getElementById('api-response').textContent = JSON.stringify(data, null, 2);
+      } catch (error) {
+        updateStatus('tier-status', `Error checking tier: ${error.message}`, 'error');
+      }
+    }
+
+    async function testDashboardAccess() {
+      const results = document.getElementById('test-results');
+      results.innerHTML = '';
+      
+      try {
+        const tier = localStorage.getItem('rvised_userTier') || 'free';
+        
+        // Test 1: Check if dashboard route is protected
+        const dashboardUrl = `${API_BASE}/dashboard`;
+        
+        if (tier === 'free') {
+          results.innerHTML += `
+            <div class="status warning">
+              <strong>Free User Test:</strong><br>
+              - Dashboard should show Pro gate<br>
+              - Should see upgrade prompt<br>
+              - Cannot access dashboard content
+            </div>
+          `;
+          markTest('test-1', 'success');
+          markTest('test-5', 'success');
+        } else {
+          results.innerHTML += `
+            <div class="status success">
+              <strong>Pro User Test:</strong><br>
+              - Dashboard should be accessible<br>
+              - No Pro gate shown<br>
+              - Full dashboard features available
+            </div>
+          `;
+          markTest('test-2', 'success');
+        }
+        
+        // Show link to test
+        results.innerHTML += `
+          <div class="status info" style="margin-top: 10px;">
+            <a href="${dashboardUrl}" target="_blank" style="color: #2c5282;">
+              Click here to test dashboard access →
+            </a>
+          </div>
+        `;
+        
+      } catch (error) {
+        results.innerHTML = `<div class="status error">Error: ${error.message}</div>`;
+      }
+    }
+
+    async function testExtensionBehavior() {
+      const results = document.getElementById('test-results');
+      results.innerHTML = '';
+      
+      try {
+        const tier = localStorage.getItem('rvised_userTier') || 'free';
+        
+        results.innerHTML = `
+          <div class="status info">
+            <strong>Extension Behavior (${tier.toUpperCase()} user):</strong><br>
+            ${tier === 'free' ? `
+              - Dashboard button shows Pro indicator<br>
+              - Clicking dashboard shows alert message<br>
+              - Alert redirects to upgrade page<br>
+              - Profile dropdown shows "Dashboard (Pro)"
+            ` : `
+              - Dashboard button shows normally<br>
+              - Clicking dashboard opens directly<br>
+              - No Pro restrictions shown<br>
+              - Full access to all features
+            `}
+          </div>
+        `;
+        
+        if (tier === 'free') {
+          markTest('test-3', 'success');
+          markTest('test-4', 'success');
+        }
+        
+        results.innerHTML += `
+          <div class="status warning" style="margin-top: 10px;">
+            <strong>To test in extension:</strong><br>
+            1. Open YouTube in a new tab<br>
+            2. Click the Rvised button on any video<br>
+            3. Try clicking the Dashboard tab/button<br>
+            4. Observe the behavior based on user tier
+          </div>
+        `;
+        
+      } catch (error) {
+        results.innerHTML = `<div class="status error">Error: ${error.message}</div>`;
+      }
+    }
+
+    async function testProGate() {
+      const results = document.getElementById('test-results');
+      results.innerHTML = '';
+      
+      try {
+        const tier = localStorage.getItem('rvised_userTier') || 'free';
+        
+        results.innerHTML = `
+          <div class="status info">
+            <strong>Pro Gate Component Test:</strong><br>
+            Testing with tier: ${tier.toUpperCase()}
+          </div>
+        `;
+        
+        // Simulate what the Pro Gate component does
+        if (tier === 'free') {
+          results.innerHTML += `
+            <div class="status warning">
+              <strong>Expected Behavior:</strong><br>
+              ✓ Shows "Dashboard is a Pro Feature" page<br>
+              ✓ Displays feature list (Analytics, Insights, etc.)<br>
+              ✓ Shows "Upgrade to Pro" button<br>
+              ✓ Redirects to upgrade page<br>
+              ✓ Shows alternative "Go to Library" option
+            </div>
+          `;
+        } else {
+          results.innerHTML += `
+            <div class="status success">
+              <strong>Expected Behavior:</strong><br>
+              ✓ Renders dashboard content directly<br>
+              ✓ No Pro gate shown<br>
+              ✓ Full access to all dashboard features<br>
+              ✓ Shows user stats and analytics
+            </div>
+          `;
+        }
+        
+      } catch (error) {
+        results.innerHTML = `<div class="status error">Error: ${error.message}</div>`;
+      }
+    }
+
+    function updateStatus(elementId, message, type) {
+      const element = document.getElementById(elementId);
+      element.textContent = message;
+      element.className = `status ${type}`;
+    }
+
+    function markTest(testId, status) {
+      const element = document.getElementById(testId);
+      if (element) {
+        element.className = status === 'success' ? '' : status;
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rvised</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 20px;
+            width: 300px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .container {
+            text-align: center;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .logo img {
+            width: 32px;
+            height: 32px;
+        }
+        
+        .message {
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 20px;
+            opacity: 0.95;
+        }
+        
+        .button {
+            background: white;
+            color: #667eea;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .button:hover {
+            transform: scale(1.05);
+        }
+        
+        .status {
+            margin-top: 20px;
+            font-size: 12px;
+            opacity: 0.8;
+        }
+        
+        .status.active {
+            color: #4ade80;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <img src="../icons/glasses.svg" alt="Rvised">
+            <span>Rvised</span>
+        </div>
+        
+        <div class="message">
+            Go to any YouTube video to see Rvised in action!
+        </div>
+        
+        <div class="message">
+            The extension will automatically appear on the right side of the video.
+        </div>
+        
+        <button class="button" id="goToYouTube">
+            Open YouTube
+        </button>
+        
+        <div class="status" id="status">
+            Extension is active
+        </div>
+    </div>
+    
+    <script src="popup-simple.js"></script>
+</body>
+</html>

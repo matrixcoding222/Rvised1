@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test YouTube Summary Extraction</title>
+</head>
+<body>
+    <h1>Testing Summary Extraction for YouTube Video</h1>
+    <div id="results"></div>
+    
+    <script>
+        const videoId = 'HfdLLl1Odjk';
+        const apiBase = 'http://localhost:3000';
+        
+        async function getSummaries() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<p>Loading summaries...</p>';
+            
+            try {
+                // Test all three modes
+                const modes = ['student', 'build', 'deep'];
+                const depths = ['standard'];
+                const results = {};
+                
+                for (const mode of modes) {
+                    console.log(`Getting summary for ${mode} mode...`);
+                    
+                    const response = await fetch(`${apiBase}/api/summarize`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            videoId: videoId,
+                            videoUrl: `https://www.youtube.com/watch?v=${videoId}`,
+                            learningMode: mode,
+                            summaryDepth: 'standard',
+                            includeTimestamps: true,
+                            includeEmojis: true,
+                            generateQuiz: true
+                        })
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        results[mode] = data;
+                        console.log(`${mode} mode summary:`, data);
+                    } else {
+                        console.error(`Failed to get ${mode} summary:`, response.status);
+                    }
+                }
+                
+                // Display results
+                resultsDiv.innerHTML = `
+                    <h2>Summary Results</h2>
+                    <pre>${JSON.stringify(results, null, 2)}</pre>
+                `;
+                
+                // Log for copying to extension-demo.tsx
+                console.log('SUMMARY DATA FOR DEMO:', results);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                resultsDiv.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+            }
+        }
+        
+        // Start the test
+        getSummaries();
+    </script>
+</body>
+</html>

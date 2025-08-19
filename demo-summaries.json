@@ -1,0 +1,375 @@
+{
+  "student": {
+    "success": true,
+    "data": {
+      "videoTitle": "How to Build an ENTIRE iPhone App From Scratch (AI + No code)",
+      "title": "How to Build an ENTIRE iPhone App From Scratch (AI + No code)",
+      "channel": "Mikey No Code",
+      "videoId": "HfdLLl1Odjk",
+      "duration": "PT21M39S",
+      "mainTakeaway": "🎯 You can build a fully functional iPhone app without coding by utilizing AI tools. This democratizes app development, making it accessible to everyone.",
+      "summary": "In the video, the creator demonstrates how to construct an entire iPhone application from scratch using AI and no coding skills, specifically through the ROR platform. The app, modeled after the successful Picture Insect, showcases the power of artificial intelligence in mobile app development. The process begins with a basic setup, where the creator outlines the app's structure, including five essential tabs: home/scanner, history, community, learn, and profile. By leveraging ROR's capabilities, the creator is able to generate a functional app in under an hour, illustrating the efficiency of no-code solutions. The integration of Google's Gemini API enhances the app's functionality, allowing users to identify insect species through image scanning. The creator emphasizes the importance of design, utilizing visual inspiration to refine the app's aesthetics. Throughout the video, the creator maintains a realistic perspective on app development, acknowledging that while the tools are powerful, success is contingent upon execution, timing, and sometimes luck. The video serves as a comprehensive guide for aspiring app developers, illustrating the potential of AI in simplifying complex processes and making app creation accessible to a broader audience.",
+      "keyInsights": [
+        "💡 Insight #1: The ROR platform allows users to create mobile apps by simply describing their desired features, eliminating the need for coding.",
+        "🔥 Insight #2: The app's core functionality includes real-time insect identification, which enhances user engagement and educational value.",
+        "✨ Insight #3: Visual design plays a crucial role in app development; the creator uses design inspiration to improve the app's user interface.",
+        "⚡ Insight #4: The integration of AI tools like Google's Gemini API significantly expands the app's capabilities, providing detailed information about scanned insects.",
+        "🚀 Insight #5: The creator stresses that while the tools are effective, the journey to monetization requires strategic planning and execution.",
+        "💎 Insight #6: The video demonstrates the iterative nature of app development, where initial prototypes can be refined based on user feedback and testing.",
+        "🎉 Insight #7: The app's design evolves throughout the process, showcasing how aesthetics can impact user experience and retention.",
+        "💡 Insight #8: The creator provides a disclaimer about the challenges of app monetization, emphasizing that success is not guaranteed.",
+        "🔥 Insight #9: The use of QR codes facilitates easy access to the app on mobile devices, streamlining the user experience.",
+        "✨ Insight #10: The video highlights the future of app development, where AI tools empower individuals without technical backgrounds to create functional applications."
+      ],
+      "actionItems": [
+        "🎯 Action #1: Sign up for the ROR platform and familiarize yourself with its interface and capabilities to begin your app development journey.",
+        "🔧 Action #2: Outline the core features you want in your app, focusing on user needs and functionality to guide your development process.",
+        "📝 Action #3: Create a basic app structure with essential tabs using ROR, ensuring a clear navigation flow for users.",
+        "⭐ Action #4: Integrate an AI tool like Google's Gemini API to enhance your app's functionality, allowing for real-time data processing.",
+        "🎪 Action #5: Seek design inspiration from existing apps and apply similar aesthetics to your app to improve user engagement.",
+        "🎨 Action #6: Test your app with real users to gather feedback, making iterative improvements based on their experiences.",
+        "🎯 Action #7: Research monetization strategies and develop a plan to effectively market your app once it is fully functional."
+      ],
+      "keyPoints": [
+        "Insight #1: The ROR platform allows users to create mobile apps by simply describing their desired features, eliminating the need for coding.",
+        "Insight #2: The app's core functionality includes real-time insect identification, which enhances user engagement and educational value.",
+        "Insight #3: Visual design plays a crucial role in app development; the creator uses design inspiration to improve the app's user interface.",
+        "Insight #4: The integration of AI tools like Google's Gemini API significantly expands the app's capabilities, providing detailed information about scanned insects.",
+        "Insight #5: The creator stresses that while the tools are effective, the journey to monetization requires strategic planning and execution.",
+        "Insight #6: The video demonstrates the iterative nature of app development, where initial prototypes can be refined based on user feedback and testing.",
+        "Insight #7: The app's design evolves throughout the process, showcasing how aesthetics can impact user experience and retention.",
+        "Insight #8: The creator provides a disclaimer about the challenges of app monetization, emphasizing that success is not guaranteed.",
+        "Insight #9: The use of QR codes facilitates easy access to the app on mobile devices, streamlining the user experience.",
+        "Insight #10: The video highlights the future of app development, where AI tools empower individuals without technical backgrounds to create functional applications."
+      ],
+      "techStack": [
+        "ROR",
+        "Google Gemini API"
+      ],
+      "timestampedSections": [
+        {
+          "time": "00:00",
+          "description": "The video opens with the creator discussing the potential of building an app without coding."
+        },
+        {
+          "time": "02:30",
+          "description": "The creator introduces the app's concept, focusing on its functionality and design."
+        },
+        {
+          "time": "05:00",
+          "description": "Demonstrations of the app's features, including the insect scanning capabilities, are showcased."
+        },
+        {
+          "time": "08:00",
+          "description": "Implementation details are provided, including integration with the Gemini API for enhanced functionality."
+        },
+        {
+          "time": "12:00",
+          "description": "The video concludes with reflections on the app development process and the importance of execution."
+        }
+      ],
+      "quiz": [
+        {
+          "question": "What was the main topic discussed in the video?",
+          "options": [
+            "Building an iPhone app without coding",
+            "The history of app development",
+            "The future of AI in technology",
+            "Monetization strategies for apps"
+          ],
+          "correct": 0
+        },
+        {
+          "question": "Which key concept was emphasized?",
+          "options": [
+            "The importance of coding skills",
+            "The role of AI in app development",
+            "The need for extensive market research",
+            "The significance of user privacy"
+          ],
+          "correct": 1
+        },
+        {
+          "question": "According to the video, what is important to remember?",
+          "options": [
+            "Success is guaranteed with the right tools",
+            "App development is easy and quick",
+            "Execution and timing are critical for success",
+            "All apps will make money immediately"
+          ],
+          "correct": 2
+        }
+      ],
+      "_debug": {
+        "hasTimestamps": true,
+        "hasQuiz": true,
+        "hasEmojis": true,
+        "settingsRequested": {
+          "timestamps": true,
+          "quiz": true,
+          "emojis": true
+        },
+        "sources": {
+          "transcriptSource": "ytx-transcript",
+          "timestampsSource": "none"
+        }
+      },
+      "partialSummary": true,
+      "coverageInfo": "Summary based on the first portion of the video",
+      "transcriptCapped": {
+        "original": 44383,
+        "capped": 22500,
+        "tier": "free"
+      }
+    }
+  },
+  "build": {
+    "success": true,
+    "data": {
+      "videoTitle": "How to Build an ENTIRE iPhone App From Scratch (AI + No code)",
+      "title": "How to Build an ENTIRE iPhone App From Scratch (AI + No code)",
+      "channel": "Mikey No Code",
+      "videoId": "HfdLLl1Odjk",
+      "duration": "PT21M39S",
+      "mainTakeaway": "🎯 Building an iPhone app from scratch is achievable without coding skills by leveraging AI tools. This innovative approach simplifies app development significantly.",
+      "summary": "In this enlightening video, viewers are guided through the process of creating a fully functional iPhone app in under an hour, utilizing AI and no-code platforms. The presenter demonstrates how to replicate the successful Picture Insect app, which generates substantial revenue, by harnessing the capabilities of ROR, Superbase, and the Gemini API. The tutorial emphasizes the ease of app development through AI, showcasing how users can create complex features with simple prompts. By the end of the session, participants will not only have a working app but also a deeper understanding of the tools and methodologies that underpin modern app development. The video highlights the importance of setting realistic expectations, as success in app monetization requires strategic execution, timing, and sometimes, a bit of luck. Throughout the tutorial, viewers are encouraged to engage with the technology, experiment with design elements, and enhance functionality, ultimately fostering a hands-on learning experience that empowers aspiring developers to explore the future of app creation.",
+      "keyInsights": [
+        "💡 Insight #1: The ROR platform enables users to build mobile applications without any coding knowledge, democratizing app development.",
+        "🔥 Insight #2: Integrating AI tools like Gemini can enhance app functionality, allowing for real-time data processing and user interaction.",
+        "✨ Insight #3: Visual design plays a crucial role in user experience; leveraging design inspiration from existing apps can significantly improve aesthetics.",
+        "⚡ Insight #4: The importance of setting realistic expectations is underscored, as not all apps achieve immediate financial success.",
+        "🚀 Insight #5: The app's scanning feature provides users with detailed insights about insects, including threat levels and pest control recommendations.",
+        "💎 Insight #6: Using environment variables to securely manage API keys is a best practice in app development, ensuring data protection.",
+        "🎉 Insight #7: The iterative process of refining app features based on user feedback can lead to a more robust final product.",
+        "💡 Insight #8: The tutorial showcases the potential of AI in simplifying complex coding tasks, making technology accessible to non-developers.",
+        "🔥 Insight #9: Engaging with the community and learning from others can provide valuable insights and support in the app development journey.",
+        "✨ Insight #10: The video serves as a reminder that while tools can facilitate app creation, the creator's vision and execution are paramount to success."
+      ],
+      "actionItems": [
+        "🎯 Action #1: Sign up for the ROR platform and familiarize yourself with its interface and features to start building your app.",
+        "🔧 Action #2: Create a basic app structure by defining the main tabs and functionalities you wish to include.",
+        "📝 Action #3: Utilize the Gemini API to integrate image recognition capabilities into your app for enhanced user interaction.",
+        "⭐ Action #4: Experiment with design elements by sourcing inspiration from other apps and applying similar styles to your project.",
+        "🎪 Action #5: Set up environment variables to securely manage any API keys needed for your app's functionality.",
+        "🎨 Action #6: Test the app's features regularly to identify areas for improvement and refine the user experience.",
+        "🎯 Action #7: Publish your app using Expo Go to see how it performs on actual devices and gather user feedback."
+      ],
+      "keyPoints": [
+        "Insight #1: The ROR platform enables users to build mobile applications without any coding knowledge, democratizing app development.",
+        "Insight #2: Integrating AI tools like Gemini can enhance app functionality, allowing for real-time data processing and user interaction.",
+        "Insight #3: Visual design plays a crucial role in user experience; leveraging design inspiration from existing apps can significantly improve aesthetics.",
+        "Insight #4: The importance of setting realistic expectations is underscored, as not all apps achieve immediate financial success.",
+        "Insight #5: The app's scanning feature provides users with detailed insights about insects, including threat levels and pest control recommendations.",
+        "Insight #6: Using environment variables to securely manage API keys is a best practice in app development, ensuring data protection.",
+        "Insight #7: The iterative process of refining app features based on user feedback can lead to a more robust final product.",
+        "Insight #8: The tutorial showcases the potential of AI in simplifying complex coding tasks, making technology accessible to non-developers.",
+        "Insight #9: Engaging with the community and learning from others can provide valuable insights and support in the app development journey.",
+        "Insight #10: The video serves as a reminder that while tools can facilitate app creation, the creator's vision and execution are paramount to success."
+      ],
+      "techStack": [
+        "ROR",
+        "Gemini API",
+        "Superbase"
+      ],
+      "timestampedSections": [
+        {
+          "time": "00:00",
+          "description": "The video opens with the presenter introducing the concept of building an iPhone app without coding."
+        },
+        {
+          "time": "02:30",
+          "description": "The main topic revolves around recreating a successful app using AI tools and no-code platforms."
+        },
+        {
+          "time": "05:00",
+          "description": "Demonstrations of app features and functionalities, including insect scanning and user interaction."
+        },
+        {
+          "time": "08:00",
+          "description": "Implementation details are provided, showcasing how to connect to the Gemini API for enhanced capabilities."
+        },
+        {
+          "time": "12:00",
+          "description": "The video concludes with final thoughts on the potential of AI in app development and user engagement."
+        }
+      ],
+      "quiz": [
+        {
+          "question": "What was the main topic discussed in the video?",
+          "options": [
+            "Building an iPhone app with coding skills",
+            "Creating an app using AI and no-code tools",
+            "Monetizing mobile applications",
+            "Designing user interfaces for apps"
+          ],
+          "correct": 1
+        },
+        {
+          "question": "Which key concept was emphasized?",
+          "options": [
+            "The importance of coding knowledge",
+            "The role of AI in app development",
+            "The necessity of financial investment",
+            "The significance of marketing strategies"
+          ],
+          "correct": 1
+        },
+        {
+          "question": "According to the video, what is important to remember?",
+          "options": [
+            "All apps will be successful immediately",
+            "Realistic expectations are crucial for app development",
+            "Design is more important than functionality",
+            "Coding skills are mandatory for app creation"
+          ],
+          "correct": 1
+        }
+      ],
+      "_debug": {
+        "hasTimestamps": true,
+        "hasQuiz": true,
+        "hasEmojis": true,
+        "settingsRequested": {
+          "timestamps": true,
+          "quiz": true,
+          "emojis": true
+        },
+        "sources": {
+          "transcriptSource": "ytx-transcript",
+          "timestampsSource": "none"
+        }
+      },
+      "partialSummary": true,
+      "coverageInfo": "Summary based on the first portion of the video",
+      "transcriptCapped": {
+        "original": 44383,
+        "capped": 22500,
+        "tier": "free"
+      }
+    }
+  },
+  "deep": {
+    "success": true,
+    "data": {
+      "videoTitle": "How to Build an ENTIRE iPhone App From Scratch (AI + No code)",
+      "title": "How to Build an ENTIRE iPhone App From Scratch (AI + No code)",
+      "channel": "Mikey No Code",
+      "videoId": "HfdLLl1Odjk",
+      "duration": "PT21M39S",
+      "mainTakeaway": "🎯 Building an iPhone app from scratch is achievable without coding skills, thanks to AI tools. The process is streamlined and efficient.",
+      "summary": "In this enlightening video, viewers are guided through the innovative process of creating a fully functional iPhone app using AI and no coding knowledge. The presenter demonstrates how to replicate a successful app, Picture Insect, which generates substantial revenue, by utilizing an AI tool named ROR. This platform allows users to construct mobile applications effortlessly, merely by describing desired features. The video showcases the step-by-step journey of app development, starting with a basic layout of five tabs, including a scanner and community features. As the app evolves, the presenter emphasizes the importance of design aesthetics, integrating visual inspiration from existing applications to enhance user experience. The integration of Google's Gemini API is pivotal, enabling real-time insect identification through image recognition. The app not only identifies species but also assesses their threat levels and provides pest control recommendations. Throughout the process, the presenter underscores the realistic expectations of app monetization, highlighting that success is contingent upon execution, timing, and sometimes, luck. By the conclusion, viewers are equipped with the knowledge to harness AI tools for app development, paving the way for future innovations in the tech landscape.",
+      "keyInsights": [
+        "💡 Insight #1: The use of AI tools like ROR revolutionizes app development, allowing non-coders to create complex applications effortlessly.",
+        "🔥 Insight #2: The integration of real-time features, such as insect identification, enhances user engagement and utility of the app.",
+        "✨ Insight #3: Visual design plays a crucial role in user experience; leveraging design inspiration can significantly improve an app's appeal.",
+        "⚡ Insight #4: The app's functionality can be expanded by integrating APIs, which provide advanced features like image recognition.",
+        "🚀 Insight #5: Building an app involves iterative design and development, where initial placeholders evolve into fully functional components.",
+        "💎 Insight #6: The potential for monetization exists, but success is not guaranteed; it requires strategic planning and execution.",
+        "🎉 Insight #7: The importance of user feedback and continuous improvement cannot be overstated in the app development process.",
+        "💡 Insight #8: Understanding the target audience is essential for tailoring app features and functionalities to meet user needs.",
+        "🔥 Insight #9: The app development landscape is rapidly evolving, with AI tools leading the charge in democratizing technology access.",
+        "✨ Insight #10: The video serves as a practical guide, illustrating that anyone can embark on app development with the right tools and mindset."
+      ],
+      "actionItems": [
+        "🎯 Action #1: Sign up for ROR and familiarize yourself with its interface to begin your app development journey.",
+        "🔧 Action #2: Outline the core features you want in your app, focusing on user needs and functionality.",
+        "📝 Action #3: Create a basic app structure in ROR, incorporating essential tabs like home, scanner, and community.",
+        "⭐ Action #4: Use design inspiration from existing apps to enhance the visual appeal of your app.",
+        "🎪 Action #5: Integrate the Gemini API by creating an API key and connecting it to your app for image recognition capabilities.",
+        "🎨 Action #6: Test the app's functionality by uploading images and assessing the accuracy of the insect identification feature.",
+        "🎯 Action #7: Gather user feedback on your app and iterate on design and functionality to improve user experience."
+      ],
+      "keyPoints": [
+        "Insight #1: The use of AI tools like ROR revolutionizes app development, allowing non-coders to create complex applications effortlessly.",
+        "Insight #2: The integration of real-time features, such as insect identification, enhances user engagement and utility of the app.",
+        "Insight #3: Visual design plays a crucial role in user experience; leveraging design inspiration can significantly improve an app's appeal.",
+        "Insight #4: The app's functionality can be expanded by integrating APIs, which provide advanced features like image recognition.",
+        "Insight #5: Building an app involves iterative design and development, where initial placeholders evolve into fully functional components.",
+        "Insight #6: The potential for monetization exists, but success is not guaranteed; it requires strategic planning and execution.",
+        "Insight #7: The importance of user feedback and continuous improvement cannot be overstated in the app development process.",
+        "Insight #8: Understanding the target audience is essential for tailoring app features and functionalities to meet user needs.",
+        "Insight #9: The app development landscape is rapidly evolving, with AI tools leading the charge in democratizing technology access.",
+        "Insight #10: The video serves as a practical guide, illustrating that anyone can embark on app development with the right tools and mindset."
+      ],
+      "techStack": [
+        "ROR",
+        "Google Gemini API"
+      ],
+      "timestampedSections": [
+        {
+          "time": "00:00",
+          "description": "The video begins with an introduction to building an iPhone app using AI without coding."
+        },
+        {
+          "time": "02:30",
+          "description": "The presenter discusses the main concept of replicating a successful app and the tools needed."
+        },
+        {
+          "time": "05:00",
+          "description": "Demonstrations of setting up the app's basic structure and design elements are shown."
+        },
+        {
+          "time": "08:00",
+          "description": "Implementation details regarding the integration of the Gemini API for insect identification are explained."
+        },
+        {
+          "time": "12:00",
+          "description": "The video concludes with reflections on app development expectations and the potential for monetization."
+        }
+      ],
+      "quiz": [
+        {
+          "question": "What was the main topic discussed in the video?",
+          "options": [
+            "Building an iPhone app using AI",
+            "The history of app development",
+            "Monetization strategies for apps",
+            "The future of technology"
+          ],
+          "correct": 0
+        },
+        {
+          "question": "Which key concept was emphasized?",
+          "options": [
+            "The importance of coding skills",
+            "The role of AI in app development",
+            "Traditional app development methods",
+            "User interface design principles"
+          ],
+          "correct": 1
+        },
+        {
+          "question": "According to the video, what is important to remember?",
+          "options": [
+            "Success is guaranteed with any app",
+            "User feedback is crucial for improvement",
+            "All apps make money immediately",
+            "Design is not important"
+          ],
+          "correct": 1
+        }
+      ],
+      "_debug": {
+        "hasTimestamps": true,
+        "hasQuiz": true,
+        "hasEmojis": true,
+        "settingsRequested": {
+          "timestamps": true,
+          "quiz": true,
+          "emojis": true
+        },
+        "sources": {
+          "transcriptSource": "ytx-transcript",
+          "timestampsSource": "none"
+        }
+      },
+      "partialSummary": true,
+      "coverageInfo": "Summary based on the first portion of the video",
+      "transcriptCapped": {
+        "original": 44383,
+        "capped": 22500,
+        "tier": "free"
+      }
+    }
+  }
+}

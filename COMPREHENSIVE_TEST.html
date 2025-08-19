@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RVISED Extension - Comprehensive Test Suite</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+        }
+        .test-category {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        .category-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .test-item {
+            padding: 10px;
+            margin: 5px 0;
+            border-left: 3px solid #e0e0e0;
+            transition: all 0.3s;
+        }
+        .test-item:hover {
+            background: #f5f5f5;
+            border-left-color: #667eea;
+        }
+        .test-status {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .status-pass {
+            background: #4ade80;
+            color: white;
+        }
+        .status-fail {
+            background: #ef4444;
+            color: white;
+        }
+        .status-pending {
+            background: #fbbf24;
+            color: white;
+        }
+        .test-button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        .test-button:hover {
+            background: #764ba2;
+            transform: scale(1.05);
+        }
+        .summary-stats {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-around;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 36px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .stat-label {
+            color: #666;
+            margin-top: 5px;
+        }
+        iframe {
+            width: 100%;
+            height: 600px;
+            border: none;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        .url-test {
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 6px;
+            margin: 10px 0;
+            font-family: monospace;
+        }
+        .icon-check {
+            width: 20px;
+            height: 20px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧪 RVISED Comprehensive Test Suite</h1>
+            <p>Complete testing of all features before deployment</p>
+        </div>
+
+        <div class="summary-stats">
+            <div class="stat-item">
+                <div class="stat-number" id="total-tests">0</div>
+                <div class="stat-label">Total Tests</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="passed-tests" style="color: #4ade80;">0</div>
+                <div class="stat-label">Passed</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="failed-tests" style="color: #ef4444;">0</div>
+                <div class="stat-label">Failed</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="pending-tests" style="color: #fbbf24;">0</div>
+                <div class="stat-label">Pending</div>
+            </div>
+        </div>
+
+        <div class="test-grid">
+            <!-- Extension Tests -->
+            <div class="test-category">
+                <div class="category-title">
+                    🧩 Chrome Extension
+                </div>
+                <div class="test-item">
+                    <strong>Manifest Version</strong>
+                    <span class="test-status status-pending">Check v3</span>
+                </div>
+                <div class="test-item">
+                    <strong>Content Script Injection</strong>
+                    <span class="test-status status-pending">YouTube pages</span>
+                </div>
+                <div class="test-item">
+                    <strong>Popup Functionality</strong>
+                    <span class="test-status status-pending">Opens correctly</span>
+                </div>
+                <div class="test-item">
+                    <strong>Icon Display</strong>
+                    <span class="test-status status-pending">glasses.svg</span>
+                </div>
+                <div class="test-item">
+                    <strong>Permissions</strong>
+                    <span class="test-status status-pending">Minimal required</span>
+                </div>
+                <button class="test-button" onclick="testExtension()">Test Extension</button>
+            </div>
+
+            <!-- Authentication Tests -->
+            <div class="test-category">
+                <div class="category-title">
+                    🔐 Authentication
+                </div>
+                <div class="test-item">
+                    <strong>Google OAuth Flow</strong>
+                    <span class="test-status status-pending">Direct redirect</span>
+                </div>
+                <div class="test-item">
+                    <strong>Sign In Button</strong>
+                    <span class="test-status status-pending">Header placement</span>
+                </div>
+                <div class="test-item">
+                    <strong>Dashboard Redirect</strong>
+                    <span class="test-status status-pending">After auth</span>
+                </div>
+                <div class="test-item">
+                    <strong>Sign Out</strong>
+                    <span class="test-status status-pending">Settings page</span>
+                </div>
+                <div class="test-item">
+                    <strong>Protected Routes</strong>
+                    <span class="test-status status-pending">Middleware check</span>
+                </div>
+                <button class="test-button" onclick="testAuth()">Test Auth</button>
+            </div>
+
+            <!-- API Endpoints -->
+            <div class="test-category">
+                <div class="category-title">
+                    🔌 API Endpoints
+                </div>
+                <div class="test-item">
+                    <strong>/api/health</strong>
+                    <span class="test-status status-pending" id="api-health">Checking...</span>
+                </div>
+                <div class="test-item">
+                    <strong>/api/summarize</strong>
+                    <span class="test-status status-pending" id="api-summarize">POST ready</span>
+                </div>
+                <div class="test-item">
+                    <strong>/api/transcript</strong>
+                    <span class="test-status status-pending" id="api-transcript">Transcript fetch</span>
+                </div>
+                <div class="test-item">
+                    <strong>/api/projects</strong>
+                    <span class="test-status status-pending" id="api-projects">CRUD ops</span>
+                </div>
+                <div class="test-item">
+                    <strong>CORS Headers</strong>
+                    <span class="test-status status-pending">Extension access</span>
+                </div>
+                <button class="test-button" onclick="testAPIs()">Test APIs</button>
+            </div>
+
+            <!-- UI/UX Tests -->
+            <div class="test-category">
+                <div class="category-title">
+                    🎨 UI/UX Design
+                </div>
+                <div class="test-item">
+                    <strong>Glasses Icon</strong>
+                    <span class="test-status status-pending">All locations</span>
+                </div>
+                <div class="test-item">
+                    <strong>Responsive Design</strong>
+                    <span class="test-status status-pending">Mobile/Desktop</span>
+                </div>
+                <div class="test-item">
+                    <strong>Loading States</strong>
+                    <span class="test-status status-pending">Smooth UX</span>
+                </div>
+                <div class="test-item">
+                    <strong>Error Handling</strong>
+                    <span class="test-status status-pending">User feedback</span>
+                </div>
+                <div class="test-item">
+                    <strong>Color Consistency</strong>
+                    <span class="test-status status-pending">Brand colors</span>
+                </div>
+                <button class="test-button" onclick="testUI()">Test UI</button>
+            </div>
+
+            <!-- Dashboard Features -->
+            <div class="test-category">
+                <div class="category-title">
+                    📊 Dashboard
+                </div>
+                <div class="test-item">
+                    <strong>Recent Summaries</strong>
+                    <span class="test-status status-pending">Display list</span>
+                </div>
+                <div class="test-item">
+                    <strong>Projects View</strong>
+                    <span class="test-status status-pending">Create/Edit</span>
+                </div>
+                <div class="test-item">
+                    <strong>Library Page</strong>
+                    <span class="test-status status-pending">Grid/List view</span>
+                </div>
+                <div class="test-item">
+                    <strong>Usage Stats</strong>
+                    <span class="test-status status-pending">Free tier limits</span>
+                </div>
+                <div class="test-item">
+                    <strong>Quick Actions</strong>
+                    <span class="test-status status-pending">All buttons work</span>
+                </div>
+                <button class="test-button" onclick="testDashboard()">Test Dashboard</button>
+            </div>
+
+            <!-- Settings Page -->
+            <div class="test-category">
+                <div class="category-title">
+                    ⚙️ Settings
+                </div>
+                <div class="test-item">
+                    <strong>Learning Preferences</strong>
+                    <span class="test-status status-pending">Save to localStorage</span>
+                </div>
+                <div class="test-item">
+                    <strong>Timestamps Toggle</strong>
+                    <span class="test-status status-pending">Functional</span>
+                </div>
+                <div class="test-item">
+                    <strong>Emojis Toggle</strong>
+                    <span class="test-status status-pending">Functional</span>
+                </div>
+                <div class="test-item">
+                    <strong>Account Deletion</strong>
+                    <span class="test-status status-pending">Confirmation dialog</span>
+                </div>
+                <div class="test-item">
+                    <strong>Sign Out Button</strong>
+                    <span class="test-status status-pending">Works correctly</span>
+                </div>
+                <button class="test-button" onclick="testSettings()">Test Settings</button>
+            </div>
+
+            <!-- Production URLs -->
+            <div class="test-category">
+                <div class="category-title">
+                    🌐 Production URLs
+                </div>
+                <div class="url-test">API: localhost:3000 → rvised.vercel.app</div>
+                <div class="url-test">Dashboard: /dashboard redirect</div>
+                <div class="url-test">Extension: No localhost refs</div>
+                <div class="url-test">OAuth: Google redirect URIs</div>
+                <div class="url-test">Assets: All icons loading</div>
+                <button class="test-button" onclick="checkURLs()">Check URLs</button>
+            </div>
+
+            <!-- Performance -->
+            <div class="test-category">
+                <div class="category-title">
+                    ⚡ Performance
+                </div>
+                <div class="test-item">
+                    <strong>Build Size</strong>
+                    <span class="test-status status-pending">< 500KB</span>
+                </div>
+                <div class="test-item">
+                    <strong>Load Time</strong>
+                    <span class="test-status status-pending">< 3s</span>
+                </div>
+                <div class="test-item">
+                    <strong>API Response</strong>
+                    <span class="test-status status-pending">< 2s</span>
+                </div>
+                <div class="test-item">
+                    <strong>Memory Usage</strong>
+                    <span class="test-status status-pending">Optimized</span>
+                </div>
+                <div class="test-item">
+                    <strong>Console Errors</strong>
+                    <span class="test-status status-pending">None</span>
+                </div>
+                <button class="test-button" onclick="testPerformance()">Test Performance</button>
+            </div>
+        </div>
+
+        <div style="margin-top: 30px; background: white; padding: 20px; border-radius: 12px;">
+            <h2 style="margin-bottom: 20px;">🚀 Live App Test</h2>
+            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                <button class="test-button" onclick="loadApp('http://localhost:3000')">Load Local App</button>
+                <button class="test-button" onclick="loadApp('http://localhost:3000/dashboard')">Dashboard</button>
+                <button class="test-button" onclick="loadApp('http://localhost:3000/settings')">Settings</button>
+                <button class="test-button" onclick="loadApp('http://localhost:3000/library')">Library</button>
+                <button class="test-button" onclick="loadApp('http://localhost:3000/projects')">Projects</button>
+            </div>
+            <iframe id="app-frame" src="http://localhost:3000"></iframe>
+        </div>
+
+        <div style="margin-top: 30px; background: white; padding: 20px; border-radius: 12px;">
+            <h2>📋 Test Results Summary</h2>
+            <div id="test-results" style="margin-top: 20px; font-family: monospace; background: #f5f5f5; padding: 15px; border-radius: 8px;">
+                <p>Click "Run All Tests" to begin comprehensive testing...</p>
+            </div>
+            <button class="test-button" style="margin-top: 20px; background: #ef4444;" onclick="runAllTests()">
+                🏁 Run All Tests
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let testResults = {
+            total: 0,
+            passed: 0,
+            failed: 0,
+            pending: 0
+        };
+
+        function updateStats() {
+            document.getElementById('total-tests').textContent = testResults.total;
+            document.getElementById('passed-tests').textContent = testResults.passed;
+            document.getElementById('failed-tests').textContent = testResults.failed;
+            document.getElementById('pending-tests').textContent = testResults.pending;
+        }
+
+        function loadApp(url) {
+            document.getElementById('app-frame').src = url;
+        }
+
+        async function testAPIs() {
+            console.log('Testing APIs...');
+            
+            // Test health endpoint
+            try {
+                const health = await fetch('http://localhost:3000/api/health');
+                if (health.ok) {
+                    document.getElementById('api-health').className = 'test-status status-pass';
+                    document.getElementById('api-health').textContent = 'Online';
+                    testResults.passed++;
+                } else {
+                    document.getElementById('api-health').className = 'test-status status-fail';
+                    testResults.failed++;
+                }
+            } catch (e) {
+                document.getElementById('api-health').className = 'test-status status-fail';
+                document.getElementById('api-health').textContent = 'Offline';
+                testResults.failed++;
+            }
+            
+            updateStats();
+        }
+
+        function testExtension() {
+            console.log('Testing extension...');
+            // This would require the extension to be loaded
+            alert('Please manually test the extension by:\n1. Loading it in Chrome\n2. Going to a YouTube video\n3. Checking if the overlay appears');
+        }
+
+        function testAuth() {
+            console.log('Testing authentication...');
+            window.open('http://localhost:3000/sign-in', '_blank');
+        }
+
+        function testUI() {
+            console.log('Testing UI...');
+            // Check for responsive design
+            const width = window.innerWidth;
+            alert(`Current viewport: ${width}px\nTest by resizing the window and checking the iframe`);
+        }
+
+        function testDashboard() {
+            loadApp('http://localhost:3000/dashboard');
+        }
+
+        function testSettings() {
+            loadApp('http://localhost:3000/settings');
+        }
+
+        function checkURLs() {
+            console.log('Checking production URLs...');
+            const urls = [
+                'http://localhost:3000',
+                'http://localhost:3000/api/health',
+                'http://localhost:3000/dashboard',
+                'http://localhost:3000/settings'
+            ];
+            
+            urls.forEach(url => {
+                console.log(`Testing: ${url}`);
+            });
+        }
+
+        function testPerformance() {
+            const start = performance.now();
+            fetch('http://localhost:3000/api/health').then(() => {
+                const end = performance.now();
+                console.log(`API response time: ${end - start}ms`);
+            });
+        }
+
+        async function runAllTests() {
+            console.log('🏁 Running all tests...');
+            testResults = { total: 40, passed: 0, failed: 0, pending: 40 };
+            updateStats();
+            
+            await testAPIs();
+            
+            document.getElementById('test-results').innerHTML = `
+                <h3>✅ Test Complete!</h3>
+                <p>Total: ${testResults.total}</p>
+                <p style="color: green;">Passed: ${testResults.passed}</p>
+                <p style="color: red;">Failed: ${testResults.failed}</p>
+                <p style="color: orange;">Manual Check Required: ${testResults.pending}</p>
+                <br>
+                <h4>Manual Testing Checklist:</h4>
+                <ul style="text-align: left;">
+                    <li>☐ Install extension locally and test on YouTube</li>
+                    <li>☐ Test Google Sign In flow</li>
+                    <li>☐ Generate a summary and save to project</li>
+                    <li>☐ Check all settings toggles work</li>
+                    <li>☐ Verify responsive design on mobile</li>
+                    <li>☐ Test sign out functionality</li>
+                    <li>☐ Check console for any errors</li>
+                </ul>
+            `;
+        }
+
+        // Count initial tests
+        testResults.total = document.querySelectorAll('.test-item').length;
+        testResults.pending = testResults.total;
+        updateStats();
+
+        // Auto-test APIs on load
+        setTimeout(testAPIs, 1000);
+    </script>
+</body>
+</html>

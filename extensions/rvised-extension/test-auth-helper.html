@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Auth Helper - RVISED</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            padding: 40px;
+            max-width: 600px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        h1 img {
+            width: 32px;
+            height: 32px;
+        }
+        .section {
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            margin: 5px;
+            font-size: 14px;
+        }
+        button:hover {
+            background: #5a67d8;
+        }
+        button.danger {
+            background: #ef4444;
+        }
+        button.danger:hover {
+            background: #dc2626;
+        }
+        .status {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .status.success {
+            background: #10b981;
+            color: white;
+        }
+        .status.error {
+            background: #ef4444;
+            color: white;
+        }
+        .info {
+            background: #fef3c7;
+            border: 1px solid #fbbf24;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .info h3 {
+            margin-top: 0;
+            color: #92400e;
+        }
+        code {
+            background: #f3f4f6;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>
+            <img src="icons/glasses.svg" alt="RVISED">
+            Test Auth Helper
+        </h1>
+
+        <div class="info">
+            <h3>⚠️ For Testing Only</h3>
+            <p>This helper simulates authentication for testing the extension. Use this to test the sign-in flow without going through actual Google OAuth.</p>
+        </div>
+
+        <!-- Current Status -->
+        <div class="section">
+            <h2>Current Auth Status</h2>
+            <div id="current-status">Checking...</div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="section">
+            <h2>Quick Actions</h2>
+            
+            <button onclick="simulateAuth()">
+                🔐 Simulate Sign In
+            </button>
+            
+            <button onclick="clearAuth()" class="danger">
+                🗑️ Clear Auth (Sign Out)
+            </button>
+            
+            <button onclick="checkExtensionStorage()">
+                🔍 Check Extension Storage
+            </button>
+            
+            <div id="action-status" class="status" style="display:none;"></div>
+        </div>
+
+        <!-- Manual Setup -->
+        <div class="section">
+            <h2>Manual Auth Setup</h2>
+            <p>Email: <input type="email" id="test-email" value="developer@rvised.app" style="width: 250px; padding: 5px;"></p>
+            <p>Tier: 
+                <select id="test-tier" style="padding: 5px;">
+                    <option value="free">Free</option>
+                    <option value="pro">Pro</option>
+                </select>
+            </p>
+            <button onclick="setCustomAuth()">Set Custom Auth</button>
+        </div>
+
+        <!-- Instructions -->
+        <div class="section">
+            <h2>Testing Instructions</h2>
+            <ol>
+                <li>Click "Simulate Sign In" to add test authentication</li>
+                <li>Go to any YouTube video</li>
+                <li>The extension should now show as authenticated</li>
+                <li>Click "Summarize" button - it should work</li>
+                <li>To test sign-in flow, click "Clear Auth" first</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        // Check current auth status
+        function checkCurrentStatus() {
+            chrome.storage.local.get(['userEmail', 'authToken', 'userTier', 'onboardingComplete'], (result) => {
+                const statusDiv = document.getElementById('current-status');
+                
+                if (result.userEmail && result.authToken) {
+                    statusDiv.innerHTML = `
+                        <div style="color: green;">
+                            ✅ Authenticated<br>
+                            Email: ${result.userEmail}<br>
+                            Tier: ${result.userTier || 'free'}<br>
+                            Token: ${result.authToken ? '***' + result.authToken.slice(-8) : 'None'}<br>
+                            Onboarding: ${result.onboardingComplete ? 'Complete' : 'Incomplete'}
+                        </div>
+                    `;
+                } else {
+                    statusDiv.innerHTML = `
+                        <div style="color: red;">
+                            ❌ Not Authenticated<br>
+                            Email: ${result.userEmail || 'None'}<br>
+                            Status: Sign-in required
+                        </div>
+                    `;
+                }
+            });
+        }
+
+        // Simulate authentication
+        function simulateAuth() {
+            const authData = {
+                userEmail: 'developer@rvised.app',
+                authToken: 'test-token-' + Date.now(),
+                userTier: 'free',
+                onboardingComplete: true,
+                userId: 'test-user-123'
+            };
+            
+            chrome.storage.local.set(authData, () => {
+                showStatus('✅ Authentication simulated successfully!', 'success');
+                checkCurrentStatus();
+            });
+        }
+
+        // Clear authentication
+        function clearAuth() {
+            chrome.storage.local.remove(['userEmail', 'authToken', 'userTier', 'onboardingComplete', 'userId'], () => {
+                showStatus('🗑️ Authentication cleared!', 'error');
+                checkCurrentStatus();
+            });
+        }
+
+        // Set custom auth
+        function setCustomAuth() {
+            const email = document.getElementById('test-email').value;
+            const tier = document.getElementById('test-tier').value;
+            
+            const authData = {
+                userEmail: email,
+                authToken: 'custom-token-' + Date.now(),
+                userTier: tier,
+                onboardingComplete: true,
+                userId: 'custom-user-' + Date.now()
+            };
+            
+            chrome.storage.local.set(authData, () => {
+                showStatus(`✅ Custom auth set for ${email} (${tier})`, 'success');
+                checkCurrentStatus();
+            });
+        }
+
+        // Check extension storage
+        function checkExtensionStorage() {
+            chrome.storage.local.get(null, (items) => {
+                console.log('Extension Storage:', items);
+                showStatus('Check console for full storage dump', 'success');
+                
+                // Show summary
+                const keys = Object.keys(items);
+                alert(`Extension Storage:\n\nTotal items: ${keys.length}\n\nKeys:\n${keys.join('\n')}`);
+            });
+        }
+
+        // Show status message
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('action-status');
+            statusDiv.textContent = message;
+            statusDiv.className = 'status ' + type;
+            statusDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                statusDiv.style.display = 'none';
+            }, 3000);
+        }
+
+        // Check if we have Chrome extension API
+        if (typeof chrome === 'undefined' || !chrome.storage) {
+            document.body.innerHTML = `
+                <div class="container">
+                    <h1 style="color: red;">⚠️ Error</h1>
+                    <p>This page must be opened from the Chrome extension.</p>
+                    <p>To use this helper:</p>
+                    <ol>
+                        <li>Load the extension in Chrome</li>
+                        <li>Open extension options or navigate to:</li>
+                        <li><code>chrome-extension://[EXTENSION_ID]/test-auth-helper.html</code></li>
+                    </ol>
+                </div>
+            `;
+        } else {
+            // Initial check
+            checkCurrentStatus();
+            
+            // Refresh status every 2 seconds
+            setInterval(checkCurrentStatus, 2000);
+        }
+    </script>
+</body>
+</html>

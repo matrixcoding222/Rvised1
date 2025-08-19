@@ -1,8 +1,24 @@
 // Background service worker for Rvised Chrome Extension
 console.log('🔧 Rvised background script loaded');
 
-// Production API endpoint
-const API_BASE_URL = 'https://rvised.vercel.app';
+// Resolve API base dynamically (local → https local → prod)
+async function resolveApiBaseUrl() {
+  // DEV-ONLY: hard-pin to local during testing
+  // Try multiple possible ports
+  const possiblePorts = [3003, 3002, 3001, 3000];
+  for (const port of possiblePorts) {
+    const base = `http://localhost:${port}`;
+    try {
+      const r = await fetch(`${base}/api/health`, { method: 'GET', timeout: 1000 });
+      if (r.ok) {
+        console.log(`✅ Found API at ${base}`);
+        return base;
+      }
+    } catch (_) {}
+  }
+  // Fallback to first port
+  return 'http://localhost:3003';
+}
 
 // Listen for extension installation
 chrome.runtime.onInstalled.addListener(function(details) {
@@ -15,9 +31,27 @@ chrome.runtime.onInstalled.addListener(function(details) {
   createOrUpdateContextMenu();
 
   if (details.reason === 'install') {
-    // Open welcome page on first install
-    chrome.tabs.create({
-      url: `${API_BASE_URL}?welcome=extension`
+    // Check if onboarding has been completed
+    chrome.storage.local.get(['onboardingComplete', 'userEmail'], (result) => {
+      if (!result.onboardingComplete || !result.userEmail || result.userEmail === 'guest') {
+        // Open onboarding page for first-time users
+        chrome.tabs.create({ 
+          url: chrome.runtime.getURL('onboarding/onboarding.html')
+        });
+      } else {
+        // User already onboarded, open YouTube
+        chrome.tabs.create({ url: 'https://www.youtube.com' });
+      }
+    });
+  } else if (details.reason === 'update') {
+    // For updates, just ensure user is still authenticated
+    chrome.storage.local.get(['userEmail', 'authToken'], (result) => {
+      if (!result.userEmail || result.userEmail === 'guest' || !result.authToken) {
+        // Re-authenticate if needed
+        chrome.tabs.create({ 
+          url: chrome.runtime.getURL('onboarding/onboarding.html')
+        });
+      }
     });
   }
 });
@@ -31,8 +65,15 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
   }
   
   if (message.action === 'openDashboard') {
-    chrome.tabs.create({
-      url: API_BASE_URL
+    resolveApiBaseUrl().then((base) => {
+      chrome.tabs.create({ url: `${base}/library` });
+    });
+    sendResponse({success: true});
+  }
+  
+  if (message.action === 'openOnboarding') {
+    chrome.tabs.create({ 
+      url: chrome.runtime.getURL('onboarding/onboarding.html')
     });
     sendResponse({success: true});
   }
@@ -59,8 +100,10 @@ async function handleVideoSummarization(data, sender, sendResponse) {
   try {
     console.log('🎬 Starting video summarization:', data.videoId);
     
-    // Make API call to our deployed endpoint
-    const response = await fetch(`${API_BASE_URL}/api/summarize`, {
+    const BASE = await resolveApiBaseUrl();
+    console.log('🔌 Using API base:', BASE);
+    // Make API call to resolved endpoint
+    const response = await fetch(`${BASE}/api/summarize`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -71,12 +114,16 @@ async function handleVideoSummarization(data, sender, sendResponse) {
         extensionTranscript: data.transcript
       })
     });
-    
+    const rawText = await response.text();
     if (!response.ok) {
-      throw new Error(`API request failed: ${response.status} ${response.statusText}`);
+      console.error('Summarize API failure:', response.status, response.statusText, 'base:', BASE, rawText);
+      throw new Error(`Summarize failed (${response.status}): ${rawText?.slice(0,300) || response.statusText}`);
     }
-    
-    const apiResp = await response.json();
+    let apiResp;
+    try { apiResp = rawText ? JSON.parse(rawText) : {}; } catch (e) {
+      console.error('Invalid JSON from summarize:', rawText);
+      throw new Error('Summarize returned invalid JSON');
+    }
     if (apiResp.error) {
       throw new Error(apiResp.error);
     }
@@ -112,7 +159,8 @@ async function handleVideoSummarization(data, sender, sendResponse) {
 // Check API status
 async function checkApiStatus(sendResponse) {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/health`, {
+    const base = await resolveApiBaseUrl();
+    const response = await fetch(`${base}/api/health`, {
       method: 'GET',
       timeout: 5000
     });
@@ -167,3 +215,36 @@ chrome.contextMenus.onClicked.addListener(function(info, tab) {
     chrome.tabs.sendMessage(tab.id, {action: 'startSummarization'});
   }
 });
+
+// Listen for external messages from the web app
+chrome.runtime.onMessageExternal.addListener(
+  function(request, sender, sendResponse) {
+    console.log('📨 External message received:', request);
+    
+    if (request.action === 'authComplete' && request.data) {
+      // Save auth data to extension storage
+      chrome.storage.local.set(request.data, () => {
+        console.log('✅ Auth data saved from web app');
+        
+        // Notify all YouTube tabs to refresh their UI
+        chrome.tabs.query({url: "*://*.youtube.com/*"}, (tabs) => {
+          tabs.forEach(tab => {
+            chrome.tabs.sendMessage(tab.id, {
+              action: 'authenticationComplete',
+              data: request.data
+            }, () => {
+              // Ignore errors if tab doesn't have content script
+              if (chrome.runtime.lastError) {
+                console.log('Tab notification error (expected):', chrome.runtime.lastError.message);
+              }
+            });
+          });
+        });
+        
+        sendResponse({success: true, message: 'Auth data received'});
+      });
+      
+      return true; // Keep channel open for async response
+    }
+  }
+);

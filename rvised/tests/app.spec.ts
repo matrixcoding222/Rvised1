@@ -22,6 +22,10 @@ test.describe('Rvised app smoke tests', () => {
         },
       },
     })
+    if (!res.ok()) {
+      const text = await res.text()
+      console.log('[summarize fail]', res.status(), text)
+    }
     expect(res.ok()).toBeTruthy()
     const body = await res.json()
     expect(body.success).toBeTruthy()

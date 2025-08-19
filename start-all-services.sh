@@ -1,39 +1,23 @@
 #!/bin/bash
 
 echo "====================================="
-echo "RVISED - Starting All Services"
+echo "RVISED - Starting App"
 echo "====================================="
 echo ""
 
 # Function to kill services on exit
 cleanup() {
     echo ""
-    echo "Stopping all services..."
-    kill $PYTHON_PID $PLAYWRIGHT_PID $NEXTJS_PID 2>/dev/null
-    echo "All services stopped."
+    echo "Stopping app..."
+    kill $NEXTJS_PID 2>/dev/null
+    echo "App stopped."
     exit 0
 }
 
 trap cleanup INT TERM
 
-# Start Python Backend (Port 5000)
-echo "[1/4] Starting Python Backend Service..."
-cd python-backend
-python backend.py &
-PYTHON_PID=$!
-cd ..
-sleep 2
-
-# Start Playwright Service (Port 8787)
-echo "[2/4] Starting Playwright Transcript Service..."
-cd transcript-service
-npm start &
-PLAYWRIGHT_PID=$!
-cd ..
-sleep 2
-
 # Start Next.js Development Server (Port 3000)
-echo "[3/4] Starting Next.js Development Server..."
+echo "[1/2] Starting Next.js Development Server..."
 cd rvised
 npm run dev &
 NEXTJS_PID=$!
@@ -41,7 +25,7 @@ cd ..
 sleep 3
 
 # Open browser (works on macOS and Linux)
-echo "[4/4] Opening browser..."
+echo "[2/2] Opening browser..."
 if [[ "$OSTYPE" == "darwin"* ]]; then
     open http://localhost:3000
 elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
@@ -50,18 +34,16 @@ fi
 
 echo ""
 echo "====================================="
-echo "All services started successfully!"
+echo "App started successfully!"
 echo "====================================="
 echo ""
-echo "Services running:"
-echo "- Python Backend: http://localhost:5000"
-echo "- Playwright Service: http://localhost:8787"
+echo "Service running:"
 echo "- Next.js App: http://localhost:3000"
 echo ""
 echo "Test transcript extraction:"
-echo "http://localhost:3000/api/transcript?videoUrl=YOUTUBE_URL"
+echo "curl -X POST http://localhost:3000/api/transcript -H 'Content-Type: application/json' -d '{"videoUrl":"https://www.youtube.com/watch?v=VIDEO_ID"}'"
 echo ""
-echo "Press Ctrl+C to stop all services..."
+echo "Press Ctrl+C to stop the app..."
 
 # Wait for interrupt
 wait

@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Complete Local Flow - RVISED</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            padding: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        h1 img {
+            width: 32px;
+            height: 32px;
+        }
+        .test-section {
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        .test-section h2 {
+            color: #667eea;
+            margin-top: 0;
+        }
+        .status {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .status.success {
+            background: #10b981;
+            color: white;
+        }
+        .status.error {
+            background: #ef4444;
+            color: white;
+        }
+        .status.pending {
+            background: #f59e0b;
+            color: white;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            margin: 5px;
+        }
+        button:hover {
+            background: #5a67d8;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            background: white;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .instructions {
+            background: #fef3c7;
+            border: 1px solid #fbbf24;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .instructions h3 {
+            margin-top: 0;
+            color: #92400e;
+        }
+        .instructions ol {
+            margin-bottom: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>
+            <img src="glasses.svg" alt="RVISED">
+            Test Complete Local Flow
+        </h1>
+
+        <div class="instructions">
+            <h3>⚠️ Setup Instructions:</h3>
+            <ol>
+                <li>Make sure your Next.js dev server is running on port 3002: <code>npm run dev</code></li>
+                <li>Load the unpacked extension in Chrome from: <code>C:\Users\User\RVISED3\extensions\rvised-extension</code></li>
+                <li>Reload the extension after any changes</li>
+                <li>Open this file in Chrome</li>
+            </ol>
+        </div>
+
+        <!-- Test 1: API Health Check -->
+        <div class="test-section">
+            <h2>Test 1: API Health Check</h2>
+            <button onclick="testApiHealth()">Test API Connection</button>
+            <div id="api-status" class="status pending">Waiting...</div>
+            <div id="api-result" class="result" style="display:none;"></div>
+        </div>
+
+        <!-- Test 2: Get Projects -->
+        <div class="test-section">
+            <h2>Test 2: Get Projects</h2>
+            <button onclick="testGetProjects()">Get Projects</button>
+            <div id="projects-status" class="status pending">Waiting...</div>
+            <div id="projects-result" class="result" style="display:none;"></div>
+        </div>
+
+        <!-- Test 3: Save to Project -->
+        <div class="test-section">
+            <h2>Test 3: Save Summary to Project</h2>
+            <input type="text" id="project-name" placeholder="Project name" value="Test Project">
+            <button onclick="testSaveToProject()">Save Test Summary</button>
+            <div id="save-status" class="status pending">Waiting...</div>
+            <div id="save-result" class="result" style="display:none;"></div>
+        </div>
+
+        <!-- Test 4: Summarize Video -->
+        <div class="test-section">
+            <h2>Test 4: Summarize YouTube Video</h2>
+            <input type="text" id="video-url" placeholder="YouTube URL" value="https://www.youtube.com/watch?v=dQw4w9WgXcQ" style="width: 400px;">
+            <button onclick="testSummarize()">Summarize Video</button>
+            <div id="summary-status" class="status pending">Waiting...</div>
+            <div id="summary-result" class="result" style="display:none;"></div>
+        </div>
+
+        <!-- Test 5: Extension Integration -->
+        <div class="test-section">
+            <h2>Test 5: Extension Integration</h2>
+            <p>Open any YouTube video and check if:</p>
+            <ul>
+                <li>The RVISED button appears below the video</li>
+                <li>Clicking it opens the overlay</li>
+                <li>Generating a summary works</li>
+                <li>"Save to Project" functionality works</li>
+            </ul>
+            <button onclick="window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ', '_blank')">Open Test Video</button>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3002';
+
+        async function testApiHealth() {
+            const statusEl = document.getElementById('api-status');
+            const resultEl = document.getElementById('api-result');
+            
+            try {
+                statusEl.textContent = 'Testing...';
+                statusEl.className = 'status pending';
+                
+                const response = await fetch(`${API_BASE}/api/health`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    statusEl.textContent = 'Connected!';
+                    statusEl.className = 'status success';
+                    resultEl.style.display = 'block';
+                    resultEl.textContent = JSON.stringify(data, null, 2);
+                } else {
+                    throw new Error(data.error || 'API error');
+                }
+            } catch (error) {
+                statusEl.textContent = 'Failed!';
+                statusEl.className = 'status error';
+                resultEl.style.display = 'block';
+                resultEl.textContent = error.message;
+            }
+        }
+
+        async function testGetProjects() {
+            const statusEl = document.getElementById('projects-status');
+            const resultEl = document.getElementById('projects-result');
+            
+            try {
+                statusEl.textContent = 'Loading...';
+                statusEl.className = 'status pending';
+                
+                const response = await fetch(`${API_BASE}/api/projects?type=projects`, {
+                    headers: {
+                        'x-user-email': 'test@example.com'
+                    }
+                });
+                const data = await response.json();
+                
+                if (response.ok) {
+                    statusEl.textContent = `Found ${data.projects?.length || 0} projects`;
+                    statusEl.className = 'status success';
+                    resultEl.style.display = 'block';
+                    resultEl.textContent = JSON.stringify(data, null, 2);
+                } else {
+                    throw new Error(data.error || 'Failed to get projects');
+                }
+            } catch (error) {
+                statusEl.textContent = 'Failed!';
+                statusEl.className = 'status error';
+                resultEl.style.display = 'block';
+                resultEl.textContent = error.message;
+            }
+        }
+
+        async function testSaveToProject() {
+            const statusEl = document.getElementById('save-status');
+            const resultEl = document.getElementById('save-result');
+            const projectName = document.getElementById('project-name').value;
+            
+            try {
+                statusEl.textContent = 'Saving...';
+                statusEl.className = 'status pending';
+                
+                const testSummary = {
+                    type: 'summary',
+                    projectName: projectName,
+                    title: 'Test Video Summary',
+                    videoUrl: 'https://www.youtube.com/watch?v=test123',
+                    videoId: 'test123',
+                    thumbnailUrl: 'https://i.ytimg.com/vi/test123/hqdefault.jpg',
+                    channelName: 'Test Channel',
+                    summary: {
+                        title: 'Test Video',
+                        keyTopics: ['Topic 1', 'Topic 2'],
+                        mainPoints: ['Point 1', 'Point 2'],
+                        detailedSummary: 'This is a test summary.',
+                        timestamps: [
+                            { time: '0:00', description: 'Introduction' },
+                            { time: '1:00', description: 'Main content' }
+                        ]
+                    }
+                };
+                
+                const response = await fetch(`${API_BASE}/api/projects`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-user-email': 'test@example.com'
+                    },
+                    body: JSON.stringify(testSummary)
+                });
+                const data = await response.json();
+                
+                if (response.ok) {
+                    statusEl.textContent = 'Saved successfully!';
+                    statusEl.className = 'status success';
+                    resultEl.style.display = 'block';
+                    resultEl.textContent = JSON.stringify(data, null, 2);
+                } else {
+                    throw new Error(data.error || 'Failed to save');
+                }
+            } catch (error) {
+                statusEl.textContent = 'Failed!';
+                statusEl.className = 'status error';
+                resultEl.style.display = 'block';
+                resultEl.textContent = error.message;
+            }
+        }
+
+        async function testSummarize() {
+            const statusEl = document.getElementById('summary-status');
+            const resultEl = document.getElementById('summary-result');
+            const videoUrl = document.getElementById('video-url').value;
+            
+            try {
+                statusEl.textContent = 'Summarizing...';
+                statusEl.className = 'status pending';
+                
+                const response = await fetch(`${API_BASE}/api/summarize`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-user-email': 'test@example.com'
+                    },
+                    body: JSON.stringify({
+                        videoUrl: videoUrl,
+                        mode: 'student',
+                        readingDepth: 'standard',
+                        includeTimestamps: true,
+                        includeEmojis: false
+                    })
+                });
+                const data = await response.json();
+                
+                if (response.ok) {
+                    statusEl.textContent = 'Summary generated!';
+                    statusEl.className = 'status success';
+                    resultEl.style.display = 'block';
+                    resultEl.textContent = JSON.stringify(data, null, 2);
+                } else {
+                    throw new Error(data.error || 'Failed to summarize');
+                }
+            } catch (error) {
+                statusEl.textContent = 'Failed!';
+                statusEl.className = 'status error';
+                resultEl.style.display = 'block';
+                resultEl.textContent = error.message;
+            }
+        }
+
+        // Auto-test API health on load
+        window.addEventListener('load', () => {
+            setTimeout(testApiHealth, 500);
+        });
+    </script>
+</body>
+</html>

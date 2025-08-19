@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rvised Extension - Auth Testing Helper</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f9fafb;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #111827;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #6b7280;
+            margin-bottom: 30px;
+        }
+        .auth-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f3f4f6;
+            border-radius: 8px;
+        }
+        .auth-section h2 {
+            margin-top: 0;
+            color: #374151;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #374151;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background: #2563eb;
+        }
+        button.secondary {
+            background: #6b7280;
+        }
+        button.secondary:hover {
+            background: #4b5563;
+        }
+        button.danger {
+            background: #ef4444;
+        }
+        button.danger:hover {
+            background: #dc2626;
+        }
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        .status.success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #10b981;
+        }
+        .status.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #ef4444;
+        }
+        .status.info {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #3b82f6;
+        }
+        .current-user {
+            background: #eff6ff;
+            border: 1px solid #3b82f6;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .current-user h3 {
+            margin-top: 0;
+            color: #1e40af;
+        }
+        .user-info {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #3b82f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .user-details {
+            flex: 1;
+        }
+        .user-email {
+            font-weight: 500;
+            color: #111827;
+        }
+        .user-tier {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 4px;
+            padding: 4px 8px;
+            background: white;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .tier-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        .tier-free .tier-dot {
+            background: #6b7280;
+        }
+        .tier-pro .tier-dot {
+            background: #10b981;
+        }
+        code {
+            background: #f3f4f6;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 Rvised Extension - Auth Testing Helper</h1>
+        <p class="subtitle">Use this page to simulate user authentication for testing the extension</p>
+
+        <div id="currentUser" class="current-user" style="display: none;">
+            <h3>Current User</h3>
+            <div class="user-info">
+                <div class="user-avatar" id="userAvatar">?</div>
+                <div class="user-details">
+                    <div class="user-email" id="userEmail">Not signed in</div>
+                    <div class="user-tier tier-free" id="userTier">
+                        <span class="tier-dot"></span>
+                        <span>Free Plan</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="auth-section">
+            <h2>Simulate User Login</h2>
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" placeholder="user@example.com" value="test@example.com">
+            </div>
+            <div class="form-group">
+                <label for="tier">Membership Tier</label>
+                <select id="tier">
+                    <option value="free">Free Plan</option>
+                    <option value="pro">Pro Member</option>
+                </select>
+            </div>
+            <button onclick="simulateLogin()">Sign In</button>
+            <button class="secondary" onclick="simulateProLogin()">Quick Pro Login</button>
+            <button class="danger" onclick="signOut()">Sign Out</button>
+        </div>
+
+        <div id="status"></div>
+
+        <div class="auth-section">
+            <h2>Test Features</h2>
+            <p>After signing in, test these features in the extension:</p>
+            <ol>
+                <li><strong>Profile Button:</strong> Click the user icon in the extension header</li>
+                <li><strong>Profile Dropdown:</strong> Should show your email and membership status</li>
+                <li><strong>Dashboard Button:</strong> Should open the dashboard in a new tab</li>
+                <li><strong>Settings Link:</strong> In profile dropdown, opens settings page</li>
+                <li><strong>Upgrade Link:</strong> Shows for free users, opens subscription page</li>
+                <li><strong>Sign Out:</strong> Clears user data and returns to guest mode</li>
+            </ol>
+        </div>
+
+        <div class="auth-section">
+            <h2>Manual Storage Control</h2>
+            <p>You can also manually set Chrome storage values:</p>
+            <button onclick="checkStorage()">Check Current Storage</button>
+            <button onclick="clearStorage()">Clear All Storage</button>
+            <div id="storageInfo" style="margin-top: 15px;"></div>
+        </div>
+    </div>
+
+    <script>
+        // Check current user on load
+        window.addEventListener('load', () => {
+            checkCurrentUser();
+        });
+
+        function checkCurrentUser() {
+            if (typeof chrome !== 'undefined' && chrome.storage) {
+                chrome.storage.local.get(['userEmail', 'userTier', 'authToken'], (result) => {
+                    if (result.userEmail) {
+                        showCurrentUser(result.userEmail, result.userTier || 'free');
+                        showStatus(`Logged in as ${result.userEmail}`, 'info');
+                    } else {
+                        hideCurrentUser();
+                        showStatus('Not signed in', 'info');
+                    }
+                });
+            } else {
+                // Fallback for testing without extension
+                const email = localStorage.getItem('rvised_userEmail');
+                const tier = localStorage.getItem('rvised_userTier');
+                if (email) {
+                    showCurrentUser(email, tier || 'free');
+                    showStatus(`Logged in as ${email}`, 'info');
+                } else {
+                    hideCurrentUser();
+                    showStatus('Not signed in', 'info');
+                }
+            }
+        }
+
+        function showCurrentUser(email, tier) {
+            const userDiv = document.getElementById('currentUser');
+            const avatarDiv = document.getElementById('userAvatar');
+            const emailDiv = document.getElementById('userEmail');
+            const tierDiv = document.getElementById('userTier');
+            
+            userDiv.style.display = 'block';
+            avatarDiv.textContent = email.charAt(0).toUpperCase();
+            emailDiv.textContent = email;
+            
+            tierDiv.className = `user-tier tier-${tier}`;
+            tierDiv.innerHTML = `
+                <span class="tier-dot"></span>
+                <span>${tier === 'pro' ? 'Pro Member' : 'Free Plan'}</span>
+            `;
+        }
+
+        function hideCurrentUser() {
+            document.getElementById('currentUser').style.display = 'none';
+        }
+
+        function simulateLogin() {
+            const email = document.getElementById('email').value;
+            const tier = document.getElementById('tier').value;
+            
+            if (!email) {
+                showStatus('Please enter an email address', 'error');
+                return;
+            }
+            
+            const userData = {
+                userEmail: email,
+                userTier: tier,
+                authToken: 'fake-token-' + Date.now(),
+                userId: 'user-' + Math.random().toString(36).substr(2, 9)
+            };
+            
+            if (typeof chrome !== 'undefined' && chrome.storage) {
+                chrome.storage.local.set(userData, () => {
+                    showStatus(`✅ Signed in as ${email} (${tier} plan)`, 'success');
+                    showCurrentUser(email, tier);
+                    
+                    // Notify extension to reload
+                    setTimeout(() => {
+                        alert('User data saved! Please refresh the YouTube page to see the changes in the extension.');
+                    }, 500);
+                });
+            } else {
+                // Fallback for testing
+                localStorage.setItem('rvised_userEmail', email);
+                localStorage.setItem('rvised_userTier', tier);
+                localStorage.setItem('rvised_authToken', userData.authToken);
+                showStatus(`✅ Signed in as ${email} (${tier} plan) - localStorage fallback`, 'success');
+                showCurrentUser(email, tier);
+            }
+        }
+
+        function simulateProLogin() {
+            document.getElementById('email').value = 'pro@example.com';
+            document.getElementById('tier').value = 'pro';
+            simulateLogin();
+        }
+
+        function signOut() {
+            if (typeof chrome !== 'undefined' && chrome.storage) {
+                chrome.storage.local.clear(() => {
+                    showStatus('✅ Signed out successfully', 'success');
+                    hideCurrentUser();
+                    
+                    setTimeout(() => {
+                        alert('User data cleared! Please refresh the YouTube page to see the changes in the extension.');
+                    }, 500);
+                });
+            } else {
+                // Fallback
+                localStorage.removeItem('rvised_userEmail');
+                localStorage.removeItem('rvised_userTier');
+                localStorage.removeItem('rvised_authToken');
+                showStatus('✅ Signed out successfully - localStorage fallback', 'success');
+                hideCurrentUser();
+            }
+        }
+
+        function checkStorage() {
+            if (typeof chrome !== 'undefined' && chrome.storage) {
+                chrome.storage.local.get(null, (items) => {
+                    const info = document.getElementById('storageInfo');
+                    if (Object.keys(items).length === 0) {
+                        info.innerHTML = '<code>Storage is empty</code>';
+                    } else {
+                        info.innerHTML = '<pre style="background: #f3f4f6; padding: 10px; border-radius: 6px; overflow-x: auto;">' + 
+                                        JSON.stringify(items, null, 2) + '</pre>';
+                    }
+                });
+            } else {
+                const info = document.getElementById('storageInfo');
+                const data = {
+                    userEmail: localStorage.getItem('rvised_userEmail'),
+                    userTier: localStorage.getItem('rvised_userTier'),
+                    authToken: localStorage.getItem('rvised_authToken')
+                };
+                info.innerHTML = '<pre style="background: #f3f4f6; padding: 10px; border-radius: 6px; overflow-x: auto;">' + 
+                                JSON.stringify(data, null, 2) + '</pre>';
+            }
+        }
+
+        function clearStorage() {
+            if (typeof chrome !== 'undefined' && chrome.storage) {
+                chrome.storage.local.clear(() => {
+                    showStatus('✅ All storage cleared', 'success');
+                    hideCurrentUser();
+                    document.getElementById('storageInfo').innerHTML = '<code>Storage cleared</code>';
+                });
+            } else {
+                localStorage.clear();
+                showStatus('✅ All localStorage cleared', 'success');
+                hideCurrentUser();
+                document.getElementById('storageInfo').innerHTML = '<code>Storage cleared</code>';
+            }
+        }
+
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.className = `status ${type}`;
+            statusDiv.textContent = message;
+            statusDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                statusDiv.style.display = 'none';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

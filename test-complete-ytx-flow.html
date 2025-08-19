@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Complete YTX Flow</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 15px;
+        }
+        .test-section {
+            margin: 30px 0;
+            padding: 20px;
+            background: #f7f7f9;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+        button {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: transform 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 8px;
+            font-family: monospace;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .status.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+        .result-box {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border: 2px solid #e0e0e0;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        pre {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(0,0,0,.1);
+            border-radius: 50%;
+            border-top-color: #667eea;
+            animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Test Complete YTX Integration Flow</h1>
+        
+        <div class="test-section">
+            <h2>📺 Test Video</h2>
+            <input type="text" id="videoUrl" style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px;" 
+                   value="https://www.youtube.com/watch?v=jNQXAC9IVRw" 
+                   placeholder="Enter YouTube URL">
+        </div>
+
+        <div class="test-section">
+            <h2>🧪 Test Steps</h2>
+            <button onclick="testYTXDirect()">1. Test YTX Direct</button>
+            <button onclick="testAPI()">2. Test API with YTX</button>
+            <button onclick="testFullFlow()">3. Test Complete Flow</button>
+            <button onclick="clearResults()">Clear Results</button>
+        </div>
+
+        <div id="results"></div>
+    </div>
+
+    <script>
+        function addStatus(message, type = 'info') {
+            const results = document.getElementById('results');
+            const status = document.createElement('div');
+            status.className = `status ${type}`;
+            status.innerHTML = `[${new Date().toLocaleTimeString()}] ${message}`;
+            results.appendChild(status);
+            results.scrollTop = results.scrollHeight;
+        }
+
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+            addStatus('Results cleared', 'info');
+        }
+
+        async function testYTXDirect() {
+            const videoUrl = document.getElementById('videoUrl').value;
+            addStatus('Testing YTX direct execution...', 'info');
+            
+            // Since we can't directly execute YTX from browser, we'll test via API
+            addStatus('Note: Direct YTX execution requires server-side code', 'warning');
+            addStatus('Use the API test instead to verify YTX integration', 'info');
+        }
+
+        async function testAPI() {
+            const videoUrl = document.getElementById('videoUrl').value;
+            addStatus(`Testing API with video: ${videoUrl}`, 'info');
+            
+            try {
+                addStatus('Sending request to API...', 'info');
+                
+                const response = await fetch('http://localhost:3003/api/summarize', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-user-tier': 'free'
+                    },
+                    body: JSON.stringify({
+                        videoUrl: videoUrl,
+                        settings: {
+                            learningMode: 'student',
+                            summaryDepth: 'standard',
+                            includeTimestamps: true,
+                            includeActionItems: true,
+                            includeQuiz: false,
+                            includeEmojis: false
+                        }
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success) {
+                        addStatus('✅ API call successful!', 'success');
+                        addStatus(`Title: ${data.data.videoTitle}`, 'info');
+                        addStatus(`Main Takeaway: ${data.data.mainTakeaway}`, 'info');
+                        addStatus(`Summary length: ${data.data.summary?.length || 0} chars`, 'info');
+                        
+                        // Check if YTX was used
+                        if (data.data._debug?.sources?.transcriptSource === 'ytx-transcript') {
+                            addStatus('✅ YTX was used for transcript extraction!', 'success');
+                        } else {
+                            addStatus(`Transcript source: ${data.data._debug?.sources?.transcriptSource || 'unknown'}`, 'warning');
+                        }
+                        
+                        // Display full result
+                        const resultBox = document.createElement('div');
+                        resultBox.className = 'result-box';
+                        resultBox.innerHTML = `<pre>${JSON.stringify(data.data, null, 2)}</pre>`;
+                        document.getElementById('results').appendChild(resultBox);
+                    } else {
+                        addStatus(`API error: ${data.error}`, 'error');
+                    }
+                } else {
+                    const text = await response.text();
+                    addStatus(`API error (${response.status}): ${text.substring(0, 200)}`, 'error');
+                }
+            } catch (error) {
+                addStatus(`Network error: ${error.message}`, 'error');
+                addStatus('Make sure the Next.js server is running on port 3003', 'warning');
+            }
+        }
+
+        async function testFullFlow() {
+            addStatus('🚀 Starting complete flow test...', 'info');
+            
+            // Step 1: Check API health
+            addStatus('Step 1: Checking API health...', 'info');
+            try {
+                const healthResponse = await fetch('http://localhost:3003/api/health');
+                if (healthResponse.ok) {
+                    addStatus('✅ API is healthy', 'success');
+                } else {
+                    addStatus('❌ API health check failed', 'error');
+                    return;
+                }
+            } catch (error) {
+                addStatus(`❌ Cannot reach API: ${error.message}`, 'error');
+                return;
+            }
+            
+            // Step 2: Test transcript extraction
+            addStatus('Step 2: Testing transcript extraction...', 'info');
+            const videoUrl = document.getElementById('videoUrl').value;
+            
+            try {
+                const transcriptResponse = await fetch('http://localhost:3003/api/transcript', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        videoUrl: videoUrl
+                    })
+                });
+                
+                if (transcriptResponse.ok) {
+                    const transcriptData = await transcriptResponse.json();
+                    if (transcriptData.success && transcriptData.transcript) {
+                        addStatus(`✅ Transcript extracted: ${transcriptData.transcript.length} chars`, 'success');
+                        addStatus(`First 100 chars: ${transcriptData.transcript.substring(0, 100)}...`, 'info');
+                    } else {
+                        addStatus('⚠️ Transcript extraction returned no data', 'warning');
+                    }
+                } else {
+                    addStatus('⚠️ Transcript endpoint not available or failed', 'warning');
+                }
+            } catch (error) {
+                addStatus(`⚠️ Transcript test error: ${error.message}`, 'warning');
+            }
+            
+            // Step 3: Test summarization with YTX
+            addStatus('Step 3: Testing summarization with YTX...', 'info');
+            await testAPI();
+            
+            addStatus('🏁 Complete flow test finished!', 'success');
+        }
+
+        // Auto-test on load
+        window.addEventListener('load', () => {
+            addStatus('Ready to test YTX integration', 'info');
+            addStatus('Click the test buttons above to start', 'info');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Rvised Extension</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f9fafb;
+        }
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        h1 {
+            margin: 0 0 10px 0;
+            color: #111827;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .test-section h2 {
+            color: #374151;
+            margin-top: 0;
+        }
+        .checklist {
+            list-style: none;
+            padding: 0;
+        }
+        .checklist li {
+            padding: 10px;
+            margin: 8px 0;
+            background: #f3f4f6;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .checklist li.success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .checklist li.error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        .status-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        .status-pending {
+            background: #e5e7eb;
+            color: #6b7280;
+        }
+        .status-success {
+            background: #10b981;
+            color: white;
+        }
+        .status-error {
+            background: #ef4444;
+            color: white;
+        }
+        .instructions {
+            background: #eff6ff;
+            border: 1px solid #3b82f6;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .instructions h3 {
+            margin-top: 0;
+            color: #1e40af;
+        }
+        .instructions ol {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        .instructions li {
+            margin: 8px 0;
+            color: #374151;
+        }
+        code {
+            background: #f3f4f6;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+        }
+        .highlight {
+            background: #fef3c7;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎓 Rvised Chrome Extension - Test & Setup Guide</h1>
+        <p>Follow these steps to load and test the Rvised extension with the new UI</p>
+    </div>
+
+    <div class="instructions">
+        <h3>📋 Setup Instructions</h3>
+        <ol>
+            <li>Open Chrome and navigate to <code>chrome://extensions/</code></li>
+            <li>Enable <strong>"Developer mode"</strong> toggle in the top right corner</li>
+            <li>Click <strong>"Load unpacked"</strong> button</li>
+            <li>Navigate to and select: <code>C:\Users\User\RVISED3\extensions\rvised-extension</code></li>
+            <li>The extension should now appear in your extensions list</li>
+            <li>Open a YouTube video to test the extension</li>
+        </ol>
+    </div>
+
+    <div class="test-section">
+        <h2>✅ Extension Features Checklist</h2>
+        <ul class="checklist">
+            <li>
+                <span class="status-icon status-pending">1</span>
+                <strong>Extension loads on YouTube:</strong> The Rvised overlay should appear in the right sidebar
+            </li>
+            <li>
+                <span class="status-icon status-pending">2</span>
+                <strong>UI Components:</strong> Header with logo, tabs (Summary, Transcript, Dashboard), and settings
+            </li>
+            <li>
+                <span class="status-icon status-pending">3</span>
+                <strong>Mode Selection:</strong> Can switch between Student, Build, and Deep modes
+            </li>
+            <li>
+                <span class="status-icon status-pending">4</span>
+                <strong>Depth Selection:</strong> Can choose Quick, Standard, or Detailed summaries
+            </li>
+            <li>
+                <span class="status-icon status-pending">5</span>
+                <strong>Options Menu:</strong> Dropdown with Timestamps, Quiz, and Transcript toggles
+            </li>
+            <li>
+                <span class="status-icon status-pending">6</span>
+                <strong>Summarize Button:</strong> Blue button that triggers video analysis
+            </li>
+            <li>
+                <span class="status-icon status-pending">7</span>
+                <strong>Settings Screen:</strong> Opens when clicking the settings icon
+            </li>
+            <li>
+                <span class="status-icon status-pending">8</span>
+                <strong>Create Project:</strong> Can create new projects for organizing summaries
+            </li>
+            <li>
+                <span class="status-icon status-pending">9</span>
+                <strong>Save Summary:</strong> Saves the generated summary to selected project
+            </li>
+            <li>
+                <span class="status-icon status-pending">10</span>
+                <strong>Timestamp Navigation:</strong> Clicking timestamps jumps to that video position
+            </li>
+        </ul>
+    </div>
+
+    <div class="test-section">
+        <h2>🔍 What to Test</h2>
+        <ol>
+            <li><strong>Initial Load:</strong> Extension should auto-show when you navigate to a YouTube video</li>
+            <li><strong>Summarize:</strong> Click "Summarize video" and wait for the analysis to complete</li>
+            <li><strong>View Tabs:</strong> Switch between Summary, Transcript, and Dashboard tabs</li>
+            <li><strong>Settings:</strong> Open settings, change modes and options, then apply</li>
+            <li><strong>Quiz:</strong> If enabled in options, quiz questions should appear after summary</li>
+            <li><strong>Project Creation:</strong> Click "+ Create" to add a new project</li>
+            <li><strong>Save to Project:</strong> Select a project and save the summary</li>
+        </ol>
+    </div>
+
+    <div class="test-section">
+        <h2>⚠️ Common Issues & Solutions</h2>
+        <ul>
+            <li><strong>Extension not showing:</strong> Refresh the YouTube page after loading the extension</li>
+            <li><strong>UI looks broken:</strong> Check browser console for errors (F12 → Console tab)</li>
+            <li><strong>Summarize fails:</strong> Ensure the backend API is running (check localhost:3000)</li>
+            <li><strong>Icons missing:</strong> Verify icons folder exists in the extension directory</li>
+        </ul>
+    </div>
+
+    <div class="test-section">
+        <h2>🎯 Test URLs</h2>
+        <p>Try the extension on these YouTube videos:</p>
+        <ul>
+            <li><a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank">Short Music Video (3:32)</a></li>
+            <li><a href="https://www.youtube.com/watch?v=jNQXAC9IVRw" target="_blank">First YouTube Video (0:19)</a></li>
+            <li><a href="https://www.youtube.com/watch?v=9bZkp7q19f0" target="_blank">Popular Music Video</a></li>
+        </ul>
+    </div>
+
+    <div class="test-section" style="background: #f0fdf4; border: 1px solid #10b981;">
+        <h2 style="color: #065f46;">✨ New UI Features</h2>
+        <p>The updated extension now includes:</p>
+        <ul>
+            <li><span class="highlight">Clean, modern design</span> matching the chrome-extension-overlay.tsx specifications</li>
+            <li><span class="highlight">Tab-based navigation</span> for Summary, Transcript, and Dashboard views</li>
+            <li><span class="highlight">Inline settings panel</span> with radio buttons for modes and depths</li>
+            <li><span class="highlight">Project management</span> with create and save functionality</li>
+            <li><span class="highlight">Interactive quiz generation</span> based on video content</li>
+            <li><span class="highlight">Timestamp navigation</span> to jump to specific video sections</li>
+            <li><span class="highlight">Copy and download</span> buttons for exporting summaries</li>
+        </ul>
+    </div>
+</body>
+</html>

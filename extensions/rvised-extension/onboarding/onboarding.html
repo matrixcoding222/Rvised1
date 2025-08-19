@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Rvised</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 24px;
+            padding: 60px;
+            max-width: 520px;
+            width: 90%;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 30px;
+            background: linear-gradient(135deg, #10b981, #34d399);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: popIn 0.5s ease-out 0.2s both;
+        }
+
+        @keyframes popIn {
+            from {
+                transform: scale(0);
+            }
+            to {
+                transform: scale(1);
+            }
+        }
+
+        .success-icon svg {
+            width: 40px;
+            height: 40px;
+            stroke: white;
+            stroke-width: 3;
+            animation: checkmark 0.4s ease-out 0.7s both;
+        }
+
+        @keyframes checkmark {
+            from {
+                stroke-dasharray: 60;
+                stroke-dashoffset: 60;
+            }
+            to {
+                stroke-dasharray: 60;
+                stroke-dashoffset: 0;
+            }
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .logo img {
+            width: 48px;
+            height: 48px;
+        }
+
+        .logo h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1f2937;
+            letter-spacing: -0.5px;
+        }
+
+        h2 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #111827;
+            text-align: center;
+            margin-bottom: 16px;
+            line-height: 1.3;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: #6b7280;
+            text-align: center;
+            margin-bottom: 40px;
+            line-height: 1.5;
+        }
+
+        .google-btn {
+            width: 100%;
+            padding: 14px 24px;
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #374151;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            transition: all 0.2s;
+            margin-bottom: 20px;
+        }
+
+        .google-btn:hover {
+            background: #f9fafb;
+            border-color: #d1d5db;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .google-btn:active {
+            transform: translateY(0);
+        }
+
+        .google-icon {
+            width: 20px;
+            height: 20px;
+        }
+
+        .features {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .feature {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .feature-icon {
+            width: 24px;
+            height: 24px;
+            background: #eff6ff;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .feature-icon svg {
+            width: 14px;
+            height: 14px;
+            stroke: #3b82f6;
+        }
+
+        .feature-content {
+            flex: 1;
+        }
+
+        .feature-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 4px;
+        }
+
+        .feature-desc {
+            font-size: 13px;
+            color: #6b7280;
+            line-height: 1.4;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid #e5e7eb;
+            border-top-color: #3b82f6;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 12px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .skip-link {
+            display: block;
+            text-align: center;
+            font-size: 14px;
+            color: #6b7280;
+            text-decoration: none;
+            margin-top: 16px;
+            transition: color 0.2s;
+        }
+
+        .skip-link:hover {
+            color: #4b5563;
+        }
+
+        .error-message {
+            display: none;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 16px;
+            font-size: 14px;
+            color: #991b1b;
+        }
+
+        .error-message.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="success-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+        </div>
+
+        <div class="logo">
+            <img src="../icons/glasses.svg" alt="Rvised">
+            <h1>Rvised</h1>
+        </div>
+
+        <h2>Successfully Installed!</h2>
+        <p class="subtitle">Please authorize with Google to start summarizing YouTube videos with AI</p>
+
+        <button class="google-btn" id="signin-btn">
+            <svg class="google-icon" viewBox="0 0 24 24">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+            </svg>
+            Sign in with Google
+        </button>
+
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M13 2L3 14l9 0l-1 8l10-12l-9 0l1-8z"/>
+                    </svg>
+                </div>
+                <div class="feature-content">
+                    <div class="feature-title">Instant AI Summaries</div>
+                    <div class="feature-desc">Get key insights from any YouTube video in seconds</div>
+                </div>
+            </div>
+
+            <div class="feature">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                        <path d="M2 17l10 5 10-5"/>
+                        <path d="M2 12l10 5 10-5"/>
+                    </svg>
+                </div>
+                <div class="feature-content">
+                    <div class="feature-title">Multiple Learning Modes</div>
+                    <div class="feature-desc">Student, Deep Dive, or Build modes for different needs</div>
+                </div>
+            </div>
+
+            <div class="feature">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 11H3v2h6v-2zm0-4H3v2h6V7zm0 8H3v2h6v-2zm12-8h-6v2h6V7zm0 4h-6v2h6v-2zm0 4h-6v2h6v-2z"/>
+                    </svg>
+                </div>
+                <div class="feature-content">
+                    <div class="feature-title">Interactive Quizzes</div>
+                    <div class="feature-desc">Test your knowledge with AI-generated questions</div>
+                </div>
+            </div>
+
+            <div class="feature">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                        <line x1="9" y1="9" x2="15" y2="9"/>
+                        <line x1="9" y1="15" x2="15" y2="15"/>
+                    </svg>
+                </div>
+                <div class="feature-content">
+                    <div class="feature-title">Save to Projects</div>
+                    <div class="feature-desc">Organize your summaries into learning projects</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <div class="loading-text">Signing you in...</div>
+        </div>
+
+        <div class="error-message" id="error">
+            Authentication failed. Please try again.
+        </div>
+
+        <!-- Remove skip link for production -->
+        <!-- <a href="#" class="skip-link" id="skip">Skip for now</a> -->
+    </div>
+
+    <script src="onboarding.js"></script>
+</body>
+</html>

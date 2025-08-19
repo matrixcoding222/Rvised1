@@ -1,7 +1,20 @@
 {
 	"folders": [
 		{
+			"name": "rvised-app",
+			"path": "../Downloads/rvised-app"
+		},
+		{
+			"name": "RVISED3",
 			"path": "."
+		},
+		{
+			"name": "rvised-app (1)",
+			"path": "../Downloads/rvised-app (1)"
+		},
+		{
+			"name": "yt transcript",
+			"path": "../yt transcript"
 		}
 	],
 	"settings": {}

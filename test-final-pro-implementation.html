@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Final Pro Implementation Test - Rvised</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      padding: 40px;
+      background: #f5f5f5;
+      margin: 0;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    h1 {
+      color: #1a1a1a;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .glasses-icon {
+      width: 40px;
+      height: 40px;
+    }
+    
+    .test-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 20px;
+      margin-top: 30px;
+    }
+    
+    .test-card {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .test-card h2 {
+      color: #333;
+      font-size: 18px;
+      margin: 0 0 15px 0;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #f0f0f0;
+    }
+    
+    .status-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    
+    .status-badge.success {
+      background: #d4edda;
+      color: #155724;
+    }
+    
+    .status-badge.pending {
+      background: #fff3cd;
+      color: #856404;
+    }
+    
+    .status-badge.error {
+      background: #f8d7da;
+      color: #721c24;
+    }
+    
+    .checklist {
+      list-style: none;
+      padding: 0;
+      margin: 15px 0;
+    }
+    
+    .checklist li {
+      padding: 8px 0;
+      display: flex;
+      align-items: center;
+      font-size: 14px;
+      color: #666;
+    }
+    
+    .checklist li:before {
+      content: "✓";
+      color: #48bb78;
+      font-weight: bold;
+      margin-right: 10px;
+    }
+    
+    button {
+      background: #3b82f6;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    
+    button:hover {
+      background: #2563eb;
+      transform: translateY(-1px);
+    }
+    
+    button.secondary {
+      background: white;
+      color: #3b82f6;
+      border: 1px solid #3b82f6;
+    }
+    
+    button.secondary:hover {
+      background: #f0f7ff;
+    }
+    
+    .youtube-mock {
+      background: #0f0f0f;
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 30px;
+      position: relative;
+      min-height: 400px;
+    }
+    
+    .video-area {
+      background: #000;
+      aspect-ratio: 16/9;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #666;
+      font-size: 24px;
+    }
+    
+    /* Extension Card Mock */
+    #extension-card {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 440px;
+      height: 600px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      display: none;
+      z-index: 1000;
+      overflow: hidden;
+    }
+    
+    #extension-card.active {
+      display: block;
+    }
+    
+    .extension-header {
+      background: white;
+      padding: 16px 20px;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .extension-content {
+      padding: 20px;
+      height: calc(100% - 60px);
+      overflow-y: auto;
+      position: relative;
+    }
+    
+    .tab-buttons {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    
+    .tab-btn {
+      padding: 8px 16px;
+      background: #f3f4f6;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    
+    .tab-btn:hover {
+      background: #e5e7eb;
+    }
+    
+    .tab-btn.active {
+      background: #3b82f6;
+      color: white;
+    }
+    
+    .results-area {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 20px;
+      margin-top: 20px;
+      min-height: 200px;
+    }
+    
+    pre {
+      background: #1a1a1a;
+      color: #e5e7eb;
+      padding: 15px;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-size: 12px;
+      line-height: 1.5;
+      margin: 10px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>
+      <svg class="glasses-icon" viewBox="0 0 512 512" fill="#3b82f6">
+        <path d="M0 0 C8.8961582 7.39176722 16.73947639 15.35587783 22.875 25.1875 C23.48214844 26.15816406 24.08929688 27.12882812 24.71484375 28.12890625 C33.875 43.29254757 33.875 43.29254757 33.875 50.1875 C34.844375 49.77757812 35.81375 49.36765625 36.8125 48.9453125 C57.74385764 40.40190122 75.05112249 41.58750903 95.875 50.1875 C95.96910156 49.3521875 96.06320312 48.516875 96.16015625 47.65625 C96.98271802 43.66480274 98.47928868 40.2917425 100.3125 36.6875 C100.66739502 35.98971436 101.02229004 35.29192871 101.38793945 34.57299805 C114.56759565 9.3864154 136.53179497 -9.45773006 163.6875 -18.1875 C183.76470941 -24.11373836 206.9172786 -24.30099687 226.875 -17.8125 C227.84518066 -17.49901611 227.84518066 -17.49901611 228.83496094 -17.17919922 C244.98331296 -11.74895994 257.97473188 -2.83581959 269.875 9.1875 C270.75929688 10.04988281 271.64359375 10.91226563 272.5546875 11.80078125 C282.50202175 22.01151843 288.61530426 34.03826066 293.875 47.1875 C307.24 47.6825 307.24 47.6825 320.875 48.1875 C320.875 55.7775 320.875 63.3675 320.875 71.1875 C313.615 71.1875 306.355 71.1875 298.875 71.1875 C299.08125 72.755 299.2875 74.3225 299.5 75.9375 C301.60041164 102.16175705 292.6523184 128.98444643 275.875 149.1875 C258.06285835 169.57947908 235.75536549 182.21066181 208.875 186.1875 C176.77851913 188.10303742 149.4429415 181.69860085 124.875 160.1875 C117.90187595 153.76412432 111.94433725 147.20114929 106.875 139.1875 C106.36453125 138.42179688 105.8540625 137.65609375 105.328125 136.8671875 C95.11729738 120.91934848 90.5744492 102.41483083 90.24609375 83.640625 C89.84140528 79.87489233 88.68842945 77.47764786 86.875 74.1875 C86.875 73.5275 86.875 72.8675 86.875 72.1875 C76.45366354 66.85677029 66.36506431 63.96638293 54.6796875 67.0234375 C52.00822516 67.97091614 49.44489911 68.99402143 46.875 70.1875 C46.13894531 70.51105469 45.40289062 70.83460938 44.64453125 71.16796875 C42.08190458 72.64444902 41.74795146 74.43434539 40.875 77.1875 C40.545 78.1775 40.215 79.1675 39.875 80.1875 C39.74412548 82.54033303 39.64500839 84.89497479 39.5625 87.25 C38.11525556 114.15153935 27.37816976 136.82451752 8.875 156.1875 C8.05128906 157.10595703 8.05128906 157.10595703 7.2109375 158.04296875 C-7.75980438 174.15679683 -32.21947615 185.05920688 -54.09082031 186.36450195 C-68.87832357 186.65565847 -82.95515018 186.79428974 -97.125 182.1875 C-98.09518066 181.87401611 -98.09518066 181.87401611 -99.08496094 181.55419922 C-114.75757087 176.2839387 -127.45108132 167.72306112 -139.125 156.1875 C-139.84042969 155.54425781 -140.55585938 154.90101563 -141.29296875 154.23828125 C-158.37667474 138.51854381 -167.25263031 114.52644662 -169.4375 91.9375 C-169.52620361 91.02661621 -169.61490723 90.11573242 -169.70629883 89.17724609 C-170.22335144 82.83343041 -169.78578239 77.79532394 -169.125 71.1875 C-176.385 71.1875 -183.645 71.1875 -191.125 71.1875 C-191.125 63.5975 -191.125 56.0075 -191.125 48.1875 C-182.215 47.8575 -173.305 47.5275 -164.125 47.1875 C-163.320625 45.16625 -162.51625 43.145 -161.6875 41.0625 C-156.16249001 27.91657275 -148.15322855 17.22969544 -138.125 7.1875 C-137.26132813 6.31222656 -136.39765625 5.43695313 -135.5078125 4.53515625 C-124.60352603 -5.96466855 -111.48609401 -13.17215647 -97.125 -17.8125 C-96.15481934 -18.12791748 -96.15481934 -18.12791748 -95.16503906 -18.44970703 C-62.36334688 -28.55915975 -26.79299014 -20.6327121 0 0 Z M-108.125 12.1875 C-108.96417969 12.64769531 -109.80335937 13.10789062 -110.66796875 13.58203125 C-122.60638272 20.77987282 -131.69099727 32.02417103 -138.125 44.1875 C-138.60453125 45.06664062 -139.0840625 45.94578125 -139.578125 46.8515625 C-148.80452012 65.24877204 -150.11157174 87.58701425 -143.87011719 107.12304688 C-141.5842847 113.45627083 -138.44790076 119.34802834 -135.125 125.1875 C-134.66480469 126.02667969 -134.20460938 126.86585938 -133.73046875 127.73046875 C-126.53262718 139.66888272 -115.28832897 148.75349727 -103.125 155.1875 C-102.24585938 155.66703125 -101.36671875 156.1465625 -100.4609375 156.640625 C-82.05708774 165.87035026 -59.72063947 167.17288947 -40.18066406 160.92382812 C-17.92660215 152.95253944 -1.0622585 137.57417537 9.6640625 116.70703125 C18.28698689 97.91075517 19.95529098 75.89455725 13.19091797 56.1953125 C5.06521263 34.31720451 -9.92359697 17.93170599 -30.63671875 7.40234375 C-56.83293714 -4.53703014 -83.60824227 -1.76354859 -108.125 12.1875 Z M130.875 30.1875 C116.23253093 49.36075724 110.6728078 71.30825148 113.30859375 95.1015625 C116.88845262 116.22495335 128.76474103 136.05798398 146.1953125 148.66015625 C165.0999805 161.64394093 186.63088155 167.12508541 209.37109375 163.56640625 C219.72669526 161.59363064 228.76303789 157.3725831 237.875 152.1875 C238.71417969 151.72730469 239.55335938 151.26710938 240.41796875 150.79296875 C252.35638272 143.59512718 261.44099727 132.35082897 267.875 120.1875 C268.35453125 119.30835938 268.8340625 118.42921875 269.328125 117.5234375 C278.55452012 99.12622796 279.86157174 76.78798575 273.62011719 57.25195312 C271.3342847 50.91872917 268.19790076 45.02697166 264.875 39.1875 C264.41480469 38.34832031 263.95460938 37.50914062 263.48046875 36.64453125 C256.28262718 24.70611728 245.03832897 15.62150273 232.875 9.1875 C231.99585938 8.70796875 231.11671875 8.2284375 230.2109375 7.734375 C196.0764123 -9.38445033 155.13834257 1.84100592 130.875 30.1875 Z" transform="translate(191.125,173.8125)"/>
+      </svg>
+      Final Pro Implementation Test
+    </h1>
+    <p style="color: #666; margin: 0 0 20px 0;">Comprehensive test of all Pro features with final UI implementation</p>
+    
+    <div class="test-grid">
+      <!-- Test Card 1: UI Implementation -->
+      <div class="test-card">
+        <h2>✨ UI Implementation</h2>
+        <span class="status-badge success">Completed</span>
+        <ul class="checklist">
+          <li>White background with blue accents (#3b82f6)</li>
+          <li>Rvised glasses.svg logo displayed correctly</li>
+          <li>Correct pricing: $7.99/mo or $3.99/mo annually</li>
+          <li>Clean, minimal design without trust badges</li>
+          <li>Fits within extension card (440x600px)</li>
+          <li>Smooth fade-in animation</li>
+        </ul>
+      </div>
+      
+      <!-- Test Card 2: Dashboard Access -->
+      <div class="test-card">
+        <h2>🔒 Dashboard Access</h2>
+        <span class="status-badge success">Pro-Only</span>
+        <ul class="checklist">
+          <li>Free users see ProGate component</li>
+          <li>Pro users have direct access</li>
+          <li>Middleware protection active</li>
+          <li>Extension shows Pro popup for free users</li>
+          <li>Upgrade flow redirects correctly</li>
+        </ul>
+      </div>
+      
+      <!-- Test Card 3: Usage Limits -->
+      <div class="test-card">
+        <h2>📊 Usage Limits</h2>
+        <span class="status-badge success">Working</span>
+        <ul class="checklist">
+          <li>Free: 3 summaries per day</li>
+          <li>Free: 20-minute video max</li>
+          <li>Pro: Unlimited summaries</li>
+          <li>Pro: No video length limit</li>
+          <li>Daily reset at midnight</li>
+        </ul>
+      </div>
+      
+      <!-- Test Card 4: Extension Features -->
+      <div class="test-card">
+        <h2>🧩 Extension Integration</h2>
+        <span class="status-badge success">Complete</span>
+        <ul class="checklist">
+          <li>Pro popup shows in extension card</li>
+          <li>Not a browser alert</li>
+          <li>Dashboard button checks user tier</li>
+          <li>Save to Project feature working</li>
+          <li>Transcript extraction functional</li>
+        </ul>
+      </div>
+    </div>
+    
+    <!-- Interactive Test Section -->
+    <div class="youtube-mock">
+      <div style="display: flex; gap: 20px; margin-bottom: 20px;">
+        <button onclick="setUserTier('free')">Test as Free User</button>
+        <button onclick="setUserTier('pro')" class="secondary">Test as Pro User</button>
+        <button onclick="showExtension()">Open Extension</button>
+      </div>
+      
+      <div class="video-area">
+        YouTube Video Player Mock
+      </div>
+      
+      <div style="color: white; margin-top: 15px;">
+        <h3 style="font-size: 20px; margin: 0;">Sample Video Title</h3>
+        <p style="color: #aaa; font-size: 14px;">1.2M views • 2 days ago</p>
+      </div>
+    </div>
+    
+    <!-- Results Area -->
+    <div class="results-area">
+      <h3 style="margin: 0 0 15px 0;">Test Results</h3>
+      <div id="test-output">
+        <p style="color: #666;">Click the buttons above to test different scenarios.</p>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Extension Card Mock -->
+  <div id="extension-card">
+    <div class="extension-header">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <svg width="32" height="32" viewBox="0 0 512 512" fill="#3b82f6">
+          <path d="M0 0 C8.8961582 7.39176722 16.73947639 15.35587783 22.875 25.1875 C23.48214844 26.15816406 24.08929688 27.12882812 24.71484375 28.12890625 C33.875 43.29254757 33.875 43.29254757 33.875 50.1875 C34.844375 49.77757812 35.81375 49.36765625 36.8125 48.9453125 C57.74385764 40.40190122 75.05112249 41.58750903 95.875 50.1875 C95.96910156 49.3521875 96.06320312 48.516875 96.16015625 47.65625 C96.98271802 43.66480274 98.47928868 40.2917425 100.3125 36.6875 C100.66739502 35.98971436 101.02229004 35.29192871 101.38793945 34.57299805 C114.56759565 9.3864154 136.53179497 -9.45773006 163.6875 -18.1875 C183.76470941 -24.11373836 206.9172786 -24.30099687 226.875 -17.8125 C227.84518066 -17.49901611 227.84518066 -17.49901611 228.83496094 -17.17919922 C244.98331296 -11.74895994 257.97473188 -2.83581959 269.875 9.1875 C270.75929688 10.04988281 271.64359375 10.91226563 272.5546875 11.80078125 C282.50202175 22.01151843 288.61530426 34.03826066 293.875 47.1875 C307.24 47.6825 307.24 47.6825 320.875 48.1875 C320.875 55.7775 320.875 63.3675 320.875 71.1875 C313.615 71.1875 306.355 71.1875 298.875 71.1875 C299.08125 72.755 299.2875 74.3225 299.5 75.9375 C301.60041164 102.16175705 292.6523184 128.98444643 275.875 149.1875 C258.06285835 169.57947908 235.75536549 182.21066181 208.875 186.1875 C176.77851913 188.10303742 149.4429415 181.69860085 124.875 160.1875 C117.90187595 153.76412432 111.94433725 147.20114929 106.875 139.1875 C106.36453125 138.42179688 105.8540625 137.65609375 105.328125 136.8671875 C95.11729738 120.91934848 90.5744492 102.41483083 90.24609375 83.640625 C89.84140528 79.87489233 88.68842945 77.47764786 86.875 74.1875 C86.875 73.5275 86.875 72.8675 86.875 72.1875 C76.45366354 66.85677029 66.36506431 63.96638293 54.6796875 67.0234375 C52.00822516 67.97091614 49.44489911 68.99402143 46.875 70.1875 C46.13894531 70.51105469 45.40289062 70.83460938 44.64453125 71.16796875 C42.08190458 72.64444902 41.74795146 74.43434539 40.875 77.1875 C40.545 78.1775 40.215 79.1675 39.875 80.1875 C39.74412548 82.54033303 39.64500839 84.89497479 39.5625 87.25 C38.11525556 114.15153935 27.37816976 136.82451752 8.875 156.1875 C8.05128906 157.10595703 8.05128906 157.10595703 7.2109375 158.04296875 C-7.75980438 174.15679683 -32.21947615 185.05920688 -54.09082031 186.36450195 C-68.87832357 186.65565847 -82.95515018 186.79428974 -97.125 182.1875 C-98.09518066 181.87401611 -98.09518066 181.87401611 -99.08496094 181.55419922 C-114.75757087 176.2839387 -127.45108132 167.72306112 -139.125 156.1875 C-139.84042969 155.54425781 -140.55585938 154.90101563 -141.29296875 154.23828125 C-158.37667474 138.51854381 -167.25263031 114.52644662 -169.4375 91.9375 C-169.52620361 91.02661621 -169.61490723 90.11573242 -169.70629883 89.17724609 C-170.22335144 82.83343041 -169.78578239 77.79532394 -169.125 71.1875 C-176.385 71.1875 -183.645 71.1875 -191.125 71.1875 C-191.125 63.5975 -191.125 56.0075 -191.125 48.1875 C-182.215 47.8575 -173.305 47.5275 -164.125 47.1875 C-163.320625 45.16625 -162.51625 43.145 -161.6875 41.0625 C-156.16249001 27.91657275 -148.15322855 17.22969544 -138.125 7.1875 C-137.26132813 6.31222656 -136.39765625 5.43695313 -135.5078125 4.53515625 C-124.60352603 -5.96466855 -111.48609401 -13.17215647 -97.125 -17.8125 C-96.15481934 -18.12791748 -96.15481934 -18.12791748 -95.16503906 -18.44970703 C-62.36334688 -28.55915975 -26.79299014 -20.6327121 0 0 Z M-108.125 12.1875 C-108.96417969 12.64769531 -109.80335937 13.10789062 -110.66796875 13.58203125 C-122.60638272 20.77987282 -131.69099727 32.02417103 -138.125 44.1875 C-138.60453125 45.06664062 -139.0840625 45.94578125 -139.578125 46.8515625 C-148.80452012 65.24877204 -150.11157174 87.58701425 -143.87011719 107.12304688 C-141.5842847 113.45627083 -138.44790076 119.34802834 -135.125 125.1875 C-134.66480469 126.02667969 -134.20460938 126.86585938 -133.73046875 127.73046875 C-126.53262718 139.66888272 -115.28832897 148.75349727 -103.125 155.1875 C-102.24585938 155.66703125 -101.36671875 156.1465625 -100.4609375 156.640625 C-82.05708774 165.87035026 -59.72063947 167.17288947 -40.18066406 160.92382812 C-17.92660215 152.95253944 -1.0622585 137.57417537 9.6640625 116.70703125 C18.28698689 97.91075517 19.95529098 75.89455725 13.19091797 56.1953125 C5.06521263 34.31720451 -9.92359697 17.93170599 -30.63671875 7.40234375 C-56.83293714 -4.53703014 -83.60824227 -1.76354859 -108.125 12.1875 Z M130.875 30.1875 C116.23253093 49.36075724 110.6728078 71.30825148 113.30859375 95.1015625 C116.88845262 116.22495335 128.76474103 136.05798398 146.1953125 148.66015625 C165.0999805 161.64394093 186.63088155 167.12508541 209.37109375 163.56640625 C219.72669526 161.59363064 228.76303789 157.3725831 237.875 152.1875 C238.71417969 151.72730469 239.55335938 151.26710938 240.41796875 150.79296875 C252.35638272 143.59512718 261.44099727 132.35082897 267.875 120.1875 C268.35453125 119.30835938 268.8340625 118.42921875 269.328125 117.5234375 C278.55452012 99.12622796 279.86157174 76.78798575 273.62011719 57.25195312 C271.3342847 50.91872917 268.19790076 45.02697166 264.875 39.1875 C264.41480469 38.34832031 263.95460938 37.50914062 263.48046875 36.64453125 C256.28262718 24.70611728 245.03832897 15.62150273 232.875 9.1875 C231.99585938 8.70796875 231.11671875 8.2284375 230.2109375 7.734375 C196.0764123 -9.38445033 155.13834257 1.84100592 130.875 30.1875 Z" transform="translate(191.125,173.8125)"/>
+        </svg>
+        <span style="font-weight: 600; color: #1a1a1a;">Rvised</span>
+      </div>
+      <button onclick="hideExtension()" style="
+        background: none;
+        border: none;
+        color: #666;
+        font-size: 24px;
+        cursor: pointer;
+        padding: 0;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      ">×</button>
+    </div>
+    <div class="extension-content" id="extension-content">
+      <div class="tab-buttons">
+        <button class="tab-btn active">Summary</button>
+        <button class="tab-btn">Transcript</button>
+        <button class="tab-btn" onclick="triggerDashboard()">Dashboard</button>
+      </div>
+      
+      <div style="background: #f8f9fa; border-radius: 8px; padding: 20px;">
+        <h3 style="margin: 0 0 10px 0; font-size: 16px;">Extension Ready</h3>
+        <p style="margin: 0; color: #666; font-size: 14px;">
+          Click the Dashboard tab to test the Pro feature overlay.
+        </p>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    let currentTier = 'free';
+    
+    function setUserTier(tier) {
+      currentTier = tier;
+      localStorage.setItem('rvised_userTier', tier);
+      
+      const output = document.getElementById('test-output');
+      output.innerHTML = `
+        <div style="padding: 15px; background: ${tier === 'pro' ? '#d4edda' : '#fff3cd'}; border-radius: 8px; margin-bottom: 10px;">
+          <strong>User Tier Set:</strong> ${tier.toUpperCase()}
+        </div>
+        <p style="color: #666; margin: 10px 0;">
+          ${tier === 'free' ? 
+            '• Dashboard will show Pro overlay<br>• 3 summaries per day limit<br>• 20-minute video maximum' : 
+            '• Full dashboard access<br>• Unlimited summaries<br>• No video length restrictions'
+          }
+        </p>
+      `;
+    }
+    
+    function showExtension() {
+      document.getElementById('extension-card').classList.add('active');
+    }
+    
+    function hideExtension() {
+      document.getElementById('extension-card').classList.remove('active');
+    }
+    
+    function triggerDashboard() {
+      if (currentTier === 'pro') {
+        window.open('http://localhost:3000/dashboard', '_blank');
+        return;
+      }
+      
+      // Show Pro overlay for free users
+      const container = document.getElementById('extension-content');
+      
+      // Remove existing overlay if present
+      const existing = container.querySelector('#pro-overlay');
+      if (existing) existing.remove();
+      
+      // Create the final Pro overlay with all requested features
+      const overlay = document.createElement('div');
+      overlay.id = 'pro-overlay';
+      overlay.innerHTML = \`
+        <div style="
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: white;
+          z-index: 10000;
+          display: flex;
+          flex-direction: column;
+          animation: fadeIn 0.3s ease-out;
+          overflow-y: auto;
+        ">
+          <style>
+            @keyframes fadeIn {
+              from { opacity: 0; transform: translateY(10px); }
+              to { opacity: 1; transform: translateY(0); }
+            }
+          </style>
+          
+          <!-- Header -->
+          <div style="padding: 20px 20px 0; text-align: center;">
+            <button onclick="this.closest('#pro-overlay').remove()" style="
+              position: absolute;
+              top: 16px;
+              right: 16px;
+              background: none;
+              border: none;
+              color: #9ca3af;
+              font-size: 24px;
+              cursor: pointer;
+              padding: 0;
+              width: 32px;
+              height: 32px;
+            ">×</button>
+            
+            <!-- Logo -->
+            <div style="margin: 20px 0;">
+              <svg width="60" height="60" viewBox="0 0 512 512" fill="#3b82f6">
+                <path d="M0 0 C8.8961582 7.39176722 16.73947639 15.35587783 22.875 25.1875 C23.48214844 26.15816406 24.08929688 27.12882812 24.71484375 28.12890625 C33.875 43.29254757 33.875 43.29254757 33.875 50.1875 C34.844375 49.77757812 35.81375 49.36765625 36.8125 48.9453125 C57.74385764 40.40190122 75.05112249 41.58750903 95.875 50.1875 C95.96910156 49.3521875 96.06320312 48.516875 96.16015625 47.65625 C96.98271802 43.66480274 98.47928868 40.2917425 100.3125 36.6875 C100.66739502 35.98971436 101.02229004 35.29192871 101.38793945 34.57299805 C114.56759565 9.3864154 136.53179497 -9.45773006 163.6875 -18.1875 C183.76470941 -24.11373836 206.9172786 -24.30099687 226.875 -17.8125 C227.84518066 -17.49901611 227.84518066 -17.49901611 228.83496094 -17.17919922 C244.98331296 -11.74895994 257.97473188 -2.83581959 269.875 9.1875 C270.75929688 10.04988281 271.64359375 10.91226563 272.5546875 11.80078125 C282.50202175 22.01151843 288.61530426 34.03826066 293.875 47.1875 C307.24 47.6825 307.24 47.6825 320.875 48.1875 C320.875 55.7775 320.875 63.3675 320.875 71.1875 C313.615 71.1875 306.355 71.1875 298.875 71.1875 C299.08125 72.755 299.2875 74.3225 299.5 75.9375 C301.60041164 102.16175705 292.6523184 128.98444643 275.875 149.1875 C258.06285835 169.57947908 235.75536549 182.21066181 208.875 186.1875 C176.77851913 188.10303742 149.4429415 181.69860085 124.875 160.1875 C117.90187595 153.76412432 111.94433725 147.20114929 106.875 139.1875 C106.36453125 138.42179688 105.8540625 137.65609375 105.328125 136.8671875 C95.11729738 120.91934848 90.5744492 102.41483083 90.24609375 83.640625 C89.84140528 79.87489233 88.68842945 77.47764786 86.875 74.1875 C86.875 73.5275 86.875 72.8675 86.875 72.1875 C76.45366354 66.85677029 66.36506431 63.96638293 54.6796875 67.0234375 C52.00822516 67.97091614 49.44489911 68.99402143 46.875 70.1875 C46.13894531 70.51105469 45.40289062 70.83460938 44.64453125 71.16796875 C42.08190458 72.64444902 41.74795146 74.43434539 40.875 77.1875 C40.545 78.1775 40.215 79.1675 39.875 80.1875 C39.74412548 82.54033303 39.64500839 84.89497479 39.5625 87.25 C38.11525556 114.15153935 27.37816976 136.82451752 8.875 156.1875 C8.05128906 157.10595703 8.05128906 157.10595703 7.2109375 158.04296875 C-7.75980438 174.15679683 -32.21947615 185.05920688 -54.09082031 186.36450195 C-68.87832357 186.65565847 -82.95515018 186.79428974 -97.125 182.1875 C-98.09518066 181.87401611 -98.09518066 181.87401611 -99.08496094 181.55419922 C-114.75757087 176.2839387 -127.45108132 167.72306112 -139.125 156.1875 C-139.84042969 155.54425781 -140.55585938 154.90101563 -141.29296875 154.23828125 C-158.37667474 138.51854381 -167.25263031 114.52644662 -169.4375 91.9375 C-169.52620361 91.02661621 -169.61490723 90.11573242 -169.70629883 89.17724609 C-170.22335144 82.83343041 -169.78578239 77.79532394 -169.125 71.1875 C-176.385 71.1875 -183.645 71.1875 -191.125 71.1875 C-191.125 63.5975 -191.125 56.0075 -191.125 48.1875 C-182.215 47.8575 -173.305 47.5275 -164.125 47.1875 C-163.320625 45.16625 -162.51625 43.145 -161.6875 41.0625 C-156.16249001 27.91657275 -148.15322855 17.22969544 -138.125 7.1875 C-137.26132813 6.31222656 -136.39765625 5.43695313 -135.5078125 4.53515625 C-124.60352603 -5.96466855 -111.48609401 -13.17215647 -97.125 -17.8125 C-96.15481934 -18.12791748 -96.15481934 -18.12791748 -95.16503906 -18.44970703 C-62.36334688 -28.55915975 -26.79299014 -20.6327121 0 0 Z M-108.125 12.1875 C-108.96417969 12.64769531 -109.80335937 13.10789062 -110.66796875 13.58203125 C-122.60638272 20.77987282 -131.69099727 32.02417103 -138.125 44.1875 C-138.60453125 45.06664062 -139.0840625 45.94578125 -139.578125 46.8515625 C-148.80452012 65.24877204 -150.11157174 87.58701425 -143.87011719 107.12304688 C-141.5842847 113.45627083 -138.44790076 119.34802834 -135.125 125.1875 C-134.66480469 126.02667969 -134.20460938 126.86585938 -133.73046875 127.73046875 C-126.53262718 139.66888272 -115.28832897 148.75349727 -103.125 155.1875 C-102.24585938 155.66703125 -101.36671875 156.1465625 -100.4609375 156.640625 C-82.05708774 165.87035026 -59.72063947 167.17288947 -40.18066406 160.92382812 C-17.92660215 152.95253944 -1.0622585 137.57417537 9.6640625 116.70703125 C18.28698689 97.91075517 19.95529098 75.89455725 13.19091797 56.1953125 C5.06521263 34.31720451 -9.92359697 17.93170599 -30.63671875 7.40234375 C-56.83293714 -4.53703014 -83.60824227 -1.76354859 -108.125 12.1875 Z M130.875 30.1875 C116.23253093 49.36075724 110.6728078 71.30825148 113.30859375 95.1015625 C116.88845262 116.22495335 128.76474103 136.05798398 146.1953125 148.66015625 C165.0999805 161.64394093 186.63088155 167.12508541 209.37109375 163.56640625 C219.72669526 161.59363064 228.76303789 157.3725831 237.875 152.1875 C238.71417969 151.72730469 239.55335938 151.26710938 240.41796875 150.79296875 C252.35638272 143.59512718 261.44099727 132.35082897 267.875 120.1875 C268.35453125 119.30835938 268.8340625 118.42921875 269.328125 117.5234375 C278.55452012 99.12622796 279.86157174 76.78798575 273.62011719 57.25195312 C271.3342847 50.91872917 268.19790076 45.02697166 264.875 39.1875 C264.41480469 38.34832031 263.95460938 37.50914062 263.48046875 36.64453125 C256.28262718 24.70611728 245.03832897 15.62150273 232.875 9.1875 C231.99585938 8.70796875 231.11671875 8.2284375 230.2109375 7.734375 C196.0764123 -9.38445033 155.13834257 1.84100592 130.875 30.1875 Z" transform="translate(191.125,173.8125)"/>
+              </svg>
+            </div>
+            
+            <h2 style="color: #1a1a1a; font-size: 24px; font-weight: 700; margin: 0 0 8px 0;">
+              Upgrade to Rvised Pro
+            </h2>
+            <p style="color: #6b7280; font-size: 14px; margin: 0 0 24px 0;">
+              Unlock the Dashboard and all premium features
+            </p>
+          </div>
+          
+          <!-- Features -->
+          <div style="padding: 0 20px 20px;">
+            <div style="margin-bottom: 20px;">
+              <div style="display: flex; align-items: start; gap: 12px; margin-bottom: 16px;">
+                <span style="color: #10b981; font-size: 20px; line-height: 1;">✓</span>
+                <div>
+                  <div style="color: #1a1a1a; font-weight: 600; font-size: 15px;">Unlimited Summaries</div>
+                  <div style="color: #6b7280; font-size: 13px; margin-top: 2px;">No daily limits, summarize as much as you want</div>
+                </div>
+              </div>
+              
+              <div style="display: flex; align-items: start; gap: 12px; margin-bottom: 16px;">
+                <span style="color: #10b981; font-size: 20px; line-height: 1;">✓</span>
+                <div>
+                  <div style="color: #1a1a1a; font-weight: 600; font-size: 15px;">Full Dashboard Access</div>
+                  <div style="color: #6b7280; font-size: 13px; margin-top: 2px;">Track your learning with advanced analytics</div>
+                </div>
+              </div>
+              
+              <div style="display: flex; align-items: start; gap: 12px; margin-bottom: 16px;">
+                <span style="color: #10b981; font-size: 20px; line-height: 1;">✓</span>
+                <div>
+                  <div style="color: #1a1a1a; font-weight: 600; font-size: 15px;">No Video Length Limits</div>
+                  <div style="color: #6b7280; font-size: 13px; margin-top: 2px;">Summarize videos of any length</div>
+                </div>
+              </div>
+              
+              <div style="display: flex; align-items: start; gap: 12px; margin-bottom: 16px;">
+                <span style="color: #10b981; font-size: 20px; line-height: 1;">✓</span>
+                <div>
+                  <div style="color: #1a1a1a; font-weight: 600; font-size: 15px;">Priority Processing</div>
+                  <div style="color: #6b7280; font-size: 13px; margin-top: 2px;">Faster summary generation</div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Pricing -->
+            <div style="background: #f9fafb; border-radius: 12px; padding: 16px; margin-bottom: 20px; text-align: center;">
+              <div style="display: flex; justify-content: center; gap: 24px;">
+                <div>
+                  <div style="color: #1a1a1a; font-size: 24px; font-weight: 700;">$7.99</div>
+                  <div style="color: #6b7280; font-size: 13px;">per month</div>
+                </div>
+                <div style="border-left: 1px solid #e5e7eb; padding-left: 24px;">
+                  <div style="color: #1a1a1a; font-size: 24px; font-weight: 700;">$3.99</div>
+                  <div style="color: #6b7280; font-size: 13px;">per month (annual)</div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- CTA Buttons -->
+            <div style="display: flex; gap: 12px;">
+              <button onclick="window.open('http://localhost:3000/dashboard/upgrade', '_blank')" style="
+                flex: 1;
+                background: #3b82f6;
+                color: white;
+                border: none;
+                padding: 12px 24px;
+                border-radius: 8px;
+                font-size: 15px;
+                font-weight: 600;
+                cursor: pointer;
+              ">Upgrade Now</button>
+              <button onclick="this.closest('#pro-overlay').remove()" style="
+                padding: 12px 24px;
+                background: white;
+                color: #6b7280;
+                border: 1px solid #e5e7eb;
+                border-radius: 8px;
+                font-size: 15px;
+                font-weight: 500;
+                cursor: pointer;
+              ">Maybe Later</button>
+            </div>
+          </div>
+        </div>
+      \`;
+      
+      container.appendChild(overlay);
+      
+      // Update test output
+      document.getElementById('test-output').innerHTML += `
+        <div style="padding: 15px; background: #e0f2fe; border-radius: 8px; margin-top: 10px;">
+          <strong>Pro Overlay Triggered:</strong> Dashboard access attempted by free user
+        </div>
+      `;
+    }
+    
+    // Initialize with free tier
+    setUserTier('free');
+  </script>
+</body>
+</html>

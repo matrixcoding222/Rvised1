@@ -52,6 +52,17 @@
             color: #6b7280;
             margin: 0;
         }
+
+        .health-badge {
+            display:inline-block;
+            font-size:12px;
+            padding:2px 8px;
+            border-radius:999px;
+            margin-top:6px;
+            border:1px solid #e5e7eb;
+        }
+        .health-ok { background:#ecfdf5; color:#065f46; border-color:#a7f3d0; }
+        .health-bad { background:#fef2f2; color:#991b1b; border-color:#fecaca; }
         
         .content {
             flex: 1;
@@ -258,6 +269,7 @@
             <div class="header">
                 <h1>Rvised</h1>
                 <p>Set up your YouTube learning experience</p>
+                <span id="apiHealthStatus" class="health-badge">API: …</span>
             </div>
             
             <div class="content">

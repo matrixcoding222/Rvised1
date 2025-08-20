@@ -1,10 +1,34 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
+import { NextResponse } from 'next/server'
+
+// WAITLIST MODE - Set to false when ready to launch
+const WAITLIST_MODE = true
+
+// Allowed users during waitlist period
+const ALLOWED_EMAILS = [
+  'tyson.so1122@gmail.com',
+  'developer@rvised.app',
+  'pro@rvised.app'
+]
+
+// Pro users who have full access
+const PRO_USERS = [
+  'tyson.so1122@gmail.com',
+  'developer@rvised.app',
+  'pro@rvised.app'
+]
 
 const isProtectedRoute = createRouteMatcher([
   '/projects(.*)',
   '/library(.*)',
   '/settings(.*)',
   '/dashboard(.*)'
+])
+
+const isProOnlyRoute = createRouteMatcher([
+  '/dashboard(.*)',
+  '/library(.*)',
+  '/projects(.*)'
 ])
 
 // These routes should be accessible without authentication (for extension and testing)
@@ -22,6 +46,29 @@ export default clerkMiddleware(async (auth, req) => {
     return
   }
 
+  // Get user info
+  const { userId, sessionClaims } = await auth()
+  const userEmail = sessionClaims?.email as string | undefined
+
+  // WAITLIST MODE: Block signups for non-allowed users
+  if (WAITLIST_MODE && userId && userEmail) {
+    if (!ALLOWED_EMAILS.includes(userEmail.toLowerCase())) {
+      // Redirect unauthorized users to home with message
+      if (url.pathname !== '/' && !url.pathname.startsWith('/api')) {
+        return NextResponse.redirect(new URL('/?blocked=waitlist', req.url))
+      }
+    }
+  }
+
+  // PRO FEATURES: Block non-pro users from pro-only routes
+  if (isProOnlyRoute(req) && userId && userEmail) {
+    if (!PRO_USERS.includes(userEmail.toLowerCase())) {
+      // Redirect to upgrade page
+      return NextResponse.redirect(new URL('/dashboard/upgrade', req.url))
+    }
+  }
+
+  // Standard protection for authenticated routes
   if (isProtectedRoute(req)) {
     await auth.protect()
   }

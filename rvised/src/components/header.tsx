@@ -9,12 +9,14 @@ import { SignUpModal } from "@/components/sign-up-modal"
 import { EmailCollectionFlow } from "@/components/email-collection-flow"
 import { WaitlistBanner } from "@/components/waitlist-banner"
 import { Chrome, Bell } from "lucide-react"
+import { isWaitlistMode } from "@/config/app-config"
 
 export function Header() {
   const { isSignedIn } = useAuth()
   const { redirectToSignIn } = useClerk()
   const [showSignUpModal, setShowSignUpModal] = useState(false)
   const [showEmailFlow, setShowEmailFlow] = useState(false)
+  const inWaitlistMode = isWaitlistMode()
 
   const handleEmailSignUp = () => {
     setShowEmailFlow(true)
@@ -76,25 +78,28 @@ export function Header() {
           </nav>
 
           <div className="flex items-center gap-3">
-            {isSignedIn ? (
-              <Link href="/dashboard">
+            {/* HIDE SIGN-IN COMPLETELY DURING WAITLIST MODE */}
+            {!inWaitlistMode && (
+              isSignedIn ? (
+                <Link href="/dashboard">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                  >
+                    Dashboard
+                  </Button>
+                </Link>
+              ) : (
                 <Button
                   variant="ghost"
                   size="sm"
                   className="text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                  onClick={handleSignIn}
                 >
-                  Dashboard
+                  Sign In
                 </Button>
-              </Link>
-            ) : (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-                onClick={handleSignIn}
-              >
-                Sign In
-              </Button>
+              )
             )}
             <Button
               size="sm"

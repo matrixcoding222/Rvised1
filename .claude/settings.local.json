@@ -25,7 +25,8 @@
       "Bash(taskkill:*)",
       "Bash(git add:*)",
       "Bash(git rm:*)",
-      "Bash(true)"
+      "Bash(true)",
+      "Bash(npx vercel:*)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits"

@@ -46,16 +46,43 @@ export default clerkMiddleware(async (auth, req) => {
     return
   }
 
+  // BLOCK ALL SIGN-IN/SIGN-UP PAGES IN WAITLIST MODE
+  if (WAITLIST_MODE) {
+    // Block sign-in and sign-up pages entirely
+    if (url.pathname.startsWith('/sign-in') || 
+        url.pathname.startsWith('/sign-up') ||
+        url.pathname.startsWith('/sso-callback')) {
+      
+      // Check if trying to authenticate
+      const { userId, sessionClaims } = await auth()
+      const userEmail = sessionClaims?.email as string | undefined
+      
+      // If no user or not in whitelist, block completely
+      if (!userEmail || !ALLOWED_EMAILS.includes(userEmail.toLowerCase())) {
+        console.log(`BLOCKED: ${userEmail || 'unknown'} tried to access ${url.pathname}`)
+        // Show waitlist message
+        const blockedUrl = new URL('/', req.url)
+        blockedUrl.searchParams.set('blocked', 'waitlist')
+        blockedUrl.searchParams.set('message', 'Sign-ups are closed. Join the waitlist!')
+        return NextResponse.redirect(blockedUrl)
+      }
+    }
+  }
+
   // Get user info
   const { userId, sessionClaims } = await auth()
   const userEmail = sessionClaims?.email as string | undefined
 
-  // WAITLIST MODE: Block signups for non-allowed users
+  // WAITLIST MODE: Block any authenticated user not in whitelist
   if (WAITLIST_MODE && userId && userEmail) {
     if (!ALLOWED_EMAILS.includes(userEmail.toLowerCase())) {
-      // Redirect unauthorized users to home with message
+      console.log(`BLOCKING USER: ${userEmail} not in whitelist`)
+      // Sign them out and redirect
       if (url.pathname !== '/' && !url.pathname.startsWith('/api')) {
-        return NextResponse.redirect(new URL('/?blocked=waitlist', req.url))
+        const blockedUrl = new URL('/', req.url)
+        blockedUrl.searchParams.set('blocked', 'unauthorized')
+        blockedUrl.searchParams.set('message', 'Your account is not authorized. Join the waitlist!')
+        return NextResponse.redirect(blockedUrl)
       }
     }
   }
@@ -63,6 +90,7 @@ export default clerkMiddleware(async (auth, req) => {
   // PRO FEATURES: Block non-pro users from pro-only routes
   if (isProOnlyRoute(req) && userId && userEmail) {
     if (!PRO_USERS.includes(userEmail.toLowerCase())) {
+      console.log(`BLOCKING PRO FEATURE: ${userEmail} tried to access ${url.pathname}`)
       // Redirect to upgrade page
       return NextResponse.redirect(new URL('/dashboard/upgrade', req.url))
     }

@@ -40,33 +40,45 @@ const isPublicApiRoute = createRouteMatcher([
 ])
 
 export default clerkMiddleware(async (auth, req) => {
-  // Skip Clerk middleware entirely for public API routes
-  const url = new URL(req.url)
-  if (isPublicApiRoute(req)) {
-    return
-  }
+  try {
+    // Skip Clerk middleware entirely for public API routes
+    const url = new URL(req.url)
+    if (isPublicApiRoute(req)) {
+      return
+    }
 
-  // BLOCK ALL SIGN-IN/SIGN-UP PAGES IN WAITLIST MODE
-  if (WAITLIST_MODE) {
-    // Block sign-in and sign-up pages entirely
-    if (url.pathname.startsWith('/sign-in') || 
-        url.pathname.startsWith('/sign-up') ||
-        url.pathname.startsWith('/sso-callback')) {
-      
-      // Check if trying to authenticate
-      const { userId, sessionClaims } = await auth()
-      const userEmail = sessionClaims?.email as string | undefined
-      
-      // If no user or not in whitelist, block completely
-      if (!userEmail || !ALLOWED_EMAILS.includes(userEmail.toLowerCase())) {
-        console.log(`BLOCKED: ${userEmail || 'unknown'} tried to access ${url.pathname}`)
-        // Show waitlist message
-        const blockedUrl = new URL('/', req.url)
-        blockedUrl.searchParams.set('blocked', 'waitlist')
-        blockedUrl.searchParams.set('message', 'Sign-ups are closed. Join the waitlist!')
-        return NextResponse.redirect(blockedUrl)
+    // BLOCK ALL SIGN-IN/SIGN-UP PAGES IN WAITLIST MODE
+    if (WAITLIST_MODE) {
+      // Block sign-in and sign-up pages entirely
+      if (url.pathname.startsWith('/sign-in') || 
+          url.pathname.startsWith('/sign-up') ||
+          url.pathname.startsWith('/sso-callback')) {
+        
+        // Try to get user info, but don't crash if it fails
+        let userEmail: string | undefined
+        try {
+          const { userId, sessionClaims } = await auth()
+          userEmail = sessionClaims?.email as string | undefined
+        } catch (e) {
+          // If auth fails, treat as no user
+          userEmail = undefined
+        }
+        
+        // If no user or not in whitelist, block completely
+        if (!userEmail || !ALLOWED_EMAILS.includes(userEmail.toLowerCase())) {
+          console.log(`BLOCKED: ${userEmail || 'unknown'} tried to access ${url.pathname}`)
+          // Show waitlist message - use the app domain, not accounts subdomain
+          const blockedUrl = new URL('/', url.origin)
+          blockedUrl.searchParams.set('blocked', 'waitlist')
+          blockedUrl.searchParams.set('message', 'Sign-ups are closed. Join the waitlist!')
+          return NextResponse.redirect(blockedUrl)
+        }
       }
     }
+  } catch (error) {
+    console.error('Middleware error:', error)
+    // On any error, redirect to home
+    return NextResponse.redirect(new URL('/', req.url))
   }
 
   // Get user info

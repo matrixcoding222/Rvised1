@@ -34,8 +34,8 @@ const CONFIG = {
       enabled: false
     },
     
-    // Production API - Your custom domain!
-    API_BASE: 'https://rvised.app',
+    // Production API - Vercel deployment URL
+    API_BASE: 'https://rvised.vercel.app',
     
     // Hide debug logs
     DEBUG_LOGS: false

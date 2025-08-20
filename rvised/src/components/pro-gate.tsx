@@ -66,7 +66,7 @@ export function ProGate({ children }: { children: React.ReactNode }) {
 
   // Show Pro upgrade page for free users
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="border-b bg-white/80 backdrop-blur-sm">
         <div className="container mx-auto px-4">
@@ -93,8 +93,8 @@ export function ProGate({ children }: { children: React.ReactNode }) {
           {/* Lock Icon */}
           <div className="flex justify-center mb-8">
             <div className="relative">
-              <div className="h-20 w-20 rounded-full bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center">
-                <Lock className="h-10 w-10 text-white" />
+              <div className="h-20 w-20 rounded-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
+                <Lock className="h-10 w-10 text-gray-600" />
               </div>
             </div>
           </div>
@@ -111,10 +111,10 @@ export function ProGate({ children }: { children: React.ReactNode }) {
 
           {/* Features Grid */}
           <div className="grid md:grid-cols-2 gap-6 mb-12">
-            <Card className="border-purple-200 bg-white/80 backdrop-blur-sm">
+            <Card className="border-gray-200 bg-white">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <BarChart3 className="h-5 w-5 text-purple-600" />
+                  <BarChart3 className="h-5 w-5 text-primary" />
                   Learning Analytics
                 </CardTitle>
               </CardHeader>
@@ -125,10 +125,10 @@ export function ProGate({ children }: { children: React.ReactNode }) {
               </CardContent>
             </Card>
 
-            <Card className="border-purple-200 bg-white/80 backdrop-blur-sm">
+            <Card className="border-gray-200 bg-white">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Sparkles className="h-5 w-5 text-purple-600" />
+                  <Sparkles className="h-5 w-5 text-primary" />
                   Advanced Insights
                 </CardTitle>
               </CardHeader>
@@ -139,10 +139,10 @@ export function ProGate({ children }: { children: React.ReactNode }) {
               </CardContent>
             </Card>
 
-            <Card className="border-purple-200 bg-white/80 backdrop-blur-sm">
+            <Card className="border-gray-200 bg-white">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <TrendingUp className="h-5 w-5 text-purple-600" />
+                  <TrendingUp className="h-5 w-5 text-primary" />
                   Progress Tracking
                 </CardTitle>
               </CardHeader>
@@ -153,10 +153,10 @@ export function ProGate({ children }: { children: React.ReactNode }) {
               </CardContent>
             </Card>
 
-            <Card className="border-purple-200 bg-white/80 backdrop-blur-sm">
+            <Card className="border-gray-200 bg-white">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Zap className="h-5 w-5 text-purple-600" />
+                  <Zap className="h-5 w-5 text-primary" />
                   Quick Actions
                 </CardTitle>
               </CardHeader>
@@ -169,17 +169,17 @@ export function ProGate({ children }: { children: React.ReactNode }) {
           </div>
 
           {/* CTA Section */}
-          <Card className="border-0 bg-gradient-to-r from-purple-600 to-pink-600 text-white">
+          <Card className="border-2 border-primary bg-gradient-to-br from-blue-50 to-white">
             <CardContent className="p-8 text-center">
-              <h2 className="text-2xl font-bold mb-4">
+              <h2 className="text-2xl font-bold mb-4 text-gray-900">
                 Upgrade to Pro Today
               </h2>
-              <p className="text-purple-100 mb-6">
+              <p className="text-gray-600 mb-6">
                 Get unlimited summaries, advanced features, and full dashboard access
               </p>
               <div className="flex items-center justify-center">
                 <Link href="/dashboard/upgrade">
-                  <Button size="lg" className="bg-white text-purple-600 hover:bg-gray-100">
+                  <Button size="lg" className="bg-primary hover:bg-primary/90 text-white">
                     <Zap className="h-5 w-5 mr-2" />
                     Upgrade to Pro
                   </Button>

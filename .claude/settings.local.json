@@ -22,7 +22,8 @@
       "Bash(curl:*)",
       "Bash(start \"C:\\Users\\User\\RVISED3\\test-extension-api.html\")",
       "Bash(vercel env ls:*)",
-      "Bash(taskkill:*)"
+      "Bash(taskkill:*)",
+      "Bash(git add:*)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits"

@@ -68,6 +68,12 @@ export function SettingsPage() {
   // Profile state
   const [displayName, setDisplayName] = useState(user?.fullName || "")
   const [bio, setBio] = useState("")
+  
+  // Promo code state
+  const [promoCode, setPromoCode] = useState("")
+  const [isApplyingPromo, setIsApplyingPromo] = useState(false)
+  const [promoMessage, setPromoMessage] = useState("")
+  const [promoSuccess, setPromoSuccess] = useState(false)
 
   useEffect(() => {
     // Load preferences from localStorage
@@ -96,6 +102,42 @@ export function SettingsPage() {
       setSavedNotification(true)
       setTimeout(() => setSavedNotification(false), 3000)
     }, 500)
+  }
+
+  const handlePromoCode = async () => {
+    setIsApplyingPromo(true)
+    setPromoMessage("")
+    
+    try {
+      const response = await fetch("/api/promo-code", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          code: promoCode,
+          email: user?.primaryEmailAddress?.emailAddress 
+        })
+      })
+      
+      const data = await response.json()
+      
+      if (response.ok && data.success) {
+        setPromoSuccess(true)
+        setPromoMessage("🎉 Promo code applied successfully! You now have Pro access.")
+        setPromoCode("")
+        // Refresh the page to update the UI
+        setTimeout(() => {
+          window.location.reload()
+        }, 2000)
+      } else {
+        setPromoSuccess(false)
+        setPromoMessage(data.error || "Invalid promo code")
+      }
+    } catch (error) {
+      setPromoSuccess(false)
+      setPromoMessage("Failed to apply promo code. Please try again.")
+    } finally {
+      setIsApplyingPromo(false)
+    }
   }
 
   const handleSignOut = async () => {
@@ -470,6 +512,40 @@ export function SettingsPage() {
                       </li>
                     </ul>
                   </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Promo Code</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <p className="text-sm text-muted-foreground">
+                    Have a promo code? Enter it below to unlock Pro features.
+                  </p>
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="Enter promo code"
+                      value={promoCode}
+                      onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+                      className="font-mono"
+                      maxLength={20}
+                    />
+                    <Button 
+                      onClick={handlePromoCode}
+                      disabled={isApplyingPromo || !promoCode}
+                      className="bg-blue-600 hover:bg-blue-700"
+                    >
+                      {isApplyingPromo ? "Applying..." : "Apply"}
+                    </Button>
+                  </div>
+                  {promoMessage && (
+                    <div className={`text-sm ${promoSuccess ? 'text-green-600' : 'text-red-600'}`}>
+                      {promoMessage}
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>

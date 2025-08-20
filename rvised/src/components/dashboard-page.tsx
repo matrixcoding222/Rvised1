@@ -393,9 +393,9 @@ https://rvised.app
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white">
+    <div className="min-h-screen bg-gray-50">
       {/* Sidebar Navigation */}
-      <div className="fixed left-0 top-0 h-full w-64 bg-white border-r border-blue-100 z-40">
+      <div className="fixed left-0 top-0 h-full w-64 bg-white border-r border-gray-200 z-40">
         <div className="p-6">
           <div className="flex items-center gap-3 mb-8">
             <Image src="/glasses.svg" alt="Rvised" width={32} height={32} />
@@ -403,34 +403,34 @@ https://rvised.app
           </div>
           
           <nav className="space-y-1">
-            <button className="w-full flex items-center gap-3 px-3 py-2 rounded-lg bg-blue-50 text-blue-900 border border-blue-200">
+            <button className="w-full flex items-center gap-3 px-3 py-2 rounded-lg bg-gray-100 text-gray-900">
               <BarChart3 className="h-5 w-5" />
               <span className="font-medium">Dashboard</span>
             </button>
-            <Link href="/library" className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-blue-50 text-blue-700">
+            <Link href="/library" className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-700">
               <Video className="h-5 w-5" />
               <span>Library</span>
             </Link>
-            <Link href="/projects" className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-blue-50 text-blue-700">
+            <Link href="/projects" className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-700">
               <FolderOpen className="h-5 w-5" />
               <span>Projects</span>
             </Link>
-            <Link href="/settings" className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-blue-50 text-blue-700">
+            <Link href="/settings" className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-700">
               <Settings className="h-5 w-5" />
               <span>Settings</span>
             </Link>
           </nav>
           
           <div className="absolute bottom-6 left-6 right-6">
-            <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200">
+            <Card className="bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-200">
               <CardContent className="p-4">
                 <div className="flex items-center gap-2 mb-2">
-                  <Sparkles className="h-5 w-5 text-blue-600" />
+                  <Sparkles className="h-5 w-5 text-purple-600" />
                   <span className="font-semibold text-sm">Upgrade to Pro</span>
                 </div>
-                <p className="text-xs text-blue-700 mb-3">Unlock unlimited summaries and advanced features</p>
+                <p className="text-xs text-gray-600 mb-3">Unlock unlimited summaries and advanced features</p>
                 <Link href="/dashboard/upgrade">
-                  <Button size="sm" className="w-full bg-blue-600 hover:bg-blue-700 text-white">
+                  <Button size="sm" className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white">
                     Upgrade Now
                   </Button>
                 </Link>
@@ -443,14 +443,14 @@ https://rvised.app
       {/* Main Content Area */}
       <div className="ml-64">
         {/* Top Header */}
-        <div className="bg-white border-b border-blue-100">
+        <div className="bg-white border-b border-gray-200">
           <div className="px-8 py-4">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-2xl font-semibold text-blue-900">
+                <h1 className="text-2xl font-semibold text-gray-900">
                   Welcome back{user?.firstName ? `, ${user.firstName}` : ''} 👋
                 </h1>
-                <p className="text-sm text-blue-600 mt-1">
+                <p className="text-sm text-gray-600 mt-1">
                   {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
                 </p>
               </div>
@@ -472,7 +472,7 @@ https://rvised.app
                 </Button>
                 <Button 
                   size="sm" 
-                  className="gap-2 bg-blue-600 hover:bg-blue-700 text-white"
+                  className="gap-2 bg-primary hover:bg-primary/90 text-white"
                   onClick={() => {
                     if (hasExtension) {
                       window.open('https://youtube.com', '_blank')
@@ -493,40 +493,40 @@ https://rvised.app
         {/* Dashboard Content */}
         <div className="px-8 py-6">
           {/* Quick Stats Bar */}
-          <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl border border-blue-200">
+          <div className="mb-6 p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl border border-gray-200">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-8">
                 <div className="flex items-center gap-3">
                   <div className="h-10 w-10 rounded-full bg-white shadow-sm flex items-center justify-center">
-                    <Flame className="h-5 w-5 text-blue-500" />
+                    <Flame className="h-5 w-5 text-orange-500" />
                   </div>
                   <div>
-                    <p className="text-xs text-blue-600">Streak</p>
+                    <p className="text-xs text-gray-600">Streak</p>
                     <p className="text-lg font-semibold">{userStats.streak} days</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="h-10 w-10 rounded-full bg-white shadow-sm flex items-center justify-center">
-                    <BookOpen className="h-5 w-5 text-blue-500" />
+                    <BookOpen className="h-5 w-5 text-green-500" />
                   </div>
                   <div>
-                    <p className="text-xs text-blue-600">Total Videos</p>
+                    <p className="text-xs text-gray-600">Total Videos</p>
                     <p className="text-lg font-semibold">{userStats.totalSummaries}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="h-10 w-10 rounded-full bg-white shadow-sm flex items-center justify-center">
-                    <Clock className="h-5 w-5 text-blue-400" />
+                    <Clock className="h-5 w-5 text-purple-500" />
                   </div>
                   <div>
-                    <p className="text-xs text-blue-600">Time Saved</p>
+                    <p className="text-xs text-gray-600">Time Saved</p>
                     <p className="text-lg font-semibold">{userStats.timeSaved}h</p>
                   </div>
                 </div>
               </div>
               <div className="text-right">
-                <p className="text-sm font-medium text-blue-900">{motivational.message}</p>
-                <p className="text-xs text-blue-600 mt-1">Keep up the great work!</p>
+                <p className="text-sm font-medium text-gray-900">{motivational.message}</p>
+                <p className="text-xs text-gray-600 mt-1">Keep up the great work!</p>
               </div>
             </div>
           </div>
@@ -534,12 +534,12 @@ https://rvised.app
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Recent Summaries - Main Column */}
             <div className="lg:col-span-2">
-              <Card className="bg-white border-blue-100 shadow-sm">
+              <Card className="bg-white border-gray-200 shadow-sm">
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-lg font-semibold">Recent Activity</CardTitle>
                     <Link href="/library">
-                      <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-800">
+                      <Button variant="ghost" size="sm" className="text-gray-600 hover:text-gray-800">
                         View all
                       </Button>
                     </Link>
@@ -549,7 +549,7 @@ https://rvised.app
                   {recentSummaries.length > 0 ? (
                     <div className="space-y-3">
                       {recentSummaries.map((summary) => (
-                        <div key={summary.id} className="flex gap-4 p-4 rounded-lg hover:bg-blue-50 transition-all duration-200 border border-transparent hover:border-blue-200 cursor-pointer"
+                        <div key={summary.id} className="flex gap-4 p-4 rounded-lg hover:bg-gray-50 transition-all duration-200 border border-transparent hover:border-gray-200 cursor-pointer"
                              onClick={() => {
                                setSelectedSummary(summary)
                                setShowSummaryModal(true)
@@ -560,17 +560,17 @@ https://rvised.app
                             className="w-24 h-16 rounded-lg object-cover flex-shrink-0"
                           />
                           <div className="flex-1 min-w-0">
-                            <h4 className="font-semibold text-sm text-blue-900 line-clamp-1">
+                            <h4 className="font-semibold text-sm text-gray-900 line-clamp-1">
                               {summary.title || summary.videoTitle || 'Untitled Video'}
                             </h4>
-                            <p className="text-xs text-blue-600 mt-1">{summary.channel || summary.channelName || 'YouTube'}</p>
+                            <p className="text-xs text-gray-600 mt-1">{summary.channel || summary.channelName || 'YouTube'}</p>
                             {summary.mainTakeaway && (
-                              <p className="text-xs text-blue-700 mt-2 line-clamp-2">
+                              <p className="text-xs text-gray-700 mt-2 line-clamp-2">
                                 {summary.mainTakeaway}
                               </p>
                             )}
                           </div>
-                          <div className="text-xs text-blue-500 flex-shrink-0">
+                          <div className="text-xs text-gray-500 flex-shrink-0">
                             {summary.createdAt ? new Date(summary.createdAt).toLocaleDateString() : 'Today'}
                           </div>
                         </div>
@@ -578,9 +578,9 @@ https://rvised.app
                     </div>
                   ) : (
                     <div className="text-center py-12">
-                      <FileText className="mx-auto h-12 w-12 text-blue-300 mb-4" />
-                      <p className="text-blue-600 mb-4">No summaries yet</p>
-                      <p className="text-sm text-blue-500">
+                      <FileText className="mx-auto h-12 w-12 text-gray-300 mb-4" />
+                      <p className="text-gray-600 mb-4">No summaries yet</p>
+                      <p className="text-sm text-gray-500">
                         Install the Chrome extension and visit any YouTube video to get started
                       </p>
                     </div>
@@ -592,7 +592,7 @@ https://rvised.app
             {/* Right Sidebar */}
             <div className="lg:col-span-1 space-y-6">
               {/* Active Projects */}
-              <Card className="bg-white border-blue-100 shadow-sm">
+              <Card className="bg-white border-gray-200 shadow-sm">
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-lg font-semibold">Projects</CardTitle>
@@ -631,7 +631,7 @@ https://rvised.app
                               {projectColors.map((color) => (
                                 <button
                                   key={color}
-                                  className={`w-8 h-8 rounded-full border-2 ${newProject.color === color ? "border-blue-400" : "border-blue-200"}`}
+                                  className={`w-8 h-8 rounded-full border-2 ${newProject.color === color ? "border-gray-400" : "border-gray-200"}`}
                                   style={{ backgroundColor: color }}
                                   onClick={() => setNewProject({ ...newProject, color })}
                                 />
@@ -644,7 +644,7 @@ https://rvised.app
                               {projectEmojis.map((emoji) => (
                                 <button
                                   key={emoji}
-                                  className={`w-10 h-10 rounded-lg border-2 text-lg ${newProject.emoji === emoji ? "border-blue-400 bg-blue-50" : "border-blue-200"}`}
+                                  className={`w-10 h-10 rounded-lg border-2 text-lg ${newProject.emoji === emoji ? "border-gray-400 bg-gray-50" : "border-gray-200"}`}
                                   onClick={() => setNewProject({ ...newProject, emoji })}
                                 >
                                   {emoji}
@@ -662,13 +662,13 @@ https://rvised.app
                               placeholder="How many videos do you want to complete?"
                               max="30"
                             />
-                            <p className="text-xs text-blue-600 mt-1">Each project can contain up to 30 videos</p>
+                            <p className="text-xs text-gray-600 mt-1">Each project can contain up to 30 videos</p>
                           </div>
                           <div className="flex gap-2 pt-2">
                             <Button variant="outline" onClick={() => setShowCreateProject(false)} className="flex-1">
                               Cancel
                             </Button>
-                            <Button onClick={handleCreateProject} className="flex-1 bg-blue-600 hover:bg-blue-700">
+                            <Button onClick={handleCreateProject} className="flex-1 bg-primary hover:bg-primary/90">
                               Create
                             </Button>
                           </div>
@@ -682,21 +682,21 @@ https://rvised.app
                     <div className="space-y-2">
                       {activeProjects.map((project) => (
                         <Link key={project.id} href={`/projects/${encodeURIComponent(project.name)}`}>
-                          <div className="flex items-center gap-3 p-3 rounded-lg hover:bg-blue-50 transition-colors cursor-pointer">
+                          <div className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
                             <div className="text-xl">{project.emoji || '📁'}</div>
                             <div className="flex-1">
-                              <h4 className="font-medium text-sm text-blue-900">{project.name}</h4>
-                              <p className="text-xs text-blue-600">{project.summaryCount || 0} videos</p>
+                              <h4 className="font-medium text-sm text-gray-900">{project.name}</h4>
+                              <p className="text-xs text-gray-600">{project.summaryCount || 0} videos</p>
                             </div>
-                            <ChevronRight className="h-4 w-4 text-blue-400" />
+                            <ChevronRight className="h-4 w-4 text-gray-400" />
                           </div>
                         </Link>
                       ))}
                     </div>
                   ) : (
                     <div className="text-center py-8">
-                      <FolderOpen className="mx-auto h-10 w-10 text-blue-300 mb-3" />
-                      <p className="text-sm text-blue-600 mb-3">No projects yet</p>
+                      <FolderOpen className="mx-auto h-10 w-10 text-gray-300 mb-3" />
+                      <p className="text-sm text-gray-600 mb-3">No projects yet</p>
                       <Button 
                         variant="outline" 
                         size="sm" 
@@ -735,9 +735,9 @@ https://rvised.app
               )}
               
               {selectedSummary.mainTakeaway && (
-                <div className="p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500">
+                <div className="p-4 bg-gray-50 rounded-lg border-l-4 border-gray-500">
                   <h3 className="font-semibold text-sm mb-1">Main Takeaway</h3>
-                  <p className="text-sm text-blue-800">{selectedSummary.mainTakeaway}</p>
+                  <p className="text-sm text-gray-800">{selectedSummary.mainTakeaway}</p>
                 </div>
               )}
               
@@ -746,8 +746,8 @@ https://rvised.app
                   <h3 className="font-semibold text-sm mb-2">Key Insights</h3>
                   <ul className="space-y-2">
                     {selectedSummary.keyInsights.map((insight: string, idx: number) => (
-                      <li key={idx} className="flex items-start gap-2 text-sm text-blue-800">
-                        <span className="text-blue-500 mt-0.5">•</span>
+                      <li key={idx} className="flex items-start gap-2 text-sm text-gray-800">
+                        <span className="text-gray-500 mt-0.5">•</span>
                         <span>{insight}</span>
                       </li>
                     ))}
@@ -758,7 +758,7 @@ https://rvised.app
               {selectedSummary.summary && (
                 <div>
                   <h3 className="font-semibold text-sm mb-2">Summary</h3>
-                  <p className="text-sm text-blue-800 whitespace-pre-line">{selectedSummary.summary}</p>
+                  <p className="text-sm text-gray-800 whitespace-pre-line">{selectedSummary.summary}</p>
                 </div>
               )}
               

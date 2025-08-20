@@ -11,6 +11,9 @@ type UsageTracking = Database['public']['Tables']['usage_tracking']['Row']
 export async function getOrCreateUser(email: string, fullName?: string) {
   const supabase = createAdminClient()
   
+  // Pro users list
+  const proEmails = ['tyson.so1122@gmail.com', 'developer@rvised.app', 'pro@rvised.app']
+  
   // Check if user exists
   const { data: existingUser, error: fetchError } = await supabase
     .from('users')
@@ -19,16 +22,26 @@ export async function getOrCreateUser(email: string, fullName?: string) {
     .single()
   
   if (existingUser) {
+    // Update to pro if it's a pro email but tier is still free
+    if (proEmails.includes(email) && existingUser.tier !== 'pro') {
+      const { data: updatedUser } = await supabase
+        .from('users')
+        .update({ tier: 'pro' })
+        .eq('email', email)
+        .select()
+        .single()
+      return { user: updatedUser || existingUser, error: null }
+    }
     return { user: existingUser, error: null }
   }
   
-  // Create new user
+  // Create new user with appropriate tier
   const { data: newUser, error: createError } = await supabase
     .from('users')
     .insert({
       email,
       full_name: fullName,
-      tier: 'free'
+      tier: proEmails.includes(email) ? 'pro' : 'free'
     })
     .select()
     .single()
@@ -192,10 +205,10 @@ export async function checkUsageLimits(userId: string) {
   const supabase = createClient()
   const today = new Date().toISOString().split('T')[0]
   
-  // Get user tier
+  // Get user tier and email
   const { data: user, error: userError } = await supabase
     .from('users')
-    .select('tier')
+    .select('tier, email')
     .eq('id', userId)
     .single()
   
@@ -203,8 +216,12 @@ export async function checkUsageLimits(userId: string) {
     return { canSummarize: true, summariesToday: 0, limit: 3, tier: 'free' }
   }
   
+  // Check if user should have pro access
+  const proEmails = ['tyson.so1122@gmail.com', 'developer@rvised.app', 'pro@rvised.app']
+  const isPro = user.tier === 'pro' || proEmails.includes(user.email)
+  
   // Pro users have unlimited
-  if (user.tier === 'pro') {
+  if (isPro) {
     return { canSummarize: true, summariesToday: -1, limit: -1, tier: 'pro' }
   }
   

@@ -7,7 +7,8 @@ import { useAuth, useClerk } from "@clerk/nextjs"
 import { Button } from "@/components/ui/button"
 import { SignUpModal } from "@/components/sign-up-modal"
 import { EmailCollectionFlow } from "@/components/email-collection-flow"
-import { Chrome } from "lucide-react"
+import { WaitlistBanner } from "@/components/waitlist-banner"
+import { Chrome, Bell } from "lucide-react"
 
 export function Header() {
   const { isSignedIn } = useAuth()
@@ -40,6 +41,7 @@ export function Header() {
 
   return (
     <>
+      <WaitlistBanner />
       <header className="sticky top-0 z-50 w-full border-b border-border/20 bg-white/80 backdrop-blur-md supports-[backdrop-filter]:bg-white/60">
         <div className="container mx-auto flex h-20 max-w-7xl items-center justify-between px-6">
           <div className="flex items-center gap-3">
@@ -96,11 +98,14 @@ export function Header() {
             )}
             <Button
               size="sm"
-              className="bg-primary hover:bg-primary/90 text-white font-medium px-6 py-2 h-10 shadow-sm hover:shadow-md transition-all duration-200"
-              onClick={() => setShowSignUpModal(true)}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 h-10 shadow-sm hover:shadow-md transition-all duration-200"
+              onClick={() => {
+                const banner = document.querySelector('#waitlist-form');
+                if (banner) banner.scrollIntoView({ behavior: 'smooth' });
+              }}
             >
-              <Chrome className="mr-2 h-4 w-4" />
-              Get Started
+              <Bell className="mr-2 h-4 w-4" />
+              Join Waitlist
             </Button>
           </div>
         </div>

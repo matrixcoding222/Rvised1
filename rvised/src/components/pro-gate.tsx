@@ -177,16 +177,11 @@ export function ProGate({ children }: { children: React.ReactNode }) {
               <p className="text-purple-100 mb-6">
                 Get unlimited summaries, advanced features, and full dashboard access
               </p>
-              <div className="flex items-center justify-center gap-4">
+              <div className="flex items-center justify-center">
                 <Link href="/dashboard/upgrade">
                   <Button size="lg" className="bg-white text-purple-600 hover:bg-gray-100">
                     <Zap className="h-5 w-5 mr-2" />
                     Upgrade to Pro
-                  </Button>
-                </Link>
-                <Link href="/library">
-                  <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
-                    Go to Library
                   </Button>
                 </Link>
               </div>

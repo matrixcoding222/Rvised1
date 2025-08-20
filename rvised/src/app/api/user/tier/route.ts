@@ -21,11 +21,14 @@ export async function GET(request: NextRequest) {
     // For now, we'll check localStorage or return free
     // In production, you'd check Stripe subscription status or database
     
-    // Example logic - replace with your actual tier checking
-    const isDeveloper = userEmail === 'developer@rvised.app'
-    const isPro = userEmail === 'pro@rvised.app' // For testing
+    // Pro users list
+    const proUsers = [
+      'developer@rvised.app',
+      'pro@rvised.app',
+      'tyson.so1122@gmail.com' // Your account with pro access
+    ]
     
-    const tier = isDeveloper ? 'pro' : isPro ? 'pro' : 'free'
+    const tier = proUsers.includes(userEmail) ? 'pro' : 'free'
     
     return NextResponse.json(
       { 

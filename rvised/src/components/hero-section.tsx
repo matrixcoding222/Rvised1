@@ -2,7 +2,8 @@
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Play, BookOpen, Clock, Chrome, Target, Lightbulb, Timer, FolderOpen, ArrowRight, Sparkles } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import { Play, BookOpen, Clock, Chrome, Target, Lightbulb, Timer, FolderOpen, ArrowRight, Sparkles, Bell, Users } from "lucide-react"
 import { SignUpModal } from "@/components/sign-up-modal"
 import { EmailCollectionFlow } from "@/components/email-collection-flow"
 import { ExtensionDemoFixed } from "@/components/extension-demo-fixed"
@@ -10,6 +11,9 @@ import { ExtensionDemoFixed } from "@/components/extension-demo-fixed"
 export function HeroSection() {
   const [showSignUpModal, setShowSignUpModal] = useState(false)
   const [showEmailFlow, setShowEmailFlow] = useState(false)
+  const [waitlistEmail, setWaitlistEmail] = useState("")
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSubmitted, setIsSubmitted] = useState(false)
 
   const handleEmailSignUp = () => {
     setShowEmailFlow(true)
@@ -49,21 +53,80 @@ export function HeroSection() {
                 tracking. Learn 5x faster, remember 80% more.
               </p>
 
-              <div className="flex flex-col sm:flex-row gap-4 mb-8 justify-center">
-                <Button
-                  size="lg"
-                  className="h-16 px-10 bg-primary hover:bg-primary/90 text-xl font-bold shadow-lg hover:shadow-xl transition-all duration-200 group"
-                  onClick={() => setShowSignUpModal(true)}
-                >
-                  <Chrome className="mr-3 h-7 w-7 group-hover:scale-110 transition-transform" />
-                  Get Started Free
-                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                </Button>
+              {/* Waitlist Form */}
+              <div id="waitlist-form" className="mb-8">
+                <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-8 max-w-2xl mx-auto border border-blue-100">
+                  <div className="flex items-center justify-center gap-2 mb-4">
+                    <Bell className="h-6 w-6 text-blue-600 animate-pulse" />
+                    <h3 className="text-xl font-bold text-gray-900">Chrome Extension in Final Review!</h3>
+                  </div>
+                  
+                  {!isSubmitted ? (
+                    <form onSubmit={async (e) => {
+                      e.preventDefault();
+                      if (!waitlistEmail) return;
+                      setIsSubmitting(true);
+                      try {
+                        const response = await fetch("/api/waitlist", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ email: waitlistEmail })
+                        });
+                        if (response.ok) {
+                          setIsSubmitted(true);
+                          setWaitlistEmail("");
+                        }
+                      } catch (error) {
+                        console.error("Failed to join waitlist:", error);
+                      } finally {
+                        setIsSubmitting(false);
+                      }
+                    }} className="flex flex-col sm:flex-row gap-3 justify-center">
+                      <Input
+                        type="email"
+                        placeholder="Enter your email"
+                        value={waitlistEmail}
+                        onChange={(e) => setWaitlistEmail(e.target.value)}
+                        className="max-w-sm bg-white text-lg h-14"
+                        required
+                      />
+                      <Button 
+                        type="submit" 
+                        disabled={isSubmitting}
+                        size="lg"
+                        className="h-14 px-8 bg-blue-600 hover:bg-blue-700 text-white text-lg font-bold"
+                      >
+                        {isSubmitting ? "Joining..." : "Join Waitlist"}
+                      </Button>
+                    </form>
+                  ) : (
+                    <div className="text-center py-4">
+                      <div className="flex items-center justify-center gap-2 text-green-600 font-bold text-lg mb-2">
+                        <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                        You're on the list!
+                      </div>
+                      <p className="text-gray-600">We'll notify you as soon as the extension is live.</p>
+                    </div>
+                  )}
+                  
+                  <div className="flex items-center justify-center gap-6 mt-6 text-sm text-gray-600">
+                    <div className="flex items-center gap-1">
+                      <Users className="h-4 w-4" />
+                      <span className="font-semibold">500+ waiting</span>
+                    </div>
+                    <span className="text-gray-400">•</span>
+                    <span>Expected: <span className="font-semibold text-blue-600">2-5 days</span></span>
+                    <span className="text-gray-400">•</span>
+                    <span className="font-semibold text-green-600">Free to use</span>
+                  </div>
+                </div>
               </div>
 
               <p className="text-sm text-muted-foreground">
-                <span className="font-semibold text-primary">3 Free Summaries Daily</span> • Works instantly • No signup required •
-                50,000+ students learning smarter
+                <span className="font-semibold text-primary">3 Free Summaries Daily</span> • Chrome Extension • 
+                AI-Powered Learning
               </p>
             </div>
 
@@ -192,9 +255,12 @@ export function HeroSection() {
                 className="w-full"
                 variant="outline"
                 size="lg"
-                onClick={() => setShowSignUpModal(true)}
+                onClick={() => {
+                  const form = document.querySelector('#waitlist-form');
+                  if (form) form.scrollIntoView({ behavior: 'smooth' });
+                }}
               >
-                Get Started Free
+                Join Waitlist
               </Button>
             </div>
 
@@ -260,11 +326,14 @@ export function HeroSection() {
             <div className="mb-6 flex flex-col sm:flex-row gap-4 justify-center">
               <Button
                 size="lg"
-                className="h-16 px-12 bg-primary hover:bg-primary/90 text-xl font-bold shadow-xl hover:shadow-2xl transition-all duration-300 group"
-                onClick={() => setShowSignUpModal(true)}
+                className="h-16 px-12 bg-blue-600 hover:bg-blue-700 text-xl font-bold shadow-xl hover:shadow-2xl transition-all duration-300 group"
+                onClick={() => {
+                  const form = document.querySelector('#waitlist-form');
+                  if (form) form.scrollIntoView({ behavior: 'smooth' });
+                }}
               >
-                <Chrome className="mr-3 h-7 w-7 group-hover:scale-110 transition-transform" />
-                Get Started Free
+                <Bell className="mr-3 h-7 w-7 group-hover:scale-110 transition-transform" />
+                Join the Waitlist
                 <ArrowRight className="ml-2 h-6 w-6 group-hover:translate-x-1 transition-transform" />
               </Button>
               <Button
@@ -281,8 +350,8 @@ export function HeroSection() {
             </div>
 
             <p className="text-lg text-muted-foreground">
-              <span className="font-semibold text-primary">3 free summaries daily</span> • No credit card required •
-              <a href="/dashboard/upgrade" className="underline hover:text-primary transition-colors">Upgrade for unlimited</a>
+              <span className="font-semibold text-primary">Launching in 2-5 days</span> • Be first to know •
+              <span className="font-semibold">500+ learners waiting</span>
             </p>
           </div>
         </div>

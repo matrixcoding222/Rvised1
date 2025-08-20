@@ -422,15 +422,15 @@ https://rvised.app
           </nav>
           
           <div className="absolute bottom-6 left-6 right-6">
-            <Card className="bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-200">
+            <Card className="bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-300">
               <CardContent className="p-4">
                 <div className="flex items-center gap-2 mb-2">
-                  <Sparkles className="h-5 w-5 text-purple-600" />
+                  <Sparkles className="h-5 w-5 text-primary" />
                   <span className="font-semibold text-sm">Upgrade to Pro</span>
                 </div>
                 <p className="text-xs text-gray-600 mb-3">Unlock unlimited summaries and advanced features</p>
                 <Link href="/dashboard/upgrade">
-                  <Button size="sm" className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white">
+                  <Button size="sm" className="w-full bg-primary hover:bg-primary/90 text-white">
                     Upgrade Now
                   </Button>
                 </Link>

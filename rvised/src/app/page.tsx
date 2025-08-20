@@ -1,13 +1,13 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { Suspense, useEffect, useState } from "react"
 import { useSearchParams } from "next/navigation"
 import { Header } from "@/components/header"
 import { HeroSection } from "@/components/hero-section"
 import { Footer } from "@/components/footer"
 import { AlertCircle, X } from "lucide-react"
 
-export default function HomePage() {
+function HomeContent() {
   const searchParams = useSearchParams()
   const [blockedMessage, setBlockedMessage] = useState<string | null>(null)
   
@@ -47,5 +47,13 @@ export default function HomePage() {
       </main>
       <Footer />
     </div>
+  )
+}
+
+export default function HomePage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-background" />}>
+      <HomeContent />
+    </Suspense>
   )
 }

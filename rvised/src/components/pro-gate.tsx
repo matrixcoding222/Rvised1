@@ -17,27 +17,54 @@ export function ProGate({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const checkUserTier = async () => {
-      if (!isLoaded || !user) {
-        setLoading(false)
+      if (!isLoaded) {
+        return
+      }
+
+      if (!user) {
+        // No user logged in - redirect to sign in
+        router.push("/sign-in?redirect_url=/dashboard")
         return
       }
 
       try {
-        // Check user metadata for tier
-        const tier = user.publicMetadata?.tier as string || "free"
-        setUserTier(tier)
+        const userEmail = user.primaryEmailAddress?.emailAddress || ""
         
-        // Also check with API
-        const response = await fetch("/api/user/tier", {
-          headers: {
-            "x-user-email": user.primaryEmailAddress?.emailAddress || ""
-          }
-        })
+        // IMPORTANT: Default to free unless explicitly pro
+        let tier = "free"
         
-        if (response.ok) {
-          const data = await response.json()
-          setUserTier(data.tier || "free")
+        // Check hardcoded pro users list
+        const proUsers = [
+          'tyson.so1122@gmail.com',
+          'developer@rvised.app',
+          'pro@rvised.app'
+        ]
+        
+        if (proUsers.includes(userEmail.toLowerCase())) {
+          tier = "pro"
         }
+        
+        // Also check with API for dynamic tier checking
+        try {
+          const response = await fetch("/api/user/tier", {
+            headers: {
+              "x-user-email": userEmail
+            }
+          })
+          
+          if (response.ok) {
+            const data = await response.json()
+            // Only upgrade to pro if API says so, never downgrade
+            if (data.tier === "pro" || data.tier === "premium") {
+              tier = data.tier
+            }
+          }
+        } catch (apiError) {
+          console.error("API check failed, using hardcoded list", apiError)
+        }
+        
+        setUserTier(tier)
+        console.log(`User ${userEmail} tier: ${tier}`)
       } catch (error) {
         console.error("Error checking user tier:", error)
         setUserTier("free")
@@ -47,19 +74,20 @@ export function ProGate({ children }: { children: React.ReactNode }) {
     }
 
     checkUserTier()
-  }, [user, isLoaded])
+  }, [user, isLoaded, router])
 
-  if (loading) {
+  if (loading || !isLoaded) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
+          <p className="mt-4 text-gray-600">Checking access...</p>
         </div>
       </div>
     )
   }
 
+  // IMPORTANT: Only allow pro/premium users
   if (userTier === "pro" || userTier === "premium") {
     return <>{children}</>
   }

@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import { useSignIn, useUser } from '@clerk/nextjs'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Image from 'next/image'
+import { isWaitlistMode } from '@/config/app-config'
 
 export default function SignInPage() {
   const { signIn, isLoaded } = useSignIn()
@@ -12,6 +13,22 @@ export default function SignInPage() {
   const searchParams = useSearchParams()
 
   useEffect(() => {
+    // If in waitlist mode, only allow specific users
+    if (isWaitlistMode()) {
+      const allowedEmails = [
+        'tyson.so1122@gmail.com',
+        'developer@rvised.app',
+        'pro@rvised.app'
+      ]
+      
+      // If trying to sign in but not in allowed list, redirect to home
+      if (user && !allowedEmails.includes(user.primaryEmailAddress?.emailAddress || '')) {
+        alert('Sign-ups are currently closed. Join the waitlist!')
+        router.push('/')
+        return
+      }
+    }
+    
     // Get redirect URL from query params
     const redirectUrl = searchParams.get('redirect_url') || '/dashboard'
     const isFromExtension = redirectUrl.includes('extension=true')

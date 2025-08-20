@@ -1,6 +1,11 @@
 "use client"
 import { ProjectsPage } from "@/components/projects-page"
+import { ProGate } from "@/components/pro-gate"
 
 export default function Projects() {
-  return <ProjectsPage />
+  return (
+    <ProGate>
+      <ProjectsPage />
+    </ProGate>
+  )
 }
